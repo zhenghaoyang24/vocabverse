@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Werse词境 单词详情</title>
+    <script src="js/jquery-3.7.0.min.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/element-ui@2.15.14-index.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+    <link rel="icon" href="image/logo-black.png">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="css/public/element-ui@2.15.14-index.css">
+    <link rel="stylesheet" href="css/top-nav.css">
+    <link rel="stylesheet" href="css/public/main.css">
+    <link rel="stylesheet" href="css/wordDetail.css">
+</head>
+<body>
+
+<div class="top-nav">
+    <div class="index-logo">
+        <a href="homePage" class="index_logo_a">
+            <img class="logo_img" src="image/topnav/topnavlogo.png" alt="Werse">
+            <h2 class="logo_h2_e">e</h2>
+            <h2 class="logo_h2_r">r</h2>
+            <h2 class="logo_h2_s">s</h2>
+            <h2 class="logo_h2_e1">e</h2>
+        </a>
+    </div>
+    <div class="nav-content">
+        <a href="homePage"
+           style="color: #00e57b;box-sizing: border-box;border-top: 3px #00e57b solid;"><span>首页</span></a>
+        <a href="studyPage"><span>学习</span></a>
+        <a href="searchPage"><span>查词</span></a>
+        <a href="translatePage"><span>翻译</span></a>
+        <a href="dataPage"><span>数据</span></a>
+    </div>
+    <div class="more-nav">
+        <div class="message_nav">
+            <img src="image/topnav/messagelogo_white.png" alt="">
+            <h3>消息</h3>
+        </div>
+    </div>
+</div>
+<!--内容-->
+<div class="content-body">
+    <div class="content-div">
+
+        <div id="wordDetailApp" class="wordDetailDivCon">
+            <div class="backBtn" @click="backBtn()">返回</div>
+            <div class="topControlDiv">
+                <span class="topBtn addBtn"></span>
+                <span class="topBtn addBtn"></span>
+                <span class="topBtn addBtn"></span>
+            </div>
+            <div class="wordDetailDivCon">
+                <div class="wordspelling">
+                    <span>{{word.spelling}}</span>
+                    <div class="wordOtherInform">
+                        <div>词频: {{numFilter(word.frequency)}}</div>
+                        <div>难度等级: {{word.difficulty}}/10</div>
+                        <div>学习人数: {{word.difficulty}}</div>
+                    </div>
+                </div>
+                <div class="yinbiao_div">
+                    <div class="yinbiao_item_div" id="UK_audio_btn" @click="playAudio($event)">
+                        英[{{word.ukphonetic}}]<span class="ying_laba"></span></div>
+                    <audio id="UK_audio" preload="metadata" :src="audio_type1"></audio>
+                    <div class="yinbiao_item_div" id="USA_audio_btn" @click="playAudio($event)">美[{{word.usphonetic}}]
+                        <span class="ying_laba"></span></div>
+                    <audio id="USA_audio" preload="metadata" :src="audio_type2"></audio>
+                </div>
+                <div class="wordParaphraseDiv">
+                    <h3 style="color: var(--greenColor00e57b)">释义</h3>
+                    <div>{{word.paraphrase}}</div>
+                    <div class="otherVocDiv">
+                        <span>其他词典</span>
+                        <a :href="bingHref" target="_blank" title="必应词典">
+                            <div class="otherVocItem"><img src="image/pageWordDetail/bingLogo.png" alt=""></div>
+                        </a>
+                        <a :href="jianqiaoHref " target="_blank" title="剑桥词典">
+                            <div class="otherVocItem"><img src="image/pageWordDetail/jianqiaoLogo.png" alt=""></div>
+                        </a>
+                        <a :href="ouluHref " target="_blank" title="欧陆词典">
+                            <div class="otherVocItem"><img src="image/pageWordDetail/ouluLogo.png" alt=""></div>
+                        </a>
+                        <a :href="youdaoHref" target="_blank" title="有道词典">
+                            <div class="otherVocItem"><img src="image/pageWordDetail/youdaoLogo.png" alt=""></div>
+                        </a>
+                        <a :href="jinshanHref " target="_blank" title="金山词典">
+                            <div class="otherVocItem"><img src="image/pageWordDetail/jinshanLogo.png" alt=""></div>
+                        </a>
+                        <a :href="baiduHref " target="_blank" title="百度词典">
+                            <div class="otherVocItem"><img src="image/pageWordDetail/baiduLogo.png" alt=""></div>
+                        </a>
+                    </div>
+                </div>
+                <div class="wordExamplesDiv">
+                    <h3 style="color: var(--greenColor00e57b)">例句</h3>
+                    <div v-for="(item,index) in exampleList" class="exampleItemDiv">
+                        <div class="en">{{item.en}}</div>
+                        <div class="en">{{item.cn}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    new Vue({
+        el: "#wordDetailApp",
+        data: {
+            word: [],
+            exampleList:[],
+            audio_type1: '',  //英英
+            audio_type2: '',   //美英
+            bingHref: '',
+            jinshanHref: '',
+            youdaoHref: '',
+            baiduHref: '',
+            jianqiaoHref: '',
+            ouluHref: '',
+            wordid:''
+
+        },
+        methods: {
+            fetchWordId() {
+                const _this = this;
+                _this.wordid = sessionStorage.getItem("wordid");
+                console.log(_this.wordid)
+            },
+            fetchWordDetail() {
+                const _this = this;
+                axios({
+                    method: "get",
+                    url: "search/searchWordById?wordid=" + _this.wordid,
+                }).then(function (data) {
+                    _this.word = data.data
+                    _this.audio_type1 = "http://dict.youdao.com/dictvoice?type=1&audio=" + _this.word.spelling;
+                    _this.audio_type2 = "http://dict.youdao.com/dictvoice?type=2&audio=" + _this.word.spelling;
+                    _this.bingHref = "https://www.bing.com/dict/search?q=speak&qs=n&form=Z9LH5&sp=-1&lq=0&pq=" + _this.word.spelling;
+                    _this.youdaoHref = "https://dict.youdao.com/result?word=" + _this.word.spelling + "&lang=en";
+                    _this.jinshanHref = "https://www.iciba.com/word?w=" + _this.word.spelling;
+                    _this.baiduHref = "https://fanyi.baidu.com/#en/zh/" + _this.word.spelling;
+                    _this.jianqiaoHref = "https://dictionary.cambridge.org/zhs/%E8%AF%8D%E5%85%B8/%E8%8B%B1%E8%AF%AD-%E6%B1%89%E8%AF%AD-%E7%AE%80%E4%BD%93/" + _this.word.spelling;
+                    _this.ouluHref = "https://dict.eudic.net/dicts/en/" + _this.word.spelling;
+                    console.log(_this.word)
+                })
+            },
+            fetchExamples() {
+                const _this = this;
+                axios({
+                    method: 'get',
+                    url: "search/findExamplesByWordId?wordid=" + _this.wordid
+                }).then(function (data) {
+                    _this.exampleList = data.data;
+                    console.log(_this.exampleList)
+                });
+            },
+            playAudio(a) {
+                const UK_audio = document.getElementById("UK_audio");
+                const USA_audio = document.getElementById("USA_audio");
+                var id = a.currentTarget.id;
+                console.log(id)
+                if (id == "UK_audio_btn") {
+                    // USA_audio.pause()
+                    UK_audio.play()
+                }
+                if (id == "USA_audio_btn") {
+                    // UK_audio.pause()
+                    USA_audio.play()
+                }
+
+            },
+            backBtn() {
+                // window.history.go(-1);  //返回上一页
+                window.history.back();  //返回上一页
+
+            },
+            numFilter(value) {
+                return Number(value).toFixed(3);
+            }
+        },
+        created() {
+            this.fetchWordId();
+            this.fetchWordDetail();
+            this.fetchExamples();
+        },
+    })
+
+</script>
+
+
+</body>
+</html>

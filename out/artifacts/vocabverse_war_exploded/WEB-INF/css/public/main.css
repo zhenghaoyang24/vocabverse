@@ -1,0 +1,59 @@
+/*全局颜色*/
+/*:root {*/
+/*    --greenColor00e57b: #00e57b;*/
+/*    --whiteColor: #ffffff;*/
+/*    --blackBackgroung: #1a1a1a;*/
+/*    --divBorderColor: #484848;*/
+/*    --normalTextColor: whitesmoke;*/
+/*    --btnBoderColor: #cbcbcb;*/
+
+/*}*/
+:root {
+    --greenColor00e57b: #00e57b;
+    --whiteColor: #ffffff;
+    --blackBackgroung: #1a1a1a;
+    --divBorderColor: #484848;
+    --normalTextColor: whitesmoke;
+    --btnBoderColor: #cbcbcb;
+
+}
+body {
+    /*background-image: url("../../image/body_bgimage.jpg");*/
+    background-color: var(--blackBackgroung);
+    margin: 0;
+    padding: 0;
+    background-repeat: no-repeat;
+    background-position: right;
+    background-attachment: fixed;
+    background-size: cover;
+
+    /*--Colors:#dfdfdf;*/
+}
+/*设置滚动条的长、宽为0*/
+html::-webkit-scrollbar {
+    height: 100%;
+    width: 5px;
+    /*color: #00e57b;*/
+    background-color: #676767;
+}
+html::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #00e57b;
+}
+
+.content-body {
+    padding-top: 70px;
+    width: 80%;
+    margin-left: 10%;
+}
+
+.content-div{
+    /*height:500px;*/
+    padding: 10px;
+    /*width: 100%;*/
+    /*border: 1px solid #484848;*/
+    /*box-shadow: 0 0 10px 2px #000000;*/
+    /*background-color: #ffffff;*/
+    /*border-radius: 5px;*/
+
+}

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-cmn">
+<head>
+    <meta charset="UTF-8">
+    <title>Werse词境 登录</title>
+    <link rel="icon" href="image/logo-black.png">
+    <link rel="stylesheet" href="css/login.css">
+    <script src="js/vue.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+    <script src="js/jquery-3.7.0.min.js"></script>
+    <script src="js/jquery.form-3.51.js"></script>
+</head>
+<body>
+<div id="app">
+    <!--登录-->
+    <div v-if="loginstatus==0" class="register-body">
+        <div class="web_title">
+            <div class="web_title_img"><img src="image/logo-white.png"></div>
+            <div class="web_title_text">词本无意，意由境生</div>
+        </div>
+        <div class="title">
+            <h4>请登录您的Werse账号</h4>
+        </div>
+        <div class="input-form-body">
+            <form class="input-form" method="post" action="user/userSignIn" target="signInIframe">
+                <div class="input_div_yige">
+                    <input class="input_style" id=sign_in_email" type="email" name="useremail" autocomplete="on"
+                           v-model="loginImfor.useremail" required="required" maxlength="30"/>
+                    <label>邮箱</label>
+                </div>
+                <div class="input_div_yige">
+                    <input class="input_style" id="sign_in_password" :type="pwdType" name="userpassword"
+                           autocomplete="on"
+                           v-model="loginImfor.userpassword" required="required" minlength="6" maxlength="16"/>
+                    <label>密码</label>
+                    <div @click="changeType()" class="eye_div"><img :src="seen?openeye:nopeneye"></div>
+                </div>
+                <!--信息显示-->
+                <div style="height: 20px;color: #00afe5;width: 100%;font-size: 13px">{{loginMsg}}</div>
+                <iframe name="signInIframe" id="signInIframe"
+                        style="display: none"></iframe>
+                <div class="remembered_div">
+                    <div style="color: white"><input type="checkbox" @click="remenberMe()" v-model:value="checkboxIsChecked" name="checkboxIsChecked">记住我</div>
+                    <a href="#" style="color: white">忘记密码</a>
+                </div>
+
+                <div class="lo-button">
+                    <input @click="subSignIn()" type="submit"  :value="btnValue" >
+                </div>
+            </form>
+        </div>
+        <div @click="loginTranslate()"
+             style="color: white;text-decoration-line: underline;font-size: 0.9em;margin:auto;width: 80%;padding-left: 20px;cursor: pointer">
+            还没有账号？去注册。
+        </div>
+    </div>
+    <!--注册-->
+    <div v-else class="register-body">
+        <div class="web_title">
+            <div class="web_title_img"><img src="image/logo-white.png"></div>
+            <div class="web_title_text">词本无意，意由境生。</div>
+        </div>
+        <div class="title">
+            <h4>请注册您的Werse账号</h4>
+        </div>
+        <div class="input-form-body">
+            <form class="input-form" method="post" target="signupIform"
+                  action="user/userSignUp">
+                <div class="input_div_yige">
+                    <input class="input_style" id=sign_up_name" type="text" name="nickname" autocomplete="off"
+                           v-model="loginImfor.nickname" required="required" maxlength="30"/>
+                    <label>用户名</label>
+                </div>
+                <div class="input_div_yige">
+                    <input class="input_style" id=sign_up_email" type="email" name="useremail" autocomplete="off"
+                           v-model="loginImfor.useremail" required="required" maxlength="30"/>
+                    <label>邮箱</label>
+                </div>
+                <div class="input_div_yige">
+                    <input class="input_style" id="sign_up_password" :type="pwdType" name="userpassword"
+                           autocomplete="off" onkeyup="value=value.replace(/[^\w\.\/]/ig,'')"
+                           v-model="loginImfor.userpassword" required="required" minlength="6" maxlength="16"/>
+                    <label>密码</label>
+                    <div @click="changeType()" class="eye_div"><img :src="seen?openeye:nopeneye"></div>
+                </div>
+                <!--信息显示-->
+                <div style="height: 20px;color: #00afe5;width: 100%;font-size: 13px">{{loginMsg}}</div>
+                <iframe name="signupIform" id="signupIform"
+                        style="display: none; background-color: #e7e7e7;border: none;height: 30px;"
+                        scrolling="no"></iframe>
+                <div class="lo-button">
+                    <input id="signupBtn" type="submit"  :value="btnValue"  @click="subSignUp()">
+                </div>
+
+            </form>
+
+        </div>
+        <div @click="loginTranslate()"
+             style="color: white;text-decoration-line: underline;font-size: 0.9em;margin:auto;width: 80%;padding-left: 20px;cursor: pointer">
+            已经有账号？去登录。
+        </div>
+    </div>
+</div>
+
+<script>
+
+    const sign_in_app = new Vue({
+        el: "#app",
+        data: {
+            btnValue:"登录",
+            loginImfor: {
+                nickname: '',
+                useremail: '',
+                userpassword: ''
+            },
+            otherMsg: '',
+            loginMsg: '', //注册消息
+            //0为登录，1为注册
+            loginstatus: 0,
+            seen: false,
+            openeye: 'image/login/眼睛_显示.png', //小眼睛图片地址
+            nopeneye: 'image/login/眼睛_隐藏.png',
+            pwdType: "password", //密码类型
+            checkboxIsChecked: true, //是否勾选记住我
+        },
+        methods: {
+            remenberMe(){
+                // console.log(this.checkboxIsChecked);
+                if(this.checkboxIsChecked){
+                    this.checkboxIsChecked=false;
+                    console.log(this.checkboxIsChecked);
+                }else {
+                    this.checkboxIsChecked=true;
+                    console.log(this.checkboxIsChecked);
+                }
+            },
+            // 点击眼睛icon查看密码
+            changeType() {
+                console.log("点击")
+                this.pwdType = this.pwdType === "password" ? "text" : "password";
+                this.seen = !this.seen; //小眼睛的变化,切换图片
+            },
+            /*切换注册与登录*/
+            loginTranslate() {
+                /*切换登录注册时，清除反馈消息。*/
+                if (this.loginstatus === 0) { //切换为注册
+                    this.loginstatus = 1;
+                    this.loginMsg = '';
+                    this.otherMsg = '';
+                    this.seen = false;
+                    this.btnValue = '注册'
+                }else{
+                    // this.loginstatus = 0;
+                    // this.loginMsg = '';
+                    // this.otherMsg = '';
+                    // this.seen = false;
+                    // this.checkboxIsChecked=true;   //记住我FALSE
+                    // this.btnValue = '登录'
+                    window.location.replace('loginPage');
+                }
+
+            },
+            /*获取iframe数据*/
+            setSignUpMsg() {
+                var iframe = document.getElementById("signupIform")
+                var iframeDocument = iframe.contentDocument
+                var iframeBody = iframeDocument.body
+                this.otherMsg = iframeBody.innerHTML;
+            },
+            setSignInMsg() {
+                var iframe = document.getElementById("signInIframe")
+                var iframeDocument = iframe.contentDocument
+                var iframeBody = iframeDocument.body
+                this.otherMsg = iframeBody.innerHTML;
+            },
+            /*将iframe数据赋给loginMsg*/
+            showSignUpMsg() {
+                let otherMsg = this.otherMsg;
+                if (otherMsg === 'emailexit') {
+                    this.loginMsg = '此邮箱已经被注册。'
+                } else if (otherMsg === 'success') {
+                    this.loginMsg = '注册成功，请登录。'
+
+                } else {
+                    this.loginMsg = '发生错误，请稍后再试。'
+                }
+            },
+            showSignInMsg() {
+                let otherMsg = this.otherMsg;
+                if (otherMsg === 'nouser') {
+                    this.loginMsg = '此邮箱还没有注册。'
+                } else {
+                    if (otherMsg === 'passworderror') {
+                        this.loginMsg = '密码错误，请重新输入。'
+                    } else if (otherMsg === 'succession') {
+                        this.loginMsg = '正在登录...'
+                        window.location.replace('homePage');
+                        // location.href = "toIndex_01";
+                    } else {
+                        this.loginMsg = '发生错误，请稍后再试。'
+                    }
+                }
+            },
+            /*注册*/
+            subSignUp() {
+                if (this.loginImfor.nickname === '' || this.loginImfor.userpassword === '' || this.loginImfor.useremail === '') {
+                    this.loginMsg = '请完善注册信息。'
+                } else if (this.loginImfor.userpassword.length < 6 || this.loginImfor.userpassword.length > 16) {
+                    this.loginMsg = '密码长度为6-16位，请重新输入。'
+                } else {
+                    setTimeout(() => {
+                        this.showSignUpMsg();
+                    }, 1200);
+                    // console.log(innerHTML);
+                    setTimeout(() => {
+                        this.setSignUpMsg();
+                        // console.log(innerHTML)
+                    }, 800);
+                }
+
+
+            },
+            /*登录*/
+            subSignIn() {
+                if (this.loginImfor.userpassword === '' || this.loginImfor.useremail === '') {
+                    this.loginMsg = '请完善注册信息。'
+                } else {
+                    setTimeout(() => {
+                        this.showSignInMsg();
+                    }, 1200);
+                    // console.log(innerHTML);
+                    setTimeout(() => {
+                        this.setSignInMsg();
+                        // console.log(innerHTML)
+                    }, 500);
+                }
+            },
+        },
+
+    })
+</script>
+
+
+</body>
+</html>

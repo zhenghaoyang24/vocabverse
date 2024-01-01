@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Werse词境 首页</title>
+    <script src="js/jquery-3.7.0.min.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/element-ui@2.15.14-index.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+    <link rel="icon" href="image/logo-black.png">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="css/public/element-ui@2.15.14-index.css">
+    <!-- 引入组件库 -->
+    <link rel="stylesheet" href="css/index_00.css">
+    <link rel="stylesheet" href="css/top-nav.css">
+    <link rel="stylesheet" href="css/public/main.css">
+</head>
+<body>
+
+<div class="top-nav">
+    <div class="index-logo">
+        <a href="homePage" class="index_logo_a">
+            <img class="logo_img" src="image/topnav/topnavlogo.png" alt="Werse">
+            <h2 class="logo_h2_e">e</h2>
+            <h2 class="logo_h2_r">r</h2>
+            <h2 class="logo_h2_s">s</h2>
+            <h2 class="logo_h2_e1">e</h2>
+        </a>
+    </div>
+    <div class="nav-content">
+        <a href="homePage"
+           style="color: #00e57b;box-sizing: border-box;border-top: 3px #00e57b solid;"><span>首页</span></a>
+        <a href="studyPage"><span>学习</span></a>
+        <a href="searchPage"><span>翻译</span></a>
+        <a href="translatePage"><span>翻译</span></a>
+        <a href="dataPage"><span>数据</span></a>
+    </div>
+    <div class="more-nav">
+        <div class="message_nav">
+            <img src="image/topnav/messagelogo_white.png" alt="">
+            <h3>消息</h3>
+        </div>
+    </div>
+</div>
+
+<!--内容-->
+<div class="content-body">
+    <div class="content-div">
+        <div style="width: 100%" id="search_app">
+
+            <div class="search_input_div">
+                <div style="display: flex">
+                    <input class="inputBox" placeholder="请输入英文或中文以查找单词"
+                           onkeyup="value=value.replace(/[^a-zA-Z^\u4e00-\u9fa5]/g,'')"
+                           type="text"
+                           v-on:input="searchWordInput"
+                           name="inputText" v-model="inputText" required>
+                    <a class="deleteInputBtn" @click="deleteInputText()" title="清除输入框 "></a>
+                </div>
+
+
+                <div class="searchQuickDiv" v-show="this.wordList.length>0">
+                    <ul>
+                        <li v-for="(item,index) in wordList" @click="searchWordBtn(item.wordid)">
+                            <div style="width: 50%"><span>{{index + 1}}.</span>
+                                <span class="spelling_span">{{item.spelling}}</span></div>
+                            <div style="width: 45%"><span class="spelling_span">{{item.paraphrase}}</span></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+
+    new Vue({
+        el: "#search_app",
+        data: {
+            inputText: '',
+            wordList: [],
+        },
+        methods: {
+            searchWordInput() {
+                const _this = this;
+                if (this.inputText.length >= 1) {
+                    console.log(this.inputText)
+                    /*发送ajax请求*/
+                    axios({
+                        method: "get",
+                        url: "search/searchWordByInput?inputText=" + this.inputText,
+                    }).then(function (data) {
+                        if (data.data == null) {
+                            _this.wordList = []
+                        } else {
+                            _this.wordList = data.data;
+                            console.log(_this.wordList)
+                        }
+                    })
+                } else {
+                    _this.wordList = []
+                }
+            },
+            deleteInputText() {
+                this.inputText = ''
+                this.wordList = []
+            },
+            searchWordBtn(e) {
+                sessionStorage.setItem("wordid", e);
+                // location.href = "toIndex_01";
+                window.location.assign('wordDetailPage?wordid=' + e);
+            },
+
+        },
+
+
+    })
+
+
+</script>
+
+</body>
+</html>

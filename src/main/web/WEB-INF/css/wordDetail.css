@@ -1,0 +1,180 @@
+.wordDetailDivCon {
+    user-select: none;
+    width: 100%;
+    /*border: 1px red solid;*/
+}
+
+.backBtn {
+    user-select: none;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background-color: #3b3b3b;
+    display: flex;
+    position: fixed;
+    justify-content: center;
+    line-height: 50px;
+    /*position:fixed;*/
+    color: white;
+    transition: all 0.3s;
+    font-weight: 700;
+    margin-left: -70px;
+    /*margin-top: -10px;*/
+}
+
+.backBtn:hover {
+    color: var(--greenColor00e57b);
+}
+
+.topBtn {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    /*border: 1px red solid;*/
+    border-radius: 5px;
+    box-shadow: 0 0 4px 1px #858585;
+    /*padding: 5px;*/
+    width: 40px;
+    height: 40px;
+    /*padding: 10px;*/
+    background-position: center;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    transition: all 0.2s;
+    margin-left: 20px;
+}
+
+.topBtn:active {
+    box-shadow: 0 0 4px 1px #4f4f4f;
+}
+
+.topBtn > img {
+    width: 50%;
+    height: 50%;
+    margin: auto;
+}
+
+.addBtn {
+    background-image: url("../image/pageWordDetail/add.png");
+}
+
+.addBtn:hover {
+    background-image: url("../image/pageWordDetail/add_green.png");
+}
+
+
+.topControlDiv {
+    display: flex;
+    justify-content: right;
+    width: auto;
+    /*padding: 10px;*/
+    padding-bottom: 10px;
+    background-color: var(--blackBackgroung);
+    /*z-index: 100;*/
+    border-bottom: 1px var(--divBorderColor) solid;
+    /*justify-content: center;*/
+}
+
+.wordspelling {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+}
+.wordspelling>span{
+    color: white;
+    font-family: Arial, serif;
+    font-weight: 800;
+    font-size: 3em;
+}
+
+.yinbiao_div {
+    display: flex;
+}
+
+.yinbiao_item_div {
+    cursor: pointer;
+    display: flex;
+    /*justify-content: center;*/
+    /*text-align: center;*/
+    margin-right: 10px;
+    color: #d7d7d7;
+    font-size: 15px;
+    font-weight: 300;
+    transition: all 0.2s;
+}
+.yinbiao_item_div:hover{
+    color: #ffffff;
+}
+.yinbiao_item_div:hover .ying_laba {
+    background-image: url("../image/pageWordDetail/laba_hover.png");
+}
+
+.ying_laba {
+    margin: auto;
+    width: 20px;
+    height: 20px;
+    /*background-size:10px 10px;*/
+    background-image: url("../image/pageWordDetail/laba.png");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+
+}
+
+.wordParaphraseDiv{
+    padding-top: 30px;
+    color: whitesmoke;
+}
+
+.otherVocDiv{
+    padding-top: 20px;
+    width: auto;
+    display: flex;
+    justify-content: left;
+}
+.otherVocDiv a{
+    margin-left: 10px;
+    /*border: 1px red solid;*/
+    /*margin: 0;*/
+    padding: 0;
+}
+
+.otherVocItem{
+    width:auto;
+    height: 20px;
+}
+.otherVocItem>img{
+    height: 100%;
+
+}
+
+.wordOtherInform{
+    /*position: absolute;*/
+    /*padding-top: 10px;*/
+    /*display: flex;*/
+    padding-top: 10px;
+    margin: auto;
+    height: 100%;
+    color: var(--normalTextColor);
+}
+
+.wordExamplesDiv{
+    user-select: auto;
+    padding-top: 30px;
+}
+
+.exampleItemDiv{
+    margin-bottom: 15px;
+    color: var(--normalTextColor);
+}
+
+
+
+
+
+
+
+

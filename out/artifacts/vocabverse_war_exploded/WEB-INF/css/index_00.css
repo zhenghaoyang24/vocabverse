@@ -1,0 +1,158 @@
+
+.search_input_div {
+    user-select: none;
+    width: 70%;
+    margin: auto;
+    height: auto;
+    padding: 10px;
+}
+
+
+.inputBox {
+    z-index: 10;
+    display: block;
+    height: 20px;
+    padding: 15px;
+    /*box-shadow: 0 0 10px 5px #dcdcdc;*/
+    border: 1px solid #cbcbcb;
+    /*background: none;*/
+    outline: none;
+    border-radius: 5px;
+    /*border: 0px;*/
+    font-weight: 700;
+    width: 60%;
+    margin: auto;
+    color: #ffffff;
+    font-size: 17px;
+    background: none;
+    transition: all 0.2s;
+}
+
+.inputBox:valid {
+    width: 90%;
+    /*border-right: none;*/
+}
+
+.inputBox:focus {
+    border: 1px solid #00e57b;
+}
+
+
+
+
+
+.inputBox::-webkit-input-placeholder { /* 使用webkit内核的浏览器 */
+    font-weight: 400;
+    color: #808080;
+}
+
+.inputBox:-moz-placeholder { /* Firefox版本4-18 */
+    font-weight: 400;
+    color: #808080;
+}
+
+.inputBox::-moz-placeholder { /* Firefox版本19+ */
+    font-weight: 400;
+    color: #808080;
+}
+
+.inputBox:-ms-input-placeholder { /* IE浏览器 */
+    font-weight: 400;
+    color: #808080;
+}
+
+.searchQuickDiv {
+    border-radius: 5px;
+    /*border-bottom-right-radius: 5px;*/
+    max-height: 400px;
+    overflow: auto;
+    z-index: 5;
+    padding: 10px;
+    /*width: 90%;*/
+    margin: auto;
+    /*margin-top: -1px;*/
+    border: 1px solid #c0c0c0;
+}
+
+/*设置滚动条的长、宽为0*/
+.searchQuickDiv::-webkit-scrollbar {
+    height: 100%;
+    width: 5px;
+    /*color: #00e57b;*/
+    background-color: #ffffff;
+}
+
+.searchQuickDiv::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #00e57b;
+}
+
+.searchQuickDiv > ul {
+    padding: 0;
+    text-decoration: none;
+}
+
+.searchQuickDiv > ul li {
+    display: flex;
+    /*justify-content: space-between;*/
+    padding: 5px;
+    cursor: pointer;
+    font-size: 17px;
+    margin-bottom: 10px;
+    /*border: 1px red solid;*/
+    list-style: none;
+    text-decoration: none;
+    color: white;
+    /*display: block;*/
+}
+
+.searchQuickDiv > ul li:hover {
+    /*color: #00e57b;*/
+    color: var(--greenColor00e57b);
+}
+
+.searchQuickDiv:hover + .inputBox {
+    /*border-bottom: 1px solid #ff0000;*/
+}
+
+.spelling_span {
+    white-space: nowrap; /*强制单行显示*/
+    text-overflow: ellipsis; /*超出部分省略号表示*/
+    overflow: hidden; /*超出部分隐藏*/
+    width: 100%; /*设置显示的最大宽度*/
+}
+
+.deleteInputBtn {
+    width: 50px;
+    height: 50px;
+    /*float: right;*/
+    /*position: absolute;*/
+    cursor: pointer;
+    transition: all 0.3s;
+    display: none;
+    justify-content: center;
+    line-height: 50px;
+    /*margin-left: -5%;*/
+    border-radius: 10px;
+    background-image: url("../image/index-00/deleteBtn-white.png");
+    background-position: center;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    color: whitesmoke;
+    border: 1px solid var(--btnBoderColor);
+    /*background: whitesmoke;*/
+}
+
+.inputBox:valid ~ .deleteInputBtn {
+    display: flex;
+    transition: all 0.3s;
+}
+
+.deleteInputBtn:hover{
+    background-image: url("../image/index-00/deleteBtn-green.png");
+    border:1px  var(--greenColor00e57b) solid;
+    color: white;
+}
+
+
+
