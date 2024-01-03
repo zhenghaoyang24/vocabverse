@@ -59,6 +59,7 @@ public class SearchInformController {
     public Word searchWordById(int wordid) {
         System.out.println("wordid:" + wordid);
         Word word = wordService.findWordById(wordid);
+        System.out.println(word);
         return word;
     }
 

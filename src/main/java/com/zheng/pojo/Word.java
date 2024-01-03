@@ -9,6 +9,16 @@ public class Word {
     double frequency;
     int difficulty;
 
+    int studycount;
+
+    public int getStudycount() {
+        return studycount;
+    }
+
+    public void setStudycount(int studycount) {
+        this.studycount = studycount;
+    }
+
     public int getWordid() {
         return wordid;
     }
@@ -75,6 +85,7 @@ public class Word {
                 ", paraphrase='" + paraphrase + '\'' +
                 ", frequency=" + frequency +
                 ", difficulty=" + difficulty +
+                ", studycount=" + studycount +
                 '}';
     }
 }

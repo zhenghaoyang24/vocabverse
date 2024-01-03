@@ -63,6 +63,7 @@
                 <div class="translateContentLeft">
                     <textarea autocomplete="off" spellcheck="false" maxlength="300"
                               placeholder="请输入翻译文本" v-model:value="inputText"></textarea>
+                    <div class="zishudiv">{{inputText.length}}/300</div>
                 </div>
                 <div class="translateContentRight">
                     <textarea autocomplete="off" :value="outText" spellcheck="false" readonly placeholder="没有翻译结果"></textarea>

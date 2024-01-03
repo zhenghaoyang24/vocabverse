@@ -171,6 +171,17 @@
     color: var(--normalTextColor);
 }
 
+.liju_title_div{
+    display: flex;
+}
+.liju_title_div>h3 {
+    margin: 0;
+}
+.liju_title_div>span{
+    height: 100%;
+/
+}
+
 
 
 

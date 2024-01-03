@@ -1,10 +1,39 @@
 
+.today_study_div{
+    user-select: none;
+    width: 45%;
+    margin: auto;
+    height: auto;
+    border-bottom: 1px var(--btnBoderColor) solid;
+    padding-bottom: 10px;
+    /*padding: 10px;*/
+}
+.today_study_div>h1{
+    color: var(--normalTextColor);
+}
+.today_study_shuju{
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 1em;
+    /*width: 100%;*/
+    display: flex;
+    justify-content: space-between;
+    color: var(--normalTextColor);
+}
+.today_study_shuju span{
+    font-size: 1.8em;
+    color: var(--greenColor00e57b);
+}
+
 .search_input_div {
+
+    /*border: 1px red  solid;*/
     user-select: none;
     width: 70%;
     margin: auto;
     height: auto;
     padding: 10px;
+    padding-top: 20px;
 }
 
 

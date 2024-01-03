@@ -115,6 +115,7 @@
 }
 
 .translateContentLeft {
+    user-select: none;
     width: 48%;
 }
 
@@ -155,6 +156,7 @@
 
 
 .translateContentRight {
+    user-select: none;
     width: 48%;
 }
 
@@ -184,11 +186,20 @@
     background-color: #232323;
 }
 
-@keyframes appeal {
+@keyframes labaFrames {
     0% {
-        opacity: 0;
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
     }
     100% {
-        opacity: 1;
+        transform: scale(1);
     }
+}
+
+.zishudiv{
+    color: whitesmoke;
+float: right;
+
 }
