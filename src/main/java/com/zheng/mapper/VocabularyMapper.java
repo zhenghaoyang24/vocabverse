@@ -3,14 +3,12 @@ package com.zheng.mapper;
 import com.zheng.pojo.Example;
 import com.zheng.pojo.Word;
 import com.zheng.service.WordService;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 public interface VocabularyMapper {
-
 
 
     /*根据英文搜索单词*/
@@ -25,9 +23,8 @@ public interface VocabularyMapper {
     @Select("SELECT * FROM tb_vocabulary WHERE wordid  = #{wordid}")
     Word findWordById(@Param("wordid") int wordid);
 
-    /*根据id搜索例句*/
-    @Select("SELECT * FROM tb_voc_examples WHERE wordid  = #{wordid} LIMIT 7")
-    List<Example> findExampleByWordId(@Param("wordid") int wordid);
+
+
 
 
 

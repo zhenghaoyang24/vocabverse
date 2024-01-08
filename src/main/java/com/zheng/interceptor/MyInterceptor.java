@@ -2,7 +2,7 @@ package com.zheng.interceptor;
 
 import com.zheng.pojo.User;
 import com.zheng.service.UserService;
-import com.zheng.utils.SetUserIDSessionUtil;
+import com.zheng.utils.UserSessionCookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -10,13 +10,12 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.Objects;
 
 public class MyInterceptor implements HandlerInterceptor {
 
-    @Autowired
-    private UserService userService;
+//    @Autowired
+//    private UserService userService;
 
     /*
     * request.getRequestDispatcher("").forward(request, response);  转发
@@ -28,33 +27,37 @@ public class MyInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         System.out.println("preHandle...");
-        Object userid = request.getSession().getAttribute("userid");
-        System.out.println("preHandle->userid:"+userid);
-        if ((request.getSession().getAttribute("userid"))!=null) {
+        String session_userid = UserSessionCookieUtil.getUserIDSession(request);  //获取session
+//        Object session_userid =request.getSession().getAttribute("userid");
+        System.out.println("preHandle->userid:"+session_userid);
+        if (session_userid!=null) {
             //session不为空，则放行，
             System.out.println("Released");
             return true;
         }else {   //session不存在则判断cookie是否存在
-            String useremail = null;
-            String userpassword = null;
-            Cookie[] cookies = request.getCookies();
-            User userByNameAndEmail;
-            for (int i = 0; i < cookies.length; i++) {
-                if (Objects.equals(cookies[i].getName(), "useremail"))
-                    useremail= cookies[i].getValue();
-                if (Objects.equals(cookies[i].getName(), "userpassword"))
-                    userpassword= cookies[i].getValue();
-            }
-            System.out.println("preHandle->useremail:"+useremail);
-            System.out.println("preHandle->userpassword:"+userpassword);
-            userByNameAndEmail = userService.findUserByNameAndEmail(useremail, userpassword);
+            User userByNameAndEmail = UserSessionCookieUtil.getUserByCookie(request);
+//            String useremail = null,userpassword = null;
+//            Cookie[] cookies = request.getCookies();
+//            User userByNameAndEmail;
+//            for (int i = 0; i < cookies.length; i++) {
+//                if (Objects.equals(cookies[i].getName(), "useremail"))
+//                    useremail= cookies[i].getValue();
+//                if (Objects.equals(cookies[i].getName(), "userpassword"))
+//                    userpassword= cookies[i].getValue();
+//            }
+////            System.out.println("preHandle->useremail:"+useremail);
+////            System.out.println("preHandle->userpassword:"+userpassword);
+//            userByNameAndEmail = userService.findUserByNameAndEmail(useremail, userpassword);
+//            System.out.println("userByNameAndEmail="+userByNameAndEmail);
             if (userByNameAndEmail==null){   //cookie不存在，则拦截，并重定向到登录页面
                 response.sendRedirect("loginPage");
                 System.out.println("Intercepted");
                 return false;
             }
             else {
-//                SetUserIDSessionUtil.setUserIDSessionUtil(userByNameAndEmail,request);
+                UserSessionCookieUtil.setUserIDSession(String.valueOf(userByNameAndEmail.getUserid()), request);
+//                request.getSession().setAttribute("userid", userByNameAndEmail.getUserid());
+//                System.out.println("request.getAttribute.userid="+request.getSession().getAttribute("userid"));
                 System.out.println("Released");    //cookie存在，放行
                 return true;
             }

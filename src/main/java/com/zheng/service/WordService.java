@@ -14,5 +14,4 @@ public interface WordService {
 
     Word findWordById(int wordid);
 
-    List<Example> findExampleByWordId(int wordid);
 }

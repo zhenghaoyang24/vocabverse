@@ -89,8 +89,22 @@
         data: {
             inputText: '',
             wordList: [],
+            userid:''
+        },
+        created(){
+            this.fetchUserId()
         },
         methods: {
+            fetchUserId() {
+                const _this = this;
+                axios({
+                    method: "get",
+                    url: "search/getUserId"
+                }).then(function (data) {
+                    console.log(data.data)
+                    _this.userid = data.data
+                })
+            },
             searchWordInput() {
                 const _this = this;
                 if (this.inputText.length >= 1) {

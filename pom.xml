@@ -17,29 +17,19 @@
     <dependencies>
 
 
-        <!--MD5-->
-<!--        <dependency>-->
-<!--            <groupId>commons-codec</groupId>-->
-<!--            <artifactId>commons-codec</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.commons</groupId>-->
-<!--            <artifactId>commons-lang3</artifactId>-->
-<!--            <version>3.8.1</version>-->
-<!--        </dependency>-->
-
         <!--邮箱验证码-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework</groupId>-->
-<!--            <artifactId>spring-context-support</artifactId>-->
-<!--            <version>5.0.0.RELEASE</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.sun.mail</groupId>-->
-<!--            <artifactId>javax.mail</artifactId>-->
-<!--            <version>1.6.1</version>-->
-<!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/org.springframework/spring-context-support -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>5.2.0.RELEASE</version>
+        </dependency>
 
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
 
 
         <dependency>

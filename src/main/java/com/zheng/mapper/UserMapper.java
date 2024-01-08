@@ -16,11 +16,19 @@ public interface UserMapper {
 
     /*注册*/
     @Insert(value = "insert into tb_user(userid,nickname,useremail,userpassword,regtime) values (#{userid},#{nickname},#{useremail},#{userpassword},#{regtime});")
-    void userSignUpMapper(User user);
+    boolean userSignUpMapper(User user);
 
     /*根据id查找用户*/
     @Select(value = "select * from tb_user where userid = #{userid}")
     User findUserByIdMapper(@Param("userid") int userid);
+
+    /**
+     * 根据id查找用户的昵称
+     * @param userid
+     * @return
+     */
+    @Select(value = "select nickname from tb_user where userid = #{userid}")
+    String findUserNicknameByIdMapper(@Param("userid") int userid);
 
     @Select(value = "select * from tb_user where useremail = #{useremail}")
     User findUserByUserEmailMapper(@Param("useremail") String useremail);

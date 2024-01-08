@@ -22,7 +22,7 @@
             <h4>请登录您的Werse账号</h4>
         </div>
         <div class="input-form-body">
-            <form class="input-form" method="post" action="user/userSignIn" target="signInIframe">
+            <form class="input-form" method="post" action="register/userSignIn" target="signInIframe">
                 <div class="input_div_yige">
                     <input class="input_style" id=sign_in_email" type="email" name="useremail" autocomplete="on"
                            v-model="loginImfor.useremail" required="required" maxlength="30"/>
@@ -65,7 +65,7 @@
         </div>
         <div class="input-form-body">
             <form class="input-form" method="post" target="signupIform"
-                  action="user/userSignUp">
+                  action="register/userSignUp">
                 <div class="input_div_yige">
                     <input class="input_style" id=sign_up_name" type="text" name="nickname" autocomplete="off"
                            v-model="loginImfor.nickname" required="required" maxlength="30"/>
@@ -148,7 +148,7 @@
                     this.loginMsg = '';
                     this.otherMsg = '';
                     this.seen = false;
-                    this.btnValue = '注册'
+                    this.btnValue = '注册并登录'
                 }else{
                     // this.loginstatus = 0;
                     // this.loginMsg = '';
@@ -179,8 +179,8 @@
                 if (otherMsg === 'emailexit') {
                     this.loginMsg = '此邮箱已经被注册。'
                 } else if (otherMsg === 'success') {
-                    this.loginMsg = '注册成功，请登录。'
-
+                    this.loginMsg = '注册成功，正在登录。'
+                    window.location.replace('homePage');
                 } else {
                     this.loginMsg = '发生错误，请稍后再试。'
                 }

@@ -3,10 +3,13 @@ package com.zheng.service.impl;
 import com.zheng.mapper.UserMapper;
 import com.zheng.pojo.User;
 import com.zheng.service.UserService;
+import com.zheng.utils.SendMailCodeUtil;
 import com.zheng.utils.SqlSessionFactoryUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.Random;
 
 
 @Service
@@ -54,6 +57,7 @@ public class UserServiceImpl implements UserService {
         sqlSession.close();
         return userByUserEmailMapper;
     }
+
 
 
 }

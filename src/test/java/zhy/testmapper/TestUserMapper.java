@@ -49,11 +49,12 @@ public class TestUserMapper {
     @Test
     public void userSignUp() {
         User user = new User();
-        user.setUserid(43525);
-        user.setNickname("zhy1");
-        user.setUseremail("1dddq@qq.c2om");
+        user.setUserid(435125);
+        user.setNickname("zhy121");
+        user.setUseremail("1ddd32q@qq.c2om");
         user.setUserpassword("12223");
         user.setRegtime("2023-12-12");
+        System.out.println(user);
         mapper.userSignUpMapper(user);
     }
 

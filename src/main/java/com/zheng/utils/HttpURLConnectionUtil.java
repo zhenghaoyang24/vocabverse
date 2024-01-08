@@ -1,13 +1,16 @@
 package com.zheng.utils;
 
-import org.springframework.lang.Nullable;
+//import org.springframework.lang.Nullable;
 
-import javax.sql.rowset.serial.SerialStruct;
+
+
+import com.sun.istack.internal.Nullable;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
+
 
 /**
  * @author riemann

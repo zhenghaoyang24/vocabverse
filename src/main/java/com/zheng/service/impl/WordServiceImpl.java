@@ -46,15 +46,6 @@ public class WordServiceImpl implements WordService {
         return wordById;
     }
 
-    @Override
-    public List<Example> findExampleByWordId(int wordid) {
-        SqlSession sqlSession = sqlSessionFactory.openSession(true);
-        VocabularyMapper mapper = sqlSession.getMapper(VocabularyMapper.class);
-        List<Example> exampleList = mapper.findExampleByWordId(wordid);
-        sqlSession.close();
-        return exampleList;
-    }
-
 
 
 

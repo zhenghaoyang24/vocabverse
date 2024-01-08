@@ -7,6 +7,28 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
+    <!--读取属性文件-->
+<!--    <context:property-placeholder location="classpath:mail.properties" ignore-unresolvable="true"/>-->
+
+<!--    &lt;!&ndash;配置邮件接口&ndash;&gt;-->
+<!--    <bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">-->
+<!--        <property name="host" value="${mail.smtp.host}"/>-->
+<!--        <property name="username" value="${mail.smtp.username}"/>-->
+<!--        <property name="password" value="${mail.smtp.password}"/>-->
+<!--        <property name="defaultEncoding" value="${mail.smtp.defaultEncoding}"/>-->
+<!--        <property name="javaMailProperties">-->
+<!--            <props>-->
+<!--                <prop key="mail.smtp.auth">${mail.smtp.auth}</prop>-->
+<!--                <prop key="mail.smtp.timeout">${mail.smtp.timeout}</prop>-->
+<!--            </props>-->
+<!--        </property>-->
+<!--    </bean>-->
+
+
+
+<!--        <bean id="sendMail" class="com.zheng.utils.SendMail"/>-->
+
+
     <!--1.mvc注解驱动-->
     <mvc:annotation-driven/>
 
@@ -36,9 +58,14 @@
         <mvc:interceptor>
             <mvc:mapping path="/*"/>
             <mvc:exclude-mapping path="/loginPage"/>
+<!--            <mvc:exclude-mapping path="/registerPage"/>-->
             <bean class="com.zheng.interceptor.MyInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
+
+
+
+
 
 
 

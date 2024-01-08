@@ -1,8 +1,12 @@
 package com.zheng.controller;
 
 import com.zheng.pojo.Example;
+import com.zheng.pojo.User;
 import com.zheng.pojo.Word;
+import com.zheng.service.ExampleService;
+import com.zheng.service.UserService;
 import com.zheng.service.WordService;
+import com.zheng.utils.UserSessionCookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Controller
@@ -18,7 +24,11 @@ public class SearchInformController {
 
 
     @Autowired
-    protected WordService wordService;
+    private WordService wordService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private ExampleService exampleService;
 
 
     /**
@@ -63,11 +73,44 @@ public class SearchInformController {
         return word;
     }
 
+    /**
+     * 根据id搜索例句
+     * @param wordid
+     * @return
+     */
     @RequestMapping(value = "/findExamplesByWordId", method = RequestMethod.GET)
     @ResponseBody
     public List<Example> findExamplesByWordId(int wordid) {
-        List<Example> exampleList = wordService.findExampleByWordId(wordid);
-//        System.out.println(exampleList);
-        return exampleList;
+//        System.out.println(exampleService.findExampleByWordId(wordid));
+        return exampleService.findExampleByWordId(wordid);
     }
+
+
+    /**
+     * 当前用户userid
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/getUserId", method = RequestMethod.GET)
+    @ResponseBody
+    int getUserId(HttpServletRequest request) {
+        String idSession = UserSessionCookieUtil.getUserIDSession(request);
+        return Integer.parseInt(idSession);
+    }
+
+
+//    /**
+//     * 根据例句的hoderid查找用户
+//     * @param holderid
+//     * @return
+//     */
+//    @RequestMapping(value = "/findUserByHolderid", method = RequestMethod.GET,produces = {"application/json;charset=UTF-8"})
+//    @ResponseBody
+//    public String findUserByHoderid(int holderid, HttpServletResponse response) {
+//        response.setCharacterEncoding("UTF-8");
+//        response.setContentType("text/html; charset=UTF-8");
+//        User userById = userService.findUserById(holderid);
+//        String usernickname = userById.getNickname();
+//        return usernickname;
+//    }
 }

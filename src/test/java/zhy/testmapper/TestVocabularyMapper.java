@@ -1,9 +1,6 @@
 package zhy.testmapper;
 
-import com.zheng.mapper.UserMapper;
 import com.zheng.mapper.VocabularyMapper;
-import com.zheng.pojo.Example;
-import com.zheng.pojo.User;
 import com.zheng.pojo.Word;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -19,6 +16,7 @@ import java.util.List;
 public class TestVocabularyMapper {
 
     private VocabularyMapper mapper;
+
 
 
     //抽取
@@ -53,10 +51,10 @@ public class TestVocabularyMapper {
         System.out.println(wordById);
     }
 
-    @Test
-    public void findExampleByWordId() {
-        List<Example>  example= mapper.findExampleByWordId(12);
-        System.out.println(example);
-    }
+
+
+
+
+
 
 }

@@ -83,7 +83,8 @@
     padding-bottom: 10px;
 
 }
-.wordspelling>span{
+
+.wordspelling > span {
     color: white;
     font-family: Arial, serif;
     font-weight: 800;
@@ -105,9 +106,11 @@
     font-weight: 300;
     transition: all 0.2s;
 }
-.yinbiao_item_div:hover{
+
+.yinbiao_item_div:hover {
     color: #ffffff;
 }
+
 .yinbiao_item_div:hover .ying_laba {
     background-image: url("../image/pageWordDetail/laba_hover.png");
 }
@@ -124,34 +127,36 @@
 
 }
 
-.wordParaphraseDiv{
+.wordParaphraseDiv {
     padding-top: 30px;
     color: whitesmoke;
 }
 
-.otherVocDiv{
+.otherVocDiv {
     padding-top: 20px;
     width: auto;
     display: flex;
     justify-content: left;
 }
-.otherVocDiv a{
+
+.otherVocDiv a {
     margin-left: 10px;
     /*border: 1px red solid;*/
     /*margin: 0;*/
     padding: 0;
 }
 
-.otherVocItem{
-    width:auto;
+.otherVocItem {
+    width: auto;
     height: 20px;
 }
-.otherVocItem>img{
+
+.otherVocItem > img {
     height: 100%;
 
 }
 
-.wordOtherInform{
+.wordOtherInform {
     /*position: absolute;*/
     /*padding-top: 10px;*/
     /*display: flex;*/
@@ -161,16 +166,262 @@
     color: var(--normalTextColor);
 }
 
-.wordExamplesDiv{
+.wordExamplesDiv {
     user-select: auto;
     padding-top: 30px;
 }
 
-.exampleItemDiv{
+.exampleItemDiv {
     margin-bottom: 15px;
     color: var(--normalTextColor);
 }
 
+.liju_title_div {
+    display: flex;
+    height: auto;
+    padding-bottom: 10px;
+}
+
+.liju_title_div > h3 {
+    margin: 0;
+    padding: 0;
+}
+
+.liju_title_div > span {
+    background-image: url("../image/pageWordDetail/exanplelist.png");
+    cursor: pointer;
+    margin-left: 10px;
+    height: auto;
+    width: 30px;
+    background-repeat: no-repeat;
+    background-size: 25px 100%;
+    padding: 0;
+    transition: all 0.3s;
+    /*margin: 0;*/
+}
+
+.liju_title_div > span:hover {
+    background-image: url("../image/pageWordDetail/examplelist_hover.png");
+}
+.tittle_sort_div{
+    background-color: #1e1e1e;
+    z-index: 10;
+    width: 500px;
+    /*padding-right: 10px;*/
+    position: fixed;
+}
+.tittle_div {
+    border-bottom: 1px solid #7e7e7e;
+    color: var(--normalTextColor);
+    display: flex;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    /*justify-content: space-between;*/
+    text-align: center;
+    height: 30px;
+    /*border: 1px red solid;*/
+}
+
+
+.sort_div{
+    width: auto;
+    height: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    box-shadow: 0 4px 5px rgba(0, 0, 0, 0.45); /* 下边框阴影 */
+}
+
+
+
+.control_example_div {
+
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.control_example_content_div {
+    user-select: none;
+    overflow: auto;
+    z-index: 12;
+    width: 500px;
+    height: 90%;
+    min-height: 520px;
+    background-color: #1e1e1e;
+    border-radius: 5px;
+    margin: auto;
+}
+
+.control_example_content_div::-webkit-scrollbar {
+    height: 100%;
+    width: 3px;
+    /*color: #00e57b;*/
+    background-color: #969696;
+}
+
+.control_example_content_div::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #00e57b;
+}
+
+.close_div_btn {
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+
+    margin-right: 10px;
+    background-position: center;
+    background-image: url("../image/pageWordDetail/close_btn.png");
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+
+}
+
+.close_div_btn:hover {
+    background-color: red;
+    background-image: url("../image/pageWordDetail/close_btn_hover.png");
+}
+
+.tittle_span {
+    color: var(--greenColor00e57b);
+    font-size: 1.2em;
+    line-height: 30px;
+    height: 30px;
+    width: 100%;
+}
+
+.all_example_list {
+    height: 80%;
+    padding: 10px;
+    padding-top: 90px;
+
+    color: var(--normalTextColor);
+}
+.add_example_list{
+    height: 80%;
+    padding: 10px;
+    padding-top: 100px;
+}
+.add_example_list div{
+    color: #b4b4b4;
+    font-weight: 700;
+}
+.add_textarea{
+    margin-top: 5px;
+    width: 97%;
+    height: 200px;
+    font-family: "Microsoft YaHei UI", serif;
+    font-size: 1em;
+    color: whitesmoke;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #7e7e7e;
+    resize: none;
+    background-color: #262626;
+    outline: none;
+}
+.add_textarea:focus{
+    border: 1px solid #00e57b;
+}
+
+
+.add_example_div{
+    /*border: 1px red solid;*/
+    height: 80%;
+    padding: 10px;
+    padding-top: 50px;
+
+    color: var(--normalTextColor);
+}
+
+.all_example_item {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px #727272 dashed;
+}
+
+.add_example_div{
+    width: 500px;
+    height: 30px;
+    background-color: #00e57b;
+    z-index: 10;
+    position: absolute;
+    bottom: 30px;
+}
+
+.example_text{
+    user-select: text;
+}
+.example_info{
+    display: flex;
+    justify-content: space-between;
+    padding-top: 5px;
+}
+
+.example_info span{
+    font-weight: 700;
+    font-family: "Microsoft YaHei UI", serif;
+    font-size: 13px;
+    /*color: #989898;*/
+}
+.user_operation_div{
+    display: flex;
+}
+.user_operation_div span{
+    font-weight: 700;
+    font-family: "Microsoft YaHei UI", serif;
+    font-size: 13px;
+    color: #989898;
+}
+.user_operation_div span:hover{
+    cursor: pointer;
+    color: #00e57b;
+}
+.example_holder{
+    color: #0098da;
+    /*background-color: #0098da*/
+}
+.example_heat{
+    cursor: pointer;
+    display: flex;
+    /*text-align: center;*/
+    color: red;
+}
+.example_heat>img{
+    width: 20px;
+    height: 20px;
+    margin-top: -2px;
+    /*margin: auto;*/
+    padding: 0;
+    /*align-items: center;*/
+    /*margin: 0 auto;*/
+
+}
+.example_adddate{
+    color: #fd9300;
+}
+.backOradd{
+    cursor: pointer;
+    margin-left: 5px;
+    border-radius: 4px;
+    padding: 4px;
+    width: auto;
+    font-size: 0.9em;
+    font-weight: 800;
+    background-color: #424242;
+   color: whitesmoke;
+    box-sizing: border-box;
+    border: 2px solid #00e57b;
+    transition: all 0.2s;
+}
+.backOradd:hover{
+    background-color: #00e57b;
+    color: #000000;
+}
 
 
 

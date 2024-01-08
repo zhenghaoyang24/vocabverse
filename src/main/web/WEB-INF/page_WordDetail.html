@@ -13,96 +13,212 @@
     <link rel="stylesheet" href="css/top-nav.css">
     <link rel="stylesheet" href="css/public/main.css">
     <link rel="stylesheet" href="css/wordDetail.css">
+
+    <style>
+        .sort_span {
+            cursor: pointer;
+            margin-left: 5px;
+            border-radius: 4px;
+            padding: 4px;
+            width: auto;
+            font-size: 0.9em;
+            font-weight: 800;
+            background-color: #a1a1a1;
+            color: #000000;
+        }
+
+        .sort_span_focus {
+            background-color: var(--greenColor00e57b);
+        }
+    </style>
 </head>
 <body>
-
-<div class="top-nav">
-    <div class="index-logo">
-        <a href="homePage" class="index_logo_a">
-            <img class="logo_img" src="image/topnav/topnavlogo.png" alt="Werse">
-            <h2 class="logo_h2_e">e</h2>
-            <h2 class="logo_h2_r">r</h2>
-            <h2 class="logo_h2_s">s</h2>
-            <h2 class="logo_h2_e1">e</h2>
-        </a>
-    </div>
-    <div class="nav-content">
-        <a href="homePage"
-           style="color: #00e57b;box-sizing: border-box;border-top: 3px #00e57b solid;"><span>首页</span></a>
-        <a href="studyPage"><span>学习</span></a>
-        <a href="searchPage"><span>查词</span></a>
-        <a href="translatePage"><span>翻译</span></a>
-        <a href="dataPage"><span>数据</span></a>
-    </div>
-    <div class="more-nav">
-        <div class="message_nav">
-            <img src="image/topnav/messagelogo_white.png" alt="">
-            <h3>消息</h3>
+<!--通知div-->
+<div id="notification" class="public_notification_div">
+    <div class="public_notification_title">
+        <div v-if="no_type==='error'" class="notification_item_tittle">
+            <img :src="spantype.error.src">
+            <span>{{spantype.error.value}}</span>
+        </div>
+        <div v-if="no_type==='message'" class="notification_item_tittle">
+            <img :src="spantype.message.src">
+            <span>{{spantype.message.value}}</span>
+        </div>
+        <div v-if="no_type==='warn'" class="notification_item_tittle">
+            <img :src="spantype.warn.src">
+            <span>{{spantype.warn.value}}</span>
+        </div>
+        <div v-if="no_type==='success'" class="notification_item_tittle">
+            <img :src="spantype.success.src">
+            <span>{{spantype.success.value}}</span>
         </div>
     </div>
+    <div class="public_notification_content">{{no_content}}</div>
 </div>
-<!--内容-->
-<div class="content-body">
-    <div class="content-div">
 
-        <div id="wordDetailApp" class="wordDetailDivCon">
-            <div class="backBtn" @click="backBtn()">返回</div>
-            <div class="topControlDiv">
-                <span class="topBtn addBtn"></span>
-                <span class="topBtn addBtn"></span>
-                <span class="topBtn addBtn"></span>
+<div style="width: 100%" id="wordDetailApp">
+
+    <!--弹窗-->
+    <div id="MessageBoxDiv" class="MessageBoxDiv">
+        <div id="messageBox" class="MessageBox">
+            <div class="MessageBoxContent">{{messageBoxContent}}</div>
+            <div class="MessageBoxController">
+                <span @click="confirmValueBtn(true)">确认</span>
+                <span @click="confirmValueBtn(false)">取消</span>
             </div>
+        </div>
+    </div>
+    <!--顶部导航栏-->
+    <div class="top-nav">
+        <div class="index-logo">
+            <a href="homePage" class="index_logo_a">
+                <img class="logo_img" src="image/topnav/topnavlogo.png" alt="Werse">
+                <h2 class="logo_h2_e">e</h2>
+                <h2 class="logo_h2_r">r</h2>
+                <h2 class="logo_h2_s">s</h2>
+                <h2 class="logo_h2_e1">e</h2>
+            </a>
+        </div>
+        <div class="nav-content">
+            <a href="homePage"
+               style="color: #00e57b;box-sizing: border-box;border-top: 3px #00e57b solid;"><span>首页</span></a>
+            <a href="studyPage"><span>学习</span></a>
+            <a href="searchPage"><span>查词</span></a>
+            <a href="translatePage"><span>翻译</span></a>
+            <a href="dataPage"><span>数据</span></a>
+        </div>
+        <div class="more-nav">
+            <div class="message_nav">
+                <img src="image/topnav/messagelogo_white.png" alt="">
+                <h3>消息</h3>
+            </div>
+        </div>
+    </div>
+    <!--内容-->
+    <!--例句控制-->
+    <div v-if="control_example_div_state" class="control_example_div">
+        <div class="control_example_content_div">
+            <div class="tittle_sort_div">
+                <div class="tittle_div">
+                    <span class="tittle_span">{{word.spelling}}</span>
+                    <span @click="controlExampleBtn" class="close_div_btn"></span>
+                </div>
+                <div class="sort_div">
+                    <!--显示例句时渲染-->
+                    <span class="sort_span sort_span_focus" id="heat_span"
+                          @click="sortFun(1)"
+                          v-show="updateStatus==0">{{heatSortState ? '热度最低在前&#8663;' : '热度最高在前&#8664;'}}</span>
+                    <!--显示例句时渲染-->
+                    <span class="sort_span" id="date_span"
+                          @click="sortFun(2)"
+                          v-show="updateStatus==0">{{dateSortState ? '时间最远在前&#8663;' : '时间最近在前&#8664;'}}</span>
+                    <!--显示例句时渲染-->
+                    <span class="backOradd" v-show="updateStatus==0" @click="addExampleBtn()">添加例句</span>
+                    <!--添加与编辑时渲染-->
+                    <span class="backOradd" v-show="updateStatus!=0" @click="allExampleBtn()">查看所有例句</span>
+                    <!--添加时渲染-->
+                    <span class="backOradd" v-show="updateStatus==1" @click="addExample(word.wordid)">确认添加</span>
+                    <!--编辑时渲染-->
+                    <span class="backOradd" v-show="updateStatus==2" @click="editExample(word.wordid)">确认编辑</span>
+                </div>
+            </div>
+
+            <!--显示页面-->
+            <div v-show="allOrUpdateStatus" class="all_example_list">
+                <div v-for="(item,index) in cardExampleList" class="all_example_item">
+                    <div class="example_text">{{item.en}}</div>
+                    <div class="example_text">{{item.cn}}</div>
+                    <div class="example_info">
+                        <span @click="heatBtn(item.exapid)" class="example_heat"><img
+                                src="image/pageWordDetail/heat_span.png">{{item.heat}}</span>
+                        <div v-if="userid==item.holderid" class="user_operation_div">
+                            <span @click="deleteExampleOrNot(item.exapid)">删除</span>
+                            &nbsp;&nbsp;
+                            <span @click="editExampleBtn(item.exapid,item.en,item.cn)">编辑</span>
+                        </div>
+                        <span class="example_holder">由{{item.holder == null ? "*已注销用户*" : item.holder}}在<span
+                                class="example_adddate">{{item.adddate}}</span>添加</span>
+                    </div>
+                </div>
+            </div>
+            <!--添加页面-->
+            <div v-show="!allOrUpdateStatus" class="add_example_list">
+                <div>英文例句 {{en.length}}/200</div>
+                <textarea maxlength="200" v-model="en" name="en" type="text" class="add_textarea"
+                          placeholder="此处输入英文例句"></textarea>
+                <div>中文翻译 {{cn.length}}/200</div>
+                <textarea maxlength="200" v-model="cn" cn name="cn" type="text" class="add_textarea"
+                          placeholder="此处输入中文翻译"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="content-body">
+
+        <div class="content-div">
+
             <div class="wordDetailDivCon">
-                <div class="wordspelling">
-                    <span>{{word.spelling}}</span>
-                    <div class="wordOtherInform">
-                        <div>词频: {{numFilter(word.frequency)}}</div>
-                        <div>难度等级: {{word.difficulty}}/10</div>
-                        <div>学习人数: {{word.studycount}}</div>
-                    </div>
+                <div class="backBtn" @click="backBtn()">返回</div>
+                <div class="topControlDiv">
+                    <span class="topBtn addBtn"></span>
+                    <span class="topBtn addBtn"></span>
+                    <span class="topBtn addBtn"></span>
                 </div>
-                <div class="yinbiao_div">
-                    <div class="yinbiao_item_div" id="UK_audio_btn" @click="playAudio($event)">
-                        英[{{word.ukphonetic}}]<span class="ying_laba"></span></div>
-                    <audio id="UK_audio" preload="metadata" :src="audio_type1"></audio>
-                    <div class="yinbiao_item_div" id="USA_audio_btn" @click="playAudio($event)">美[{{word.usphonetic}}]
-                        <span class="ying_laba"></span></div>
-                    <audio id="USA_audio" preload="metadata" :src="audio_type2"></audio>
-                </div>
-                <div class="wordParaphraseDiv">
-                    <h3 style="color: var(--greenColor00e57b)">释义</h3>
-                    <div>{{word.paraphrase}}</div>
-                    <div class="otherVocDiv">
-                        <span>其他词典</span>
-                        <a :href="bingHref" target="_blank" title="必应词典">
-                            <div class="otherVocItem"><img src="image/pageWordDetail/bingLogo.png" alt=""></div>
-                        </a>
-                        <a :href="jianqiaoHref " target="_blank" title="剑桥词典">
-                            <div class="otherVocItem"><img src="image/pageWordDetail/jianqiaoLogo.png" alt=""></div>
-                        </a>
-                        <a :href="ouluHref " target="_blank" title="欧陆词典">
-                            <div class="otherVocItem"><img src="image/pageWordDetail/ouluLogo.png" alt=""></div>
-                        </a>
-                        <a :href="youdaoHref" target="_blank" title="有道词典">
-                            <div class="otherVocItem"><img src="image/pageWordDetail/youdaoLogo.png" alt=""></div>
-                        </a>
-                        <a :href="jinshanHref " target="_blank" title="金山词典">
-                            <div class="otherVocItem"><img src="image/pageWordDetail/jinshanLogo.png" alt=""></div>
-                        </a>
-                        <a :href="baiduHref " target="_blank" title="百度词典">
-                            <div class="otherVocItem"><img src="image/pageWordDetail/baiduLogo.png" alt=""></div>
-                        </a>
+                <div class="wordDetailDivCon">
+                    <div class="wordspelling">
+                        <span>{{word.spelling}}</span>
+                        <div class="wordOtherInform">
+                            <div>词频: {{numFilter(word.frequency)}}</div>
+                            <div>难度等级: {{word.difficulty}}/10</div>
+                            <div>学习人数: {{word.studycount}}</div>
+                        </div>
                     </div>
-                </div>
-                <div class="wordExamplesDiv">
-                    <div class="liju_title_div">
-                        <h3 style="color: var(--greenColor00e57b)">例句</h3>
-<!--                        <span>添加例句</span>-->
+                    <div class="yinbiao_div">
+                        <div class="yinbiao_item_div" id="UK_audio_btn" @click="playAudio($event)">
+                            英[{{word.ukphonetic}}]<span class="ying_laba"></span></div>
+                        <audio id="UK_audio" preload="metadata" :src="audio_type1"></audio>
+                        <div class="yinbiao_item_div" id="USA_audio_btn" @click="playAudio($event)">
+                            美[{{word.usphonetic}}]
+                            <span class="ying_laba"></span></div>
+                        <audio id="USA_audio" preload="metadata" :src="audio_type2"></audio>
                     </div>
-
-                    <div v-for="(item,index) in exampleList" class="exampleItemDiv">
-                        <div class="en">{{item.en}}</div>
-                        <div class="en">{{item.cn}}</div>
+                    <div class="wordParaphraseDiv">
+                        <h3 style="color: var(--greenColor00e57b)">释义</h3>
+                        <div>{{word.paraphrase}}</div>
+                        <div class="otherVocDiv">
+                            <span>其他词典</span>
+                            <a :href="bingHref" target="_blank" title="必应词典">
+                                <div class="otherVocItem"><img src="image/pageWordDetail/bingLogo.png" alt=""></div>
+                            </a>
+                            <a :href="jianqiaoHref " target="_blank" title="剑桥词典">
+                                <div class="otherVocItem"><img src="image/pageWordDetail/jianqiaoLogo.png" alt="">
+                                </div>
+                            </a>
+                            <a :href="ouluHref " target="_blank" title="欧陆词典">
+                                <div class="otherVocItem"><img src="image/pageWordDetail/ouluLogo.png" alt=""></div>
+                            </a>
+                            <a :href="youdaoHref" target="_blank" title="有道词典">
+                                <div class="otherVocItem"><img src="image/pageWordDetail/youdaoLogo.png" alt="">
+                                </div>
+                            </a>
+                            <a :href="jinshanHref " target="_blank" title="金山词典">
+                                <div class="otherVocItem"><img src="image/pageWordDetail/jinshanLogo.png" alt="">
+                                </div>
+                            </a>
+                            <a :href="baiduHref " target="_blank" title="百度词典">
+                                <div class="otherVocItem"><img src="image/pageWordDetail/baiduLogo.png" alt="">
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="wordExamplesDiv">
+                        <div class="liju_title_div">
+                            <h3 style="color: var(--greenColor00e57b)">例句</h3>
+                            <span @click="controlExampleBtn()"></span>
+                        </div>
+                        <div v-for="(item,index) in exampleList.slice(0, 7)" class="exampleItemDiv">
+                            <div>{{item.en}}</div>
+                            <div>{{item.cn}}</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -110,24 +226,283 @@
     </div>
 </div>
 
-<script>
+<script type="text/javascript">
+    /*消息vue*/
+    const NotificationVue = new Vue({
+        el: "#notification",
+        data: {
+            no_content: '',
+            no_type: '',   //error，message消息，warn警告,success成功
+            timer: null,
+            spantype: {
+                error: {
+                    value: '失败',
+                    src: 'image/public_notification/error.png'
+                },
+                message: {
+                    value: '消息',
+                    src: 'image/public_notification/message.png'
+                },
+                success: {
+                    value: '成功',
+                    src: 'image/public_notification/success.png'
+                },
+                warn: {
+                    value: '警告',
+                    src: 'image/public_notification/warn.png'
+                },
+            }
+        },
+        methods: {
+            showPublicNotification(type, content) {
+                if (this.timer) { //计时器已经存在则销毁
+                    clearTimeout(this.timer)
+                    this.timer = null
+                }
+                const id = document.getElementById("notification")
+                id.style.right = "30px";
+                this.no_content = content
+                this.no_type = type
+                this.timer = setTimeout(() => {
+                    this.no_content = ''
+                    this.no_type = ''
+                    id.style.right = "-300px"
+                }, 3000)
+                console.log(content);
+            }
+        },
+    })
+
     new Vue({
         el: "#wordDetailApp",
         data: {
+            messageBoxContent: "",   //弹出框消息
+            messageBoxValue: null,  //弹出框选择的值
+            userid: '',
             word: [],
-            exampleList: [],
+            exampleList: [],   //单词详细页面例句数据
+            cardExampleList: [],  //显示所有例句卡数据
             audio_type1: '',  //英英
             audio_type2: '',   //美英
-            bingHref: '',
+            bingHref: '',  //其他词典路径
             jinshanHref: '',
             youdaoHref: '',
             baiduHref: '',
             jianqiaoHref: '',
             ouluHref: '',
-            wordid: ''
+            wordid: '',
+            control_example_div_state: false,  //控制所有例句卡的显示与关闭
+            heatSortState: false, //true正序 FALSE倒叙
+            dateSortState: true, //true正序 FALSE倒叙
+            allOrUpdateStatus: true, //true为显示,false为添加或编辑
+            updateStatus: 0,  //控制操作按钮  值为 0：显示，1：添加，2：编辑
+            // editStatus: false, //是否为编辑状态
 
+            en: '',
+            cn: '',
+            editExampleId: null,   //编辑的例句id
+            alreadyDddStates: false,  //是否成功添加过例句
+            alreadyEditStatus: false,  //是否编辑过
+        },
+        created() {
+            this.fetchWordId();
+            this.fetchWordDetail();
+            this.fetchExamples();
+            this.fetchUserId();
         },
         methods: {
+            /*public弹窗弹出*/
+            showMessageBox(content) {
+                this.messageBoxValue = null
+                this.messageBoxContent = content
+                // this.functionName = functionName
+                let messageBox = document.getElementById("messageBox");
+                let MessageBoxDiv = document.getElementById("MessageBoxDiv");
+                MessageBoxDiv.style.display = "flex"
+                messageBox.style.marginTop = "20px";
+            },
+            /*public确认还是取消按钮并关闭弹窗*/
+            confirmValueBtn(v) {
+                this.messageBoxValue = v
+                //关闭弹窗
+                let messageBox = document.getElementById("messageBox");
+                let MessageBoxDiv = document.getElementById("MessageBoxDiv");
+                MessageBoxDiv.style.display = "none"
+                messageBox.style.marginTop = "-200px";
+            },
+            /*public确认是否删除例句*/
+            async deleteExampleOrNot(exapid) {
+                this.showMessageBox("你确定要删除这个例句吗？");
+                let r = new Promise((resolve) => {
+                    let timer = setInterval(() => {   //定时器
+                        if (this.messageBoxValue != null) {
+                            clearInterval(timer)
+                            resolve(this.messageBoxValue)
+                        }
+                    }, 100)
+                })
+                r.then((res) => {
+                    if (res) {  //删除例句
+                        this.deleteExample(exapid)
+                    }
+                    this.messageBoxValue = null
+                    console.log("res=" + res);
+                })
+            },
+            /*删除例句*/
+            async deleteExample(exapid) {
+                await axios({
+                    method: "post",
+                    url: "update/deleteExample?exapid=" + exapid
+                }).then(function (data) {
+                    console.log(data.data)
+                    if (data.data)
+                        NotificationVue.showPublicNotification("success", "删除成功。");
+                    else
+                        NotificationVue.showPublicNotification("error", "发生错误，删除失败，请稍后再试。");
+                })
+                this.freshExample();
+            },
+
+            /*编辑例句按钮*/
+            editExampleBtn(exapid, en, cn) {
+                this.en = en
+                this.cn = cn
+                this.editExampleId = exapid
+                this.allOrUpdateStatus = false  //切换为编辑页面
+                this.updateStatus = 2  //切换为编辑状态
+            },
+            //执行编辑
+            async editExample() {
+                const en = this.en
+                const cn = this.cn
+                const exapid = this.editExampleId
+                const _this = this
+                await axios({
+                    method: 'post',
+                    url: "update/editExample?exapid=" + exapid + "&en=" + en + "&cn=" + cn + "&wordid=" + this.wordid
+                }).then(function (data) {
+                    if (data.data === 'noen')
+                        NotificationVue.showPublicNotification("error", "请填写该单词的英文例句。");
+                    if (data.data === 'nocn')
+                        NotificationVue.showPublicNotification("error", "请填写该例句的中文翻译。");
+                    if (data.data === 'noword')
+                        NotificationVue.showPublicNotification("error", "你填写的英文例句里没有这个单词，请修改英文例句。");
+                    if (data.data === true) {
+                        NotificationVue.showPublicNotification("success", "例句修改成功。");
+                        _this.alreadyEditStatus = true
+                    }
+                    if (data.data === false) {
+                        NotificationVue.showPublicNotification("error", "哎呀，发生了未知错误。");
+                    }
+                });
+            },
+
+            freshExample() {
+                const _this = this;
+                axios({
+                    method: 'get',
+                    url: "search/findExamplesByWordId?wordid=" + _this.wordid
+                }).then(function (data) {
+                    _this.cardExampleList = data.data;
+                    _this.cardExampleList.sort((a, b) => b.heat - a.heat);   //递减排
+                    _this.heatSortState = false
+                });
+            },
+            fetchUserId() {
+                const _this = this;
+                axios({
+                    method: "get",
+                    url: "search/getUserId"
+                }).then(function (data) {
+                    console.log(data.data)
+                    _this.userid = data.data
+                })
+            },
+            /*添加例句按钮*/
+            addExampleBtn() {
+                this.allOrUpdateStatus = false
+                this.updateStatus = 1
+            },
+            addExample(wordid) {
+                const _this = this
+                axios({
+                    method: 'post',
+                    url: "update/addExample?wordid=" + wordid + "&en=" + this.en + "&cn=" + this.cn
+                }).then(function (data) {
+                    if (data.data === 'noen')
+                        NotificationVue.showPublicNotification("error", "请填写该单词的英文例句。");
+                    if (data.data === 'nocn')
+                        NotificationVue.showPublicNotification("error", "请填写该例句的中文翻译。");
+                    if (data.data === 'noword')
+                        NotificationVue.showPublicNotification("error", "你填写的英文例句里没有这个单词，请修改英文例句。");
+                    if (data.data === true) {
+                        NotificationVue.showPublicNotification("success", "例句添加成功。");
+                        _this.en = '';
+                        _this.cn = '';
+                        _this.alreadyDddStates = true
+                    }
+                    if (data.data === false) {
+                        NotificationVue.showPublicNotification("error", "哎呀，发生了未知错误。");
+                    }
+                });
+
+            },
+            /*控制添加或者显示选项卡*/
+            async allExampleBtn() {
+                if (this.alreadyDddStates || this.alreadyEditStatus) {  //成功编辑过或添加过则刷新例句
+                    await this.freshExample()   //刷新例句
+                }
+                this.alreadyDddStates = false  //还原值
+                this.alreadyEditStatus = false
+                this.allOrUpdateStatus = true  //切换为显示页面
+                this.updateStatus = 0  //切换为显示状态
+                this.en = ''  //清空编辑值
+                this.cn = ''
+                this.editExampleId = null
+            },
+            heatBtn(exapid) {
+                console.log(exapid);
+                const itemToRemove = this.cardExampleList.find(item => item.exapid === exapid);
+                itemToRemove.heat = itemToRemove.heat + 1
+                axios({
+                    method: 'get',
+                    url: "update/addHeat?heat=" + itemToRemove.heat + "&exapid=" + exapid
+                }).then(function (data) {
+                    if (data.data)
+                        NotificationVue.showPublicNotification("success", "成功为该例句增加热度。");
+                    else
+                        NotificationVue.showPublicNotification("error", "出现错误。");
+                });
+
+            },
+            sortFun(s) {
+                const heat_span = document.getElementById("heat_span")
+                const date_span = document.getElementById("date_span")
+                if (s === 1) {
+                    date_span.classList.remove("sort_span_focus")
+                    heat_span.classList.add("sort_span_focus")
+                    if (this.heatSortState) {
+                        this.cardExampleList.sort((a, b) => b.heat - a.heat);
+                        this.heatSortState = false
+                    } else {
+                        this.cardExampleList.sort((a, b) => a.heat - b.heat);
+                        this.heatSortState = true
+                    }
+                }
+                if (s === 2) {
+                    heat_span.classList.remove("sort_span_focus")
+                    date_span.classList.add("sort_span_focus")
+                    if (this.dateSortState) {
+                        this.cardExampleList.sort((a, b) => this.getTimeDate(b.adddate) - this.getTimeDate(a.adddate));
+                        this.dateSortState = false
+                    } else {
+                        this.cardExampleList.sort((a, b) => this.getTimeDate(a.adddate) - this.getTimeDate(b.adddate));
+                        this.dateSortState = true
+                    }
+                }
+
+            },
             fetchWordId() {
                 const _this = this;
                 _this.wordid = sessionStorage.getItem("wordid");
@@ -158,7 +533,6 @@
                     url: "search/findExamplesByWordId?wordid=" + _this.wordid
                 }).then(function (data) {
                     _this.exampleList = data.data;
-                    console.log(_this.exampleList)
                 });
             },
             playAudio(a) {
@@ -182,15 +556,41 @@
 
             },
             numFilter(value) {
-                return Number(value).toFixed(3);
-            }
+                if (value !== 0)
+                    return Number(value).toFixed(4);
+                else
+                    return 0;
+            },
+            async controlExampleBtn() {
+                if (!this.control_example_div_state) {
+                    const _this = this;
+                    await axios({
+                        method: 'get',
+                        url: "search/findExamplesByWordId?wordid=" + _this.wordid
+                    }).then(function (data) {
+                        _this.cardExampleList = data.data;
+                        _this.cardExampleList.sort((a, b) => b.heat - a.heat);
+                        _this.heatSortState = false
+                        // console.log(_this.cardExampleList)
+                    });
+                    this.control_example_div_state = true
+                } else {
+                    this.control_example_div_state = false //关闭例句div
+                    this.allOrAddStatus = true  //将allOrAddStatus改为所有例句状态
+                }
+            },
+            /*事件转换*/
+            getTimeDate(date) {
+                return new Date(date).getTime();
+
+            },
+
+
         },
-        created() {
-            this.fetchWordId();
-            this.fetchWordDetail();
-            this.fetchExamples();
-        },
+
+
     })
+
 
 </script>
 
