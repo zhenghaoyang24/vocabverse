@@ -1,6 +1,7 @@
 package com.zheng.service;
 
 import com.zheng.pojo.Example;
+import com.zheng.pojo.SearchWordHistory;
 import com.zheng.pojo.Word;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,5 +14,18 @@ public interface WordService {
     List<Word> findWordByLetterCn(String letter);
 
     Word findWordById(int wordid);
+
+    boolean addSearchTimes(int wordid);
+
+    /*
+    单词历史
+    */
+    boolean addSearchedWordHistory(SearchWordHistory history);
+    List<SearchWordHistory> getAllSearchWordHistory(int userid);
+    boolean deleteSearchWordHistory(int wordid,int userid);
+    boolean deleteAllSearchWordHistory(int userid);
+
+    List<Word> getWordsSearchTimesRank();
+    List<Word> getWordsStudyTimesRank();
 
 }

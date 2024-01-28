@@ -1,24 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Werse词境 数据</title>
     <script src="js/jquery-3.7.0.min.js"></script>
+    <script src="js/vue.js"></script>
     <script src="js/axios-0.18.0.js"></script>
-    <script src="js/element-ui@2.15.14-index.js"></script>
-    <link rel="icon" href="image/logo-black.png">
-    <!-- 引入样式 -->
-    <link rel="stylesheet" href="css/public/element-ui@2.15.14-index.css">
+    <link rel="icon" href="image/logo-white.png">
     <link rel="stylesheet" href="css/top-nav.css">
     <link rel="stylesheet" href="css/public/main.css">
+    <link rel="stylesheet" href="css/index_04.css">
     <style>
-        .is-selected {
-            color: #1989FA;
+        .avatar_border_active {
+            border: 4px #00e57b solid;
+        }
+
+        /*弹出框动效*/
+        .MessageBoxBorderFrames {
+            animation: MessageBoxBorderFrames 0.3s linear;
+        }
+
+        /*v-if动画*/
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+
+        .fade-enter, .fade-leave-to {
+            opacity: 0;
+        }
+
+        .updateConfirmBtnBackColor_visiable {
+            background-color: #00e57b;
+        }
+
+        .updateConfirmBtnBackColor_invisiable {
+            background-color: #858585;
+        }
+
+        .updateBtn {
+            background-color: #858585;
+        }
+
+        .updateBtn_active {
+            background-color: #00e57b;
+        }
+
+        .updateBtn_active:hover {
+            background-color: #1aff96;
         }
     </style>
 </head>
 <body>
+<!--通知-->
+<div id="notification" class="public_notification_div">
+    <div class="public_notification_title">
+        <div v-if="no_type==='error'" class="notification_item_tittle">
+            <img :src="spantype.error.src">
+            <span>{{spantype.error.value}}</span>
+        </div>
+        <div v-if="no_type==='message'" class="notification_item_tittle">
+            <img :src="spantype.message.src">
+            <span>{{spantype.message.value}}</span>
+        </div>
+        <div v-if="no_type==='warn'" class="notification_item_tittle">
+            <img :src="spantype.warn.src">
+            <span>{{spantype.warn.value}}</span>
+        </div>
+        <div v-if="no_type==='success'" class="notification_item_tittle">
+            <img :src="spantype.success.src">
+            <span>{{spantype.success.value}}</span>
+        </div>
+    </div>
+    <div class="public_notification_content">{{no_content}}</div>
+</div>
+<!--弹窗-->
+<div id="MessageBoxContent" class="MessageBoxDiv" @click="tipEffection">
+    <div id="messageBox" class="MessageBox" :class="{'MessageBoxBorderFrames':borderFramesValue}"
+         @animationend="tipEffectionEnd">
+        <div class="MessageBoxContent">{{messageBoxQuestion}}</div>
+        <div class="MessageBoxController">
+            <span @click.stop="messageBoxConfirmBtn(true)">确认</span>
+            <span @click.stop="messageBoxConfirmBtn(false)">取消</span>
+        </div>
+    </div>
+</div>
 <!-- 顶部导航栏，三个元素 -->
 <div class="top-nav">
     <div class="index-logo">
@@ -33,33 +99,574 @@
     <div class="nav-content">
         <a href="homePage"><span>首页</span></a>
         <a href="studyPage"><span>学习</span></a>
-        <a href="searchPage"><span>翻译</span></a>
-        <a href="translatePage"><span>翻译</span></a>
-        <a href="dataPage" style="color: #00e57b;box-sizing: border-box;border-top: 3px #00e57b solid;"><span>数据</span></a>
+        <a><span>查</span><span>-</span><span>译</span></a>
+        <div class="cha_yi_div">
+            <a href="searchWordPage">查词</a>
+            <a href="translatePage">翻译</a>
+        </div>
+        <a href="wersebotPage"><span>WerseBot</span></a>
+        <a href="dataPage"
+           style="color: #00e57b;box-sizing: border-box;border-top: 3px #00e57b solid;"><span>数据</span></a>
     </div>
     <div class="more-nav">
 
 
     </div>
 </div>
-
+<!--修改卡片-->
+<div v-if="cardShowValue" id="updateCardApp" class="user_data_update_card_div">
+    <div class="user_data_update_card">
+        <!--标题-->
+        <div class="update_card_title_div">
+            <span class="update_card_title_span">{{cardTitle}}</span>
+            <span @click="closeUpdateCard" class="close_update_card_div_btn"></span>
+        </div>
+        <!--修改头像-->
+        <div v-if="updateCategory==='avatar'" style="margin-top: 50px">
+            <div style="display: flex;justify-content: center;">
+                <div style="width: 490px; background-color: #1e1e1e;padding-top: 20px;padding-bottom: 20px; display:flex;justify-content: center;flex-direction: column;align-items: center;position: fixed">
+                    <img v-if="newUpdateValue===null" style="width: 70px;height: 70px" :src="dataValue" alt="头像">
+                    <img v-else style="width: 70px;height: 70px" :src="newUpdateValue" alt="头像">
+                    <div class="uploadAvatarBtn_div">
+                        <span class="updateBtn_active">上传头像</span>
+                        <span :class="newUpdateValue===null? 'updateBtn':'updateBtn_active'" @click="updateConfirmBtn">确定</span>
+                    </div>
+                </div>
+            </div>
+            <div style="z-index: 999;display: flex;justify-content: left;flex-wrap: wrap;padding: 180px 21px 20px;min-width: 497px">
+                <img :id="item.url" @click="avatarImgBtn(item.url)" class="update_avatar_img"
+                     v-for="(item,index) in avatarUrl" :src="item.url" alt="gif">
+            </div>
+        </div>
+    </div>
+</div>
 <!--内容-->
 <div class="content-body">
     <div class="content-div">
-        <div style="height: 1000px;"></div>
+        <div class="data_body_content" id="userDataApp">
+            <!--左侧-->
+            <!--我的信息-->
+            <transition name="fade">
+                <div v-if="cardStateValue==='allInformation'" class="user_data_div">
+                    <!--头像 名字 性别-->
+                    <div class="user_data_content">
+                        <div style="width: 100%;display: flex">
+                            <div class="user_data_avatar">
+                                <img :src="user.avatar" alt="头像">
+                            </div>
+                            <div class="user_data_name_sex_level_uid">
+                                <h4>{{user.nickname}}</h4>
+                                <div class="user_data_sex_level_uid">
+                                    <span v-if="user.gender===1" class="user_sex_male"></span>
+                                    <span v-else-if="user.gender===0" class="user_sex_female"></span>
+                                    <span v-else class="user_sex_sex"></span>
+                                    <span class="user_level">LVL{{user.level}}</span>
+                                    <span class="user_uid">UID:{{user.userid}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="user_other_data_div">
+                            <!--签名-->
+                            <div class="user_synopsis">
+                                签名：{{user.synopsis === null ? "你还没有签名，快去写个签名吧。" : user.synopsis}}
+                            </div>
+                            <div class="user_other_data_item">
+                                <span>生日：</span>
+                                <span>{{user.birthday === null ? "无" : user.birthday}}</span>
+                            </div>
+                            <div class="user_other_data_item">
+                                <span>学校：</span>
+                                <span>{{user.school === null ? "无" : user.school}}</span>
+                            </div>
+                            <div class="user_other_data_item">
+                                <span>地区：</span>
+                                <span>{{user.region === null ? "无" : user.region}}</span>
+                            </div>
+                            <div class="user_other_data_item">
+                                <span>邮箱：</span>
+                                <span>{{user.useremail}}</span>
+                            </div>
+                            <div class="user_other_data_item">
+                                <span>手机：</span>
+                                <span>{{user.phonenumber === null ? "无" : user.phonenumber}}</span>
+                            </div>
+                            <div class="user_other_data_item">
+                                <span>注册时间：</span>
+                                <span>{{user.regtime === null ? "无" : user.regtime}}</span>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!--底部控制-->
+                    <div class="user_data_control_div">
+                        <div class="user_data_update_div">
+                            <div @click="updateInformationBtn">修改信息</div>
+                            <div @click="updatePasswordBtn">修改密码</div>
+                        </div>
+                        <div class="loginOut_div" @click="loginOut">
+                            <span class="loginOuText">退出登录</span>
+                            <span class="loginOutImg"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </transition>
+            <!--修改信息-->
+            <transition name="fade">
+                <div v-if="cardStateValue==='updateInformation'" class="user_update_data_div">
+                    <div style="display:flex;justify-content: space-between;border-bottom: 2px #626262 solid;padding-bottom: 10px">
+                        <div @click="updateBackBtn" class="update_information_div_back_btn">
+                            <span class="update_information_div_back_btn_img"></span>返回
+                        </div>
+                        <div style="color:#a8a8a8;display: flex;align-items: center"><img
+                                style="width: 20px;height: 20px;margin: 0;padding: 0" src="image/index_04/tip_icon.png"
+                                alt=""> 点击单项更改
+                        </div>
+                    </div>
+                    <div class="update_user_data_item" @click="updateItemDataBtn('avatar',user.avatar)">
+                        <div style="color: #ffffff;font-weight: 600;font-size: 1em;">头像</div>
+                        <img :src="user.avatar" alt="">
+                        <span></span>
+                    </div>
+                    <div class="update_user_data_item" @click="updateItemDataBtn('synopsis',user.synopsis)">
+                        <div class="update_user_data_item_jianjie">
+                            <div>简介：</div>
+                            <div>{{user.synopsis === null ? "无" : user.synopsis}}</div>
+                        </div>
+                        <span></span>
+                    </div>
+                    <div class="update_user_data_item" @click="updateItemDataBtn('nickname',user.nickname)">
+                        <div class="update_user_data_item_left">
+                            <span>昵称：</span>
+                            <span>{{user.nickname === null ? "无" : user.nickname}}</span>
+                        </div>
+                        <span></span>
+                    </div>
+                    <div class="update_user_data_item" @click="updateItemDataBtn('gender',user.gender)">
+                        <div class="update_user_data_item_left">
+                            <span>性别：</span>
+                            <span v-if="user.gender===0">女</span>
+                            <span v-else-if="user.gender===1">男</span>
+                            <span v-else>外星人</span>
+                        </div>
+                        <span></span>
+                    </div>
+                    <div class="update_user_data_item" @click="updateItemDataBtn('birthday',user.birthday)">
+                        <div class="update_user_data_item_left">
+                            <span>生日：</span>
+                            <span>{{user.birthday === null ? "无" : user.birthday}}</span>
+                        </div>
+                        <span></span>
+                    </div>
+                    <div class="update_user_data_item" @click="updateItemDataBtn('phonenumber',user.phonenumber)">
+                        <div class="update_user_data_item_left">
+                            <span>手机：</span>
+                            <span>{{user.phonenumber === null ? "无" : user.phonenumber}}</span>
+                        </div>
+                        <span></span>
+                    </div>
+                    <div class="update_user_data_item" @click="updateItemDataBtn('school',user.school)">
+                        <div class="update_user_data_item_left">
+                            <span>学校：</span>
+                            <span>{{user.school === null ? "无" : user.school}}</span>
+                        </div>
+                        <span></span>
+                    </div>
+                    <div class="update_user_data_item" @click="updateItemDataBtn('region',user.region)">
+                        <div class="update_user_data_item_left">
+                            <span>地区：</span>
+                            <span>{{user.region === null ? "无" : user.region}}</span>
+                        </div>
+                        <span></span>
+                    </div>
 
 
+                </div>
+            </transition>
+            <!--修改密码-->
+            <transition name="fade">
+                <div v-if="cardStateValue==='updatePassword'" class="user_data_div">
+                    <!--头像 名字 性别-->
+                    <div class="user_data_content">
+                        <div style="width: 100%;display: flex">
+                            <div class="user_data_avatar">
+                                <img :src="user.avatar" alt="头像">
+                            </div>
+                            <div class="user_data_name_sex_level_uid">
+                                <h4>{{user.nickname}}</h4>
+                                <div class="user_data_sex_level_uid">
+                                    <span v-if="user.gender===1" class="user_sex_male"></span>
+                                    <span v-else-if="user.gender===0" class="user_sex_female"></span>
+                                    <span v-else class="user_sex_sex"></span>
+                                    <span class="user_level">LVL{{user.level}}</span>
+                                    <span class="user_uid">UID:{{user.userid}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="user_other_data_div">
+                            <!--签名-->
+                            <div class="user_synopsis">
+                                签名：{{user.synopsis === null ? "你还没有签名，快去写个签名吧。" : user.synopsis}}
+                            </div>
+                            <div class="user_other_data_item">
+                                <span>生日：</span>
+                                <span>{{user.birthday === null ? "无" : user.birthday}}</span>
+                            </div>
+                            <div class="user_other_data_item">
+                                <span>学校：</span>
+                                <span>{{user.school === null ? "无" : user.school}}</span>
+                            </div>
+                            <div class="user_other_data_item">
+                                <span>地区：</span>
+                                <span>{{user.region === null ? "无" : user.region}}</span>
+                            </div>
+                            <div class="user_other_data_item">
+                                <span>邮箱：</span>
+                                <span>{{user.useremail}}</span>
+                            </div>
+                            <div class="user_other_data_item">
+                                <span>手机：</span>
+                                <span>{{user.phonenumber === null ? "无" : user.phonenumber}}</span>
+                            </div>
+                            <div class="user_other_data_item">
+                                <span>注册时间：</span>
+                                <span>{{user.regtime === null ? "无" : user.regtime}}</span>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!--底部控制-->
+                    <div class="user_data_update_div">
+                        <div>修改信息</div>
+                        <div>修改密码</div>
+                        <div>退出登录</div>
+                    </div>
+
+                </div>
+            </transition>
+            <!--右侧-->
+            <div class="user_study_data_div"></div>
 
 
-
-
-
-
+        </div>
     </div>
 </div>
 
 
+<script>
+
+    const userDataApp = new Vue({
+        el: "#userDataApp",
+        data: {
+
+            user: [],
+            cardStateValue: "allInformation"  //左侧显示状态  allInformation  updateInformation   updatePassword
+        },
+        created() {
+            this.fetchUserInformationAxios()
+        },
+        methods: {
+            /*点击某一项 打开修改卡*/
+            updateItemDataBtn(category, value) {
+                updateCardApp.openUpdateCard(category, value);
+            },
+            /*获取我的个人所有信息*/
+            fetchUserInformationAxios() {
+                let _this = this
+                axios({
+                    method: "get",
+                    url: "search/findUserById"
+                }).then(function (data) {
+                    _this.user = data.data
+                });
+            },
+            /*修改信息按钮*/
+            updateInformationBtn() {
+                this.cardStateValue = "updateInformation"
+            },
+            /*修改也买你顶部返回按钮*/
+            updateBackBtn() {
+                this.cardStateValue = "allInformation"
+            },
+            updatePasswordBtn() {
+
+            },
+            loginOut() {
+
+            },
+        }
+
+    })
+    const updateCardApp = new Vue({
+        el: "#updateCardApp",
+        data: {
+            avatarUrl: [
+                {url: "image/avatar/gif/101.gif"},
+                {url: "image/avatar/gif/102.gif"},
+                {url: "image/avatar/gif/103.gif"},
+                {url: "image/avatar/gif/104.gif"},
+                {url: "image/avatar/gif/105.gif"},
+                {url: "image/avatar/gif/106.gif"},
+                {url: "image/avatar/gif/107.gif"},
+                {url: "image/avatar/gif/108.gif"},
+                {url: "image/avatar/gif/109.gif"},
+                {url: "image/avatar/gif/110.gif"},
+                {url: "image/avatar/gif/111.gif"},
+                {url: "image/avatar/gif/112.gif"},
+                {url: "image/avatar/gif/113.gif"},
+                {url: "image/avatar/gif/114.gif"},
+                {url: "image/avatar/gif/115.gif"},
+                {url: "image/avatar/gif/116.gif"},
+                {url: "image/avatar/gif/117.gif"},
+                {url: "image/avatar/gif/118.gif"},
+                {url: "image/avatar/gif/119.gif"},
+                {url: "image/avatar/gif/120.gif"},
+                {url: "image/avatar/gif/121.gif"},
+                {url: "image/avatar/gif/122.gif"},
+                {url: "image/avatar/gif/123.gif"},
+                {url: "image/avatar/gif/124.gif"},
+                {url: "image/avatar/gif/125.gif"},
+                {url: "image/avatar/gif/126.gif"},
+                {url: "image/avatar/gif/127.gif"},
+                {url: "image/avatar/gif/128.gif"},
+                {url: "image/avatar/gif/129.gif"},
+                {url: "image/avatar/gif/130.gif"},
+                {url: "image/avatar/gif/131.gif"},
+                {url: "image/avatar/gif/132.gif"},
+                {url: "image/avatar/gif/133.gif"},
+                {url: "image/avatar/gif/134.gif"},
+                {url: "image/avatar/gif/135.gif"},
+                {url: "image/avatar/gif/136.gif"},
+                {url: "image/avatar/gif/137.gif"},
+                {url: "image/avatar/gif/138.gif"},
+                {url: "image/avatar/gif/139.gif"},
+                {url: "image/avatar/gif/140.gif"},
+                {url: "image/avatar/gif/141.gif"},
+                {url: "image/avatar/gif/142.gif"},
+                {url: "image/avatar/gif/143.gif"},
+                {url: "image/avatar/gif/144.gif"},
+                {url: "image/avatar/gif/145.gif"},
+                {url: "image/avatar/gif/146.gif"},
+                {url: "image/avatar/gif/147.gif"},
+                {url: "image/avatar/gif/148.gif"},
+                {url: "image/avatar/gif/149.gif"},
+                {url: "image/avatar/gif/150.gif"},
+                {url: "image/avatar/gif/151.gif"},
+                {url: "image/avatar/gif/152.gif"},
+                {url: "image/avatar/gif/153.gif"},
+                {url: "image/avatar/gif/154.gif"},
+                {url: "image/avatar/gif/155.gif"},
+                {url: "image/avatar/gif/156.gif"},
+                {url: "image/avatar/gif/157.gif"},
+                {url: "image/avatar/gif/158.gif"},
+                {url: "image/avatar/gif/159.gif"},
+                {url: "image/avatar/gif/160.gif"},
+                {url: "image/avatar/gif/161.gif"},
+                {url: "image/avatar/gif/162.gif"},
+                {url: "image/avatar/gif/163.gif"},
+                {url: "image/avatar/gif/164.gif"},
+                {url: "image/avatar/gif/165.gif"},
+                {url: "image/avatar/gif/166.gif"},
+                {url: "image/avatar/gif/167.gif"},
+                {url: "image/avatar/gif/168.gif"},
+                {url: "image/avatar/gif/169.gif"},
+                {url: "image/avatar/gif/170.gif"},
+                {url: "image/avatar/gif/171.gif"},
+                {url: "image/avatar/gif/172.gif"},
+                {url: "image/avatar/gif/173.gif"},
+                {url: "image/avatar/gif/174.gif"},
+                {url: "image/avatar/gif/175.gif"},
+                {url: "image/avatar/gif/176.gif"},
+                {url: "image/avatar/gif/177.gif"},
+                {url: "image/avatar/gif/178.gif"},
+                {url: "image/avatar/gif/179.gif"},
+                {url: "image/avatar/gif/180.gif"},
+                {url: "image/avatar/gif/181.gif"},
+                {url: "image/avatar/gif/182.gif"},
+                {url: "image/avatar/gif/183.gif"},
+                {url: "image/avatar/gif/184.gif"},
+                {url: "image/avatar/gif/185.gif"},
+                {url: "image/avatar/gif/186.gif"},
+                {url: "image/avatar/gif/187.gif"},
+                {url: "image/avatar/gif/188.gif"},
+                {url: "image/avatar/gif/189.gif"},
+                {url: "image/avatar/gif/190.gif"},
+                {url: "image/avatar/gif/191.gif"},
+                {url: "image/avatar/gif/192.gif"},
+                {url: "image/avatar/gif/193.gif"},
+                {url: "image/avatar/gif/194.gif"},
+                {url: "image/avatar/gif/195.gif"},
+                {url: "image/avatar/gif/196.gif"},
+                {url: "image/avatar/gif/197.gif"},
+                {url: "image/avatar/gif/198.gif"},
+                {url: "image/avatar/gif/199.gif"},
+                {url: "image/avatar/gif/200.gif"},
+                {url: "image/avatar/gif/201.gif"},
+                {url: "image/avatar/gif/202.gif"},
+                {url: "image/avatar/gif/203.gif"},
+            ],
+            cardTitle: "",  //标题
+            cardShowValue: false,
+            dataValue: "",    //要修改的值
+            newUpdateValue: null,    //更改的新值
+            updateCategory: "",   //类别
+            oldAvatarId: "null",
+
+        },
+        created() {
+        },
+        methods: {
+            /*确认修改按钮*/
+            updateConfirmBtn() {
+                let _this = this
+                if (this.newUpdateValue !== null) {
+                    axios({
+                        method: "post",
+                        url: "update/updateUserData?newValue=" + this.newUpdateValue + "&category=" + this.updateCategory
+                    }).then(async function (data) {
+                        if (data.data) {
+                            await userDataApp.fetchUserInformationAxios()  //如修改成功  这刷新user数据
+                            _this.closeUpdateCard()   //关闭选卡片
+                            NotificationVue.showPublicNotification("success", "修改成功！")
+                        } else {
+                            NotificationVue.showPublicNotification("error", "发生未知错误，修改失败！")
+                        }
+                    });
+                }
+            },
+            openUpdateCard(category, value) {
+                if (category === 'avatar')
+                    this.cardTitle = "修改头像"
+                if (category === 'synopsis')
+                    this.cardTitle = "修改简介"
+                if (category === 'nickname')
+                    this.cardTitle = "修改昵称"
+                if (category === 'gender')
+                    this.cardTitle = "修改性别"
+                if (category === 'birthday')
+                    this.cardTitle = "修改生日"
+                if (category === 'phonenumber')
+                    this.cardTitle = "修改手机号"
+                if (category === 'region')
+                    this.cardTitle = "修改地区"
+                if (category === 'school')
+                    this.cardTitle = "修改学校"
+                this.updateCategory = category
+                this.dataValue = value  //要修改的值
+                this.cardShowValue = true
+
+            },
+            closeUpdateCard() {
+                this.cardShowValue = false
+                this.dataValue = ""    //要修改的值
+                this.newUpdateValue = null    //更改的新值
+                this.updateCategory = ""   //类别
+                this.oldAvatarId = "null"
+            },
+            avatarImgBtn(v) {
+                const new_id = document.getElementById(v)
+                if (v === this.oldAvatarId) {  //点击同一个
+                    new_id.classList.remove("avatar_border_active")
+                    this.oldAvatarId = "null"
+                    this.newUpdateValue = null
+                } else {
+                    if (this.oldAvatarId === "null") {   //第一次点击
+                        this.oldAvatarId = v
+                        new_id.classList.add("avatar_border_active")
+                    } else {
+                        const old_id = document.getElementById(this.oldAvatarId)
+                        old_id.classList.remove("avatar_border_active")
+                        new_id.classList.add("avatar_border_active")
+                        this.oldAvatarId = v
+                    }
+                    this.newUpdateValue = v
+                }
+
+            },
+        }
+    })
 
 
+    /*弹窗*/
+    const MessageBoxContent = new Vue({
+        el: "#MessageBoxContent",
+        data: {
+            messageBoxQuestion: "",
+            borderFramesValue: false,
+        },
+        methods: {
+            /*public确认还是取消按钮并关闭弹窗*/
+            messageBoxConfirmBtn(v) {
+                window.sessionStorage.setItem("messageBoxConfirmValue", v);
+                //关闭弹窗
+                let messageBox = document.getElementById("messageBox");
+                let MessageBoxContent = document.getElementById("MessageBoxContent");
+                MessageBoxContent.style.display = "none"
+                messageBox.style.marginTop = "-200px";
+            },
+            /*打开弹窗 其他vue实例使用*/
+            openMessageBox(content) {
+                sessionStorage.setItem("messageBoxConfirmValue", "null");
+                this.messageBoxQuestion = content
+                // this.functionName = functionName
+                let messageBox = document.getElementById("messageBox");
+                let MessageBoxContent = document.getElementById("MessageBoxContent");
+                MessageBoxContent.style.display = "flex"
+                messageBox.style.marginTop = "20px";
+            },
+            tipEffection() {
+                this.borderFramesValue = true
+            },
+            tipEffectionEnd() {
+                this.borderFramesValue = false
+            },
+
+        }
+    })
+    /*消息vue*/
+    const NotificationVue = new Vue({
+        el: "#notification",
+        data: {
+            no_content: '',
+            no_type: '',   //error，message消息，warn警告,success成功
+            timer: null,
+            spantype: {
+                error: {
+                    value: '失败',
+                    src: 'image/public_notification/error.png'
+                },
+                message: {
+                    value: '消息',
+                    src: 'image/public_notification/message.png'
+                },
+                success: {
+                    value: '成功',
+                    src: 'image/public_notification/success.png'
+                },
+                warn: {
+                    value: '警告',
+                    src: 'image/public_notification/warn.png'
+                },
+            }
+        },
+        methods: {
+            showPublicNotification(type, content) {
+                if (this.timer) { //计时器已经存在则销毁
+                    clearTimeout(this.timer)
+                    this.timer = null
+                }
+                const id = document.getElementById("notification")
+                id.style.right = "30px";
+                this.no_content = content
+                this.no_type = type
+                this.timer = setTimeout(() => {
+                    this.no_content = ''
+                    this.no_type = ''
+                    id.style.right = "-300px"
+                }, 3000)
+            }
+        },
+    })
+</script>
 </body>
 </html>

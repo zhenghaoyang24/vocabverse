@@ -58,6 +58,12 @@ public class TestUserMapper {
         mapper.userSignUpMapper(user);
     }
 
+    @Test
+    public void updateUser1() {
+        mapper.updateGenderMapper("1",1000);
+
+    }
+
 
 
 

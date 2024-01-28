@@ -9,14 +9,23 @@ public class Word {
     double frequency;
     int difficulty;
 
-    int studycount;
+    int studytimes;
+    int searchtimes;
 
-    public int getStudycount() {
-        return studycount;
+    public int getSearchtimes() {
+        return searchtimes;
     }
 
-    public void setStudycount(int studycount) {
-        this.studycount = studycount;
+    public void setSearchtimes(int searchtimes) {
+        this.searchtimes = searchtimes;
+    }
+
+    public int getStudytimes() {
+        return studytimes;
+    }
+
+    public void setStudytimes(int studytimes) {
+        this.studytimes = studytimes;
     }
 
     public int getWordid() {
@@ -85,7 +94,8 @@ public class Word {
                 ", paraphrase='" + paraphrase + '\'' +
                 ", frequency=" + frequency +
                 ", difficulty=" + difficulty +
-                ", studycount=" + studycount +
+                ", studytimes=" + studytimes +
+                ", searchtimes=" + searchtimes +
                 '}';
     }
 }

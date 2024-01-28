@@ -18,7 +18,8 @@
 
 }
 body {
-    /*background-image: url("../../image/body_bgimage.jpg");*/
+    min-width: 800px;
+    user-select: none;
     background-color: var(--blackBackgroung);
     margin: 0;
     padding: 0;
@@ -26,8 +27,6 @@ body {
     background-position: right;
     background-attachment: fixed;
     background-size: cover;
-
-    /*--Colors:#dfdfdf;*/
 }
 /*设置滚动条的长、宽为0*/
 html::-webkit-scrollbar {
@@ -48,13 +47,12 @@ html::-webkit-scrollbar-thumb {
 }
 
 .content-div{
+    width: auto;
     /*height:500px;*/
     padding: 10px;
     /*width: 100%;*/
     /*border: 1px solid #484848;*/
-    /*box-shadow: 0 0 10px 2px #000000;*/
-    /*background-color: #ffffff;*/
-    /*border-radius: 5px;*/
+
 
 }
 
@@ -67,11 +65,11 @@ html::-webkit-scrollbar-thumb {
     padding: 10px;
     width: 250px;
     /*height: 50px;*/
-    background-color: #2c2c2c;
-    box-shadow: 0 0 6px 2px #4f4f4f;
+    background-color: #262626;
+    box-shadow: 0 0 3px 1px #6b6b6b;
     border-radius: 5px;
     right: -300px;
-    top: 50px;
+    top: 60px;
 }
 .public_notification_content{
     padding-top: 10px;
@@ -99,6 +97,7 @@ html::-webkit-scrollbar-thumb {
     font-size: 15px;
 }
 
+
 /*弹窗*/
 .MessageBoxDiv{
     user-select: none;
@@ -109,9 +108,10 @@ html::-webkit-scrollbar-thumb {
     width: 100%;
     height: 100%;
     z-index: 99999;
-    /*justify-content: ;*/
+    background-color: rgba(0, 0, 0, 0.62);
 }
 .MessageBox{
+    border: 2px rgba(255, 0, 0, 0) solid;
     box-shadow: 0 0 4px 1px #626262;
     margin-top: -200px;
     border-radius: 5px;
@@ -121,10 +121,7 @@ html::-webkit-scrollbar-thumb {
     padding-top:  20px;
     padding-right:  20px;
     padding-left:  20px;
-    /*border: 1px #ff0000 solid;!important;*/
-
-    transition: all 0.3s;
-    /*animation: MessageBoxTip 2s normal infinite;*/
+    transition: all 0.2s;
 }
 .MessageBoxContent{
     /*height: 100%;*/
@@ -157,4 +154,17 @@ html::-webkit-scrollbar-thumb {
     padding: 5px;
     border-radius: 5px;
     width: 40%;
+}
+
+/*弹出框边框动画*/
+@keyframes MessageBoxBorderFrames {
+    10% {
+        border: 2px rgba(255, 0, 0) solid;
+    }
+    50% {
+        border: 2px rgba(255, 0, 0, 0) solid;
+    }
+    90% {
+        border: 2px rgba(255, 0, 0) solid;
+    }
 }

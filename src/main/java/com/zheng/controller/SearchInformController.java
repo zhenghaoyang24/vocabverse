@@ -1,15 +1,12 @@
 package com.zheng.controller;
 
-import com.zheng.pojo.Example;
-import com.zheng.pojo.User;
-import com.zheng.pojo.Word;
-import com.zheng.service.ExampleService;
-import com.zheng.service.UserService;
-import com.zheng.service.WordService;
+import com.zheng.pojo.*;
+import com.zheng.service.*;
+import com.zheng.utils.GetNowDataUtil;
 import com.zheng.utils.UserSessionCookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,6 +26,43 @@ public class SearchInformController {
     private UserService userService;
     @Autowired
     private ExampleService exampleService;
+    @Autowired
+    private UserBookService userBookService;
+    @Autowired
+    private DailyService dailyService;
+
+
+    @RequestMapping(value = "/getWordsSearchTimesRank", method = RequestMethod.GET)
+    @ResponseBody
+    List<Word> getWordsSearchTimes() {
+        return wordService.getWordsSearchTimesRank();
+    }
+
+    @RequestMapping(value = "/getWordsStudyTimesRank", method = RequestMethod.GET)
+    @ResponseBody
+    List<Word> getWordsStudyTimesRank() {
+        return wordService.getWordsStudyTimesRank();
+    }
+
+    @RequestMapping(value = "/getAllSearchWordHistory", method = RequestMethod.GET)
+    @ResponseBody
+    List<SearchWordHistory> getAllSearchWordHistory(HttpServletRequest request) {
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+        return wordService.getAllSearchWordHistory(userid);
+    }
+
+
+    @RequestMapping(value = "/dailyExist", method = RequestMethod.GET)
+    @ResponseBody
+    public Daily dailyExist(HttpServletRequest request) {
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+        String time = GetNowDataUtil.getNowData();
+        Daily daily = dailyService.getDaily(userid, time);
+        if (daily == null)
+            return null;
+        else
+            return daily;
+    }
 
 
     /**
@@ -40,7 +74,7 @@ public class SearchInformController {
     @RequestMapping(value = "/searchWordByInput", method = RequestMethod.GET)
     @ResponseBody
     public List<Word> searchWordByInput(String inputText) {
-        System.out.println(inputText);
+        System.out.println("searchWordByInput");
         List<Word> wordList = null;
         boolean en = inputText.matches("^[a-zA-Z]*");
         boolean cn = inputText.matches("[\\u4e00-\\u9fa5]+");
@@ -75,6 +109,7 @@ public class SearchInformController {
 
     /**
      * 根据id搜索例句
+     *
      * @param wordid
      * @return
      */
@@ -88,6 +123,7 @@ public class SearchInformController {
 
     /**
      * 当前用户userid
+     *
      * @param request
      * @return
      */
@@ -99,18 +135,53 @@ public class SearchInformController {
     }
 
 
-//    /**
-//     * 根据例句的hoderid查找用户
-//     * @param holderid
-//     * @return
-//     */
-//    @RequestMapping(value = "/findUserByHolderid", method = RequestMethod.GET,produces = {"application/json;charset=UTF-8"})
-//    @ResponseBody
-//    public String findUserByHoderid(int holderid, HttpServletResponse response) {
-//        response.setCharacterEncoding("UTF-8");
-//        response.setContentType("text/html; charset=UTF-8");
-//        User userById = userService.findUserById(holderid);
-//        String usernickname = userById.getNickname();
-//        return usernickname;
-//    }
+    /**
+     * 查询所有我的词库
+     *
+     * @param holderid
+     * @return
+     */
+    @RequestMapping(value = "/allMyUserBooks", method = RequestMethod.GET)
+    @ResponseBody
+    public List<UserBook> allMyUserBooks(int holderid) {
+        List<UserBook> userBooks = userBookService.allMyUserBooks(holderid);
+        return userBooks;
+    }
+
+
+    /**
+     * 判断这个单词是否在这本书里
+     *
+     * @param wordid
+     * @param bookid
+     * @return
+     */
+    @RequestMapping(value = "/judgeTheWordInTheBook", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean judgeTheWordInTheBook(int wordid, int bookid) {
+        VocBook vocBook = userBookService.judgeTheWordInTheBook(wordid, bookid);
+        if (vocBook == null)
+            return false;  //改单词在这个单词本
+        else
+            return true;
+    }
+
+
+    @RequestMapping(value = "/getUserBookOfAllWords", method = RequestMethod.GET)
+    @ResponseBody
+    List<VocBook> theUserBookOfAllWords(int bookid) {
+        List<VocBook> vocBooks = userBookService.theUserBookOfAllWords(bookid);
+        return vocBooks;
+    }
+
+    @RequestMapping(value = "/findUserById", method = RequestMethod.GET)
+    @ResponseBody
+    User findUserById(HttpServletRequest request) {
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+        User user = userService.findUserById(userid);
+        return user;
+    }
+
+
+
 }

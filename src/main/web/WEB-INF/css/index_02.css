@@ -3,18 +3,18 @@
     width: 100%;
 }
 
-.btnTranslate{
+.btnTranslate {
     margin-left: 50px;
     cursor: pointer;
     height: auto;
     color: whitesmoke;
-    border: 1px whitesmoke solid;
-    font-size: 0.8em;
-    transition: all 0.3s;
+    border: 2px #00e57b solid;
+    transition: all 0.2s;
 }
+
 .btnTranslate:hover {
-    color: var(--greenColor00e57b);
-    border: 1px var(--greenColor00e57b) solid;
+    color: #000000;
+    background-color: #00e57b;
 }
 
 .translateControlDiv {
@@ -26,18 +26,19 @@
 }
 
 .translateControlDiv span {
-    /*margin: auto;*/
+    width: 100px;
+    text-align: center;
     line-height: 40px;
-    padding-left: 10px;
-    padding-right: 10px;
+    font-weight: 700;
+    font-size: 1.1em;
     border-radius: 5px;
+    box-sizing: content-box;
+
 }
 
 .zidongjiance {
-    border: 1px var(--btnBoderColor) solid;
-    height: auto;
-    color: var(--normalTextColor);
-    font-size: 0.8em;
+    border: 2px solid #c4c4c4;
+    color: #c4c4c4;
 }
 
 .zhuanhuan {
@@ -53,7 +54,7 @@
     cursor: pointer;
     height: auto;
     color: var(--greenColor00e57b);
-    border: 1px var(--greenColor00e57b) solid;
+    border: 2px var(--greenColor00e57b) solid;
     font-size: 0.8em;
     transition: all 0.3s;
 }
@@ -85,7 +86,8 @@
     flex-wrap: wrap;
     width: 500px;
 }
-.select_languages_item_div:hover{
+
+.select_languages_item_div:hover {
     display: flex;
 }
 
@@ -198,8 +200,370 @@
     }
 }
 
-.zishudiv{
+.zishudiv {
     color: whitesmoke;
-float: right;
+    float: right;
 
 }
+
+
+/*查词
+
+
+
+
+
+*/
+
+/*.today_study_div {*/
+/*    !*border: 1px red solid;*!*/
+/*    user-select: none;*/
+/*    width: 100%;*/
+/*    !*margin: auto;*!*/
+/*    !*height: auto;*!*/
+/*    !*border-bottom: 1px var(--btnBoderColor) solid;*!*/
+/*    !*padding-bottom: 5px;*!*/
+/*    !*padding: 10px;*!*/
+/*}*/
+
+/*.today_study_div > h1 {*/
+/*    color: var(--normalTextColor);*/
+/*}*/
+
+.today_study_shuju {
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 1em;
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--normalTextColor);
+    margin: auto;
+}
+
+.today_study_shuju > div {
+    display: flex;
+    align-items: center;
+}
+
+.today_study_shuju span {
+    font-size: 1.8em;
+    color: var(--greenColor00e57b);
+}
+
+.search_input_div {
+    user-select: none;
+    width: auto;
+    height: auto;
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    /*padding-top: 20px;*/
+}
+
+.word_rank_div {
+    min-width: 140px;
+    border-radius: 5px;
+    border: 1px solid #3d3d3d;
+    box-shadow: 0 0 4px 1px #2f2f2f;
+    width: 15%;
+    height: 450px;
+}
+
+.word_rank_div > h4 {
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin: 0;
+    color: whitesmoke;
+}
+
+.word_rank_content_div {
+    padding: 5px;
+}
+
+.word_rank_item {
+cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+    border-radius: 3px;
+}
+.word_rank_item:hover{
+    background-color: #313131;
+}
+
+.word_rank_item > span:nth-child(1) {
+    white-space: nowrap; /* 不换行 */
+    overflow: hidden;    /* 超出部分隐藏 */
+    text-overflow: ellipsis; /* 超出部分显示省略号 */
+    color: #d3d3d3;
+}
+
+.word_rank_item > span:nth-child(2) {
+    color: #ff6c2f;
+}
+
+.search_word_content_div {
+    width: 65%;
+}
+
+.inputBox {
+    display: block;
+    z-index: 10;
+    height: 20px;
+    padding: 15px;
+    border: 1px solid #cbcbcb;
+    outline: none;
+    border-radius: 5px;
+    font-weight: 700;
+    width: 60%;
+    margin: auto;
+    color: #ffffff;
+    font-size: 17px;
+    background: none;
+    transition: all 0.2s;
+}
+
+.inputBox:valid {
+    width: 80%;
+    /*transition: all 0.2s;*/
+}
+
+
+.inputBox:focus {
+    border: 1px solid #00e57b;
+}
+
+
+.inputBox::-webkit-input-placeholder { /* 使用webkit内核的浏览器 */
+    font-weight: 400;
+    color: #808080;
+}
+
+.inputBox:-moz-placeholder { /* Firefox版本4-18 */
+    font-weight: 400;
+    color: #808080;
+}
+
+.inputBox::-moz-placeholder { /* Firefox版本19+ */
+    font-weight: 400;
+    color: #808080;
+}
+
+.inputBox:-ms-input-placeholder { /* IE浏览器 */
+    font-weight: 400;
+    color: #808080;
+}
+
+.searchQuickDiv {
+    width: 80%;
+    border-radius: 5px;
+    /*border-bottom-right-radius: 5px;*/
+    max-height: 400px;
+    overflow: auto;
+    z-index: 5;
+    padding: 10px;
+    position: relative;
+    /*width: 90%;*/
+    margin: auto;
+    /*margin-top: -1px;*/
+    border: 1px solid #c0c0c0;
+}
+
+/*设置滚动条的长、宽为0*/
+.searchQuickDiv::-webkit-scrollbar {
+    height: 100%;
+    width: 5px;
+    /*color: #00e57b;*/
+    background-color: #ffffff;
+}
+
+.searchQuickDiv::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #00e57b;
+}
+
+.searchQuickDiv > ul {
+    padding: 0;
+    text-decoration: none;
+}
+
+.searchQuickDiv > ul li {
+    display: flex;
+    /*justify-content: space-between;*/
+    padding: 5px;
+    cursor: pointer;
+    font-size: 17px;
+    margin-bottom: 10px;
+    /*border: 1px red solid;*/
+    list-style: none;
+    text-decoration: none;
+    color: white;
+    /*display: block;*/
+}
+
+.searchQuickDiv > ul li:hover {
+    /*color: #00e57b;*/
+    color: var(--greenColor00e57b);
+}
+
+.searchQuickDiv:hover + .inputBox {
+    /*border-bottom: 1px solid #ff0000;*/
+}
+
+.spelling_span {
+    width: 100%; /*设置显示的最大宽度*/
+}
+
+.deleteInputBtn {
+    width: 50px;
+    height: 50px;
+    /*float: right;*/
+    /*position: absolute;*/
+    cursor: pointer;
+    transition: all 0.3s;
+    display: none;
+    justify-content: center;
+    line-height: 50px;
+    /*margin-left: -5%;*/
+    border-radius: 10px;
+    background-image: url("../image/index-00/deleteBtn-white.png");
+    background-position: center;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    color: whitesmoke;
+    border: 1px solid var(--btnBoderColor);
+    /*background: whitesmoke;*/
+}
+
+.inputBox:valid ~ .deleteInputBtn {
+    display: flex;
+    transition: all 0.3s;
+}
+
+.deleteInputBtn:hover {
+    background-image: url("../image/index-00/deleteBtn-green.png");
+    border: 1px var(--greenColor00e57b) solid;
+    color: white;
+}
+
+.freshDataBtn {
+    cursor: pointer;
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background-image: url("../image/public_icon/freshBtn_white.png");
+    background-repeat: no-repeat;
+    background-size: 15px 15px;
+    transition: all 0.5s;
+    transform-origin: center center;
+
+}
+
+.freshDataBtn:hover {
+    background-image: url("../image/public_icon/freshBtn_green.png");
+}
+
+.search_history_div {
+    width: 86%;
+    /*margin-top: 10px;*/
+    border-top: 1px #00e57b solid;
+    margin: 20px auto;
+}
+
+.search_history_div_title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 5px;
+    padding-left: 5px;
+
+}
+
+.search_history_div_title > span:nth-child(1) {
+    color: #c5c5c5;
+    font-family: "Microsoft YaHei UI", serif;
+    font-size: 0.9em;
+}
+
+.search_history_div_title > span:nth-child(2) {
+    cursor: pointer;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url("../image/index-02/deleteall_white.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: all 0.2s;
+}
+
+.search_history_div_title > span:nth-child(2):hover {
+    background-image: url("../image/index-02/deleteall_green.png");
+}
+
+.search_history_div_content {
+    width: auto;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+}
+
+.wordHistory_item_div {
+    margin-right: 20px;
+    margin-top: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: left;
+    align-items: center;
+    background-color: #696969;
+    border-radius: 5px;
+    padding: 3px;
+}
+
+.wordHistory_item_div > span:nth-child(1) {
+    padding-right: 3px;
+    display: inline-block;
+    color: whitesmoke;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.wordHistory_item_div > span:nth-child(1):hover {
+    color: #00e57b;
+}
+
+.wordHistory_item_div > span:nth-child(2) {
+    cursor: pointer;
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    background-size: 13px 13px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("../image/index-02/chacha_white.png");
+    transition: all 0.2s;
+}
+
+.wordHistory_item_div > span:nth-child(2):hover {
+    background-image: url("../image/index-02/chacha_green.png");
+}
+
+
+@keyframes fresh-rotate {
+    0% {
+        transform: rotate(0deg);
+        background-image: url("../image/public_icon/freshBtn_green.png");
+    }
+    100% {
+        transform: rotate(720deg);
+        background-image: url("../image/public_icon/freshBtn_white.png");
+    }
+}
+

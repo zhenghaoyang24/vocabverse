@@ -39,7 +39,7 @@
     height: 40px;
     /*padding: 10px;*/
     background-position: center;
-    background-size: 20px 20px;
+    background-size: 30px 30px;
     background-repeat: no-repeat;
     transition: all 0.2s;
     margin-left: 20px;
@@ -49,20 +49,21 @@
     box-shadow: 0 0 4px 1px #4f4f4f;
 }
 
-.topBtn > img {
-    width: 50%;
-    height: 50%;
-    margin: auto;
+.jiyiBtn {
+    background-image: url("../image/pageWordDetail/jiyi.png");
 }
 
-.addBtn {
-    background-image: url("../image/pageWordDetail/add.png");
+.jiyiBtn:hover {
+    background-image: url("../image/pageWordDetail/jiyi_green.png");
 }
 
-.addBtn:hover {
-    background-image: url("../image/pageWordDetail/add_green.png");
+.addShoucangBtn {
+    background-image: url("../image/pageWordDetail/shoucang.png");
 }
 
+.addShoucangBtn:hover {
+    background-image: url("../image/pageWordDetail/shoucang_green.png");
+}
 
 .topControlDiv {
     display: flex;
@@ -81,7 +82,6 @@
     justify-content: space-between;
     padding-top: 10px;
     padding-bottom: 10px;
-
 }
 
 .wordspelling > span {
@@ -89,6 +89,7 @@
     font-family: Arial, serif;
     font-weight: 800;
     font-size: 3em;
+    display: block;
 }
 
 .yinbiao_div {
@@ -161,17 +162,23 @@
     /*padding-top: 10px;*/
     /*display: flex;*/
     padding-top: 10px;
-    margin: auto;
+    /*margin: auto;*/
     height: 100%;
     color: var(--normalTextColor);
 }
 
+.wordOtherInform span {
+    margin-left: 20px;
+    display: inline-block;
+}
+
 .wordExamplesDiv {
-    user-select: auto;
+    user-select: none;
     padding-top: 30px;
 }
 
 .exampleItemDiv {
+    user-select: text;
     margin-bottom: 15px;
     color: var(--normalTextColor);
 }
@@ -203,13 +210,15 @@
 .liju_title_div > span:hover {
     background-image: url("../image/pageWordDetail/examplelist_hover.png");
 }
-.tittle_sort_div{
+
+.tittle_sort_div {
     background-color: #1e1e1e;
     z-index: 10;
     width: 500px;
     /*padding-right: 10px;*/
     position: fixed;
 }
+
 .tittle_div {
     border-bottom: 1px solid #7e7e7e;
     color: var(--normalTextColor);
@@ -223,7 +232,7 @@
 }
 
 
-.sort_div{
+.sort_div {
     width: auto;
     height: 20px;
     padding-top: 10px;
@@ -232,9 +241,7 @@
 }
 
 
-
 .control_example_div {
-
     display: flex;
     justify-content: center;
     height: 100%;
@@ -297,20 +304,23 @@
 .all_example_list {
     height: 80%;
     padding: 10px;
-    padding-top: 90px;
+    padding-top: 100px;
 
     color: var(--normalTextColor);
 }
-.add_example_list{
+
+.add_example_list {
     height: 80%;
     padding: 10px;
     padding-top: 100px;
 }
-.add_example_list div{
+
+.add_example_list div {
     color: #b4b4b4;
     font-weight: 700;
 }
-.add_textarea{
+
+.add_textarea {
     margin-top: 5px;
     width: 97%;
     height: 200px;
@@ -324,12 +334,13 @@
     background-color: #262626;
     outline: none;
 }
-.add_textarea:focus{
+
+.add_textarea:focus {
     border: 1px solid #00e57b;
 }
 
 
-.add_example_div{
+.add_example_div {
     /*border: 1px red solid;*/
     height: 80%;
     padding: 10px;
@@ -344,7 +355,7 @@
     border-bottom: 1px #727272 dashed;
 }
 
-.add_example_div{
+.add_example_div {
     width: 500px;
     height: 30px;
     background-color: #00e57b;
@@ -353,45 +364,52 @@
     bottom: 30px;
 }
 
-.example_text{
+.example_text {
     user-select: text;
 }
-.example_info{
+
+.example_info {
     display: flex;
     justify-content: space-between;
     padding-top: 5px;
 }
 
-.example_info span{
+.example_info span {
     font-weight: 700;
     font-family: "Microsoft YaHei UI", serif;
     font-size: 13px;
     /*color: #989898;*/
 }
-.user_operation_div{
+
+.user_operation_div {
     display: flex;
 }
-.user_operation_div span{
+
+.user_operation_div span {
     font-weight: 700;
     font-family: "Microsoft YaHei UI", serif;
     font-size: 13px;
     color: #989898;
 }
-.user_operation_div span:hover{
+
+.user_operation_div span:hover {
     cursor: pointer;
     color: #00e57b;
 }
-.example_holder{
+
+.example_holder {
     color: #0098da;
     /*background-color: #0098da*/
 }
-.example_heat{
+
+.example_heat {
     cursor: pointer;
     display: flex;
     /*text-align: center;*/
     color: red;
 }
-.example_heat>img{
+
+.example_heat > img {
     width: 20px;
     height: 20px;
     margin-top: -2px;
@@ -401,10 +419,12 @@
     /*margin: 0 auto;*/
 
 }
-.example_adddate{
+
+.example_adddate {
     color: #fd9300;
 }
-.backOradd{
+
+.backOradd {
     cursor: pointer;
     margin-left: 5px;
     border-radius: 4px;
@@ -413,15 +433,234 @@
     font-size: 0.9em;
     font-weight: 800;
     background-color: #424242;
-   color: whitesmoke;
+    color: whitesmoke;
     box-sizing: border-box;
     border: 2px solid #00e57b;
     transition: all 0.2s;
 }
-.backOradd:hover{
+
+.backOradd:hover {
     background-color: #00e57b;
     color: #000000;
 }
+
+
+.userBookItemDiv {
+    /*padding-left: 5px;*/
+    /*padding-right: 5px;*/
+    /*padding-top: 10px;*/
+    /*padding-bottom: 10px;*/
+    padding: 10px;
+    border-radius: 5px;
+    transition: all 0.2s;
+    cursor: pointer;
+    width: auto;
+    display: flex;
+    justify-content: space-between;
+    color: #f1f1f1;
+
+    font-size: 1em;
+    border: 1px rgba(0, 0, 0, 0) solid;
+}
+
+.userBookItemDiv:hover {
+    border: 1px #00e57b solid;
+}
+
+.userBookNameDiv {
+    display: flex;
+}
+
+.userBookItemDiv:hover .userBookNameDiv_child1 {
+    background-image: url("../image/pageWordDetail/book_icon_green.png");
+}
+
+.userBookItemDiv:hover .userBookNameDiv_child2 {
+    color: #00e57b;
+}
+
+.userBookNameDiv_child1 {
+    transition: all 0.2s;
+    width: 30px;
+    height: 30px;
+    background-image: url("../image/pageWordDetail/book_icon_white.png");
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.userBookNameDiv_child2 {
+    color: whitesmoke;
+    font-size: 1em;
+    line-height: 30px;
+    transition: all 0.2s;
+}
+
+.addTheWordToCikuBtn {
+    cursor: pointer;
+    margin-left: 5px;
+    border-radius: 4px;
+    padding: 4px;
+    width: auto;
+    font-size: 0.9em;
+    font-weight: 800;
+    background-color: #424242;
+    color: whitesmoke;
+    box-sizing: border-box;
+    border: 2px solid #00e57b;
+    transition: all 0.2s;
+}
+
+.addTheWordToCikuBtn:hover {
+    background-color: #00e57b;
+    color: #000000;
+}
+
+
+.addUserBookDiv {
+    display: flex;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.addUserBookDiv > label {
+    font-weight: 600;
+    color: whitesmoke;
+    font-size: 1em;
+    text-align: center;
+}
+
+.addUserBookDiv > input {
+    width: 80%;
+    padding: 5px;
+    background-color: rgba(0, 255, 138, 0);
+    outline: 1px solid whitesmoke;
+    border-radius: 3px;
+    color: whitesmoke;
+    font-size: 1em;
+    border: none;
+}
+
+.addUserBookDiv > input:focus {
+    outline: 1px solid #00e57b;
+}
+
+.addUserBookDiv_jianjie {
+    display: flex;
+    padding-top: 10px;
+    /*display: flex;*/
+}
+
+.addUserBookDiv_jianjie > label {
+    color: whitesmoke;
+    font-size: 1em;
+    text-align: center;
+    font-weight: 600;
+}
+
+.addUserBookDiv_jianjie > textarea {
+    height: 200px;
+    width: 80%;
+    outline: none;
+    border: 1px solid whitesmoke;
+    color: whitesmoke;
+    font-size: 1.3em;
+    padding: 5px;
+    resize: none;
+    background-color: #262626;
+    border-radius: 3px;
+}
+
+.addUserBookDiv_jianjie > textarea:focus {
+    border: 1px solid #00e57b;
+}
+
+.double_switch_div {
+    display: flex;
+    padding-top: 20px;
+}
+
+.double_switch_div > label {
+    color: whitesmoke;
+    font-size: 1em;
+    text-align: center;
+    font-weight: 600;
+}
+
+.double_switch_div_btn {
+    width: 100px;
+    height: 30px;
+    color: whitesmoke;
+}
+
+.userbook_detail_tittle_div {
+    width: auto;
+    font-size: 1em;
+    /*margin: auto;*/
+    color: #a1a1a1;
+    padding-bottom: 10px;
+    border-bottom: 2px #4f4f4f solid;
+}
+.userbook_detail_tittle_div>div{
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
+.the_book_all_words_div {
+    height: 80%;
+    padding: 10px;
+    padding-top: 100px;
+}
+.all_words_div{
+    overflow: auto;
+    display: flex;
+    flex-wrap: wrap;
+    width: auto;
+}
+.all_words_div>div{
+    display: flex;
+    width: auto;
+    transition: all 0.2s;
+    cursor: pointer;
+    margin: 5px;
+    padding: 5px;
+
+    border: 1px solid #00e57b;
+    border-radius: 3px;
+}
+.all_words_div>div:hover .all_words_div_item_span{
+    color: #00e57b;
+    transition: all 0.2s;
+}
+.all_words_div_item_span{
+    color: #eaeaea;
+    font-size: 20px;
+}
+
+.all_words_div>div:hover{
+    color: #00e57b;
+}
+
+.word_item_span{
+    /*margin-left: 10px;*/
+    transition: all 0.2s;
+    margin: auto;
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("../image/pageWordDetail/chacha_white.png");
+}
+.word_item_span:hover{
+    background-image: url("../image/pageWordDetail/chacha_green.png");
+}
+
+
+
+
+
 
 
 

@@ -1,0 +1,23 @@
+/*返回按钮
+绿色边框
+黑底白字
+*/
+.backOradd {
+    cursor: pointer;
+    margin-left: 5px;
+    border-radius: 4px;
+    padding: 4px;
+    width: auto;
+    font-size: 0.9em;
+    font-weight: 800;
+    background-color: #424242;
+    color: whitesmoke;
+    box-sizing: border-box;
+    border: 2px solid #00e57b;
+    transition: all 0.2s;
+}
+
+.backOradd:hover {
+    background-color: #00e57b;
+    color: #000000;
+}

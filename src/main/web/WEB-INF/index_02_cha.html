@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Werse词境 查词</title>
+    <script src="js/jquery-3.7.0.min.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+    <link rel="icon" href="image/logo-white.png">
+    <link rel="stylesheet" href="css/top-nav.css">
+    <link rel="stylesheet" href="css/public/main.css">
+    <link rel="stylesheet" href="css/index_02.css">
+    <style>
+        /*刷新按钮动效*/
+        .fresh-rotate {
+            animation: fresh-rotate 1s ease-out;
+        }
+        /*弹出框动效*/
+        .MessageBoxBorderFrames{
+            animation: MessageBoxBorderFrames 0.3s linear;
+        }
+
+        .yi {
+            transition: color 0.3s;
+        }
+        .yi:hover {
+            color: #00e57b;
+        }
+    </style>
+</head>
+<body>
+<!--通知-->
+<div id="notification" class="public_notification_div">
+    <div class="public_notification_title">
+        <div v-if="no_type==='error'" class="notification_item_tittle">
+            <img :src="spantype.error.src">
+            <span>{{spantype.error.value}}</span>
+        </div>
+        <div v-if="no_type==='message'" class="notification_item_tittle">
+            <img :src="spantype.message.src">
+            <span>{{spantype.message.value}}</span>
+        </div>
+        <div v-if="no_type==='warn'" class="notification_item_tittle">
+            <img :src="spantype.warn.src">
+            <span>{{spantype.warn.value}}</span>
+        </div>
+        <div v-if="no_type==='success'" class="notification_item_tittle">
+            <img :src="spantype.success.src">
+            <span>{{spantype.success.value}}</span>
+        </div>
+    </div>
+    <div class="public_notification_content">{{no_content}}</div>
+</div>
+<!--弹窗-->
+<div id="MessageBoxContent" class="MessageBoxDiv" @click="tipEffection">
+    <div id="messageBox" class="MessageBox" :class="{'MessageBoxBorderFrames':borderFramesValue}" @animationend="tipEffectionEnd">
+        <div class="MessageBoxContent">{{messageBoxQuestion}}</div>
+        <div class="MessageBoxController">
+            <span @click.stop="messageBoxConfirmBtn(true)">确认</span>
+            <span @click.stop="messageBoxConfirmBtn(false)">取消</span>
+        </div>
+    </div>
+</div>
+<!-- 顶部导航栏，三个元素 -->
+<div class="top-nav" id="topNavApp">
+    <div class="index-logo">
+        <a href="homePage" class="index_logo_a">
+            <img class="logo_img" src="image/topnav/topnavlogo.png" alt="Werse">
+            <h2 class="logo_h2_e">e</h2>
+            <h2 class="logo_h2_r">r</h2>
+            <h2 class="logo_h2_s">s</h2>
+            <h2 class="logo_h2_e1">e</h2>
+        </a>
+    </div>
+    <div class="nav-content">
+        <a href="homePage"><span>首页</span></a>
+        <a href="studyPage"><span>学习</span></a>
+        <a style="color: whitesmoke;box-sizing: border-box;border-top: 3px #00e57b solid;">
+            <span style="color: #00e57b">查</span>
+            <span>-</span>
+            <span @click="chanPage()" class="yi">译</span>
+        </a>
+        <a href="wersebotPage"><span>WerseBot</span></a>
+        <a href="dataPage"><span>数据</span></a>
+    </div>
+    <div class="more-nav">
+
+    </div>
+</div>
+<!--内容-->
+<div class="content-body">
+    <div class="content-div" id="search_app">
+        <div class="today_study_shuju">
+            <div>今天搜索了<span>{{searchedword}}</span>个单词</div>
+            <span :class="{'fresh-rotate':fresh_rotate}" @click="playFreshAnimation"
+                  @animationend="resetFreshAnimation" class="freshDataBtn"></span>
+        </div>
+        <div class="search_input_div">
+            <div class="word_rank_div">
+                <h4>搜索次数榜</h4>
+                <div class="word_rank_content_div">
+                    <div @click="theWordDetailBtn(item.wordid)" v-for="item in wordsRankSearchTimes"
+                         class="word_rank_item">
+                        <span>{{item.spelling}}</span>
+                        <span>{{item.searchtimes}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="search_word_content_div">
+                <input @blur="closeSearchQuickDiv" class="inputBox" placeholder="请输入英文或中文以查找单词"
+                       onkeyup="value=value.replace(/[^a-zA-Z^\u4e00-\u9fa5]/g,'')"
+                       type="text"
+                       v-on:input="searchWordInput"
+                       name="inputText" v-model="inputText" required>
+                <div class="search_history_div" v-show="this.wordList.length===0">
+                    <div class="search_history_div_title">
+                        <span>搜索历史</span>
+                        <span @click="deleteAllSearchWordHistoryBtn"></span>
+                    </div>
+                    <div class="search_history_div_content">
+                        <div v-if="wordHistoryListLength===0"
+                             style="color: #808080;padding-top: 20px;text-align: center;">
+                            没有搜索历史
+                        </div>
+                        <div v-else @click="theWordDetailBtn(item.wordid)"
+                             v-for="(item,index) in wordHistoryList"
+                             class="wordHistory_item_div">
+                            <span>{{item.spelling}}</span>
+                            <span @click.stop="deleteTheWordHistory(item.wordid)"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="searchQuickDiv" v-show="this.wordList.length>0">
+                    <ul>
+                        <li v-for="(item,index) in wordList" @mousedown="searchWordBtn(item.wordid,item.spelling)">
+                            <div style="width: 50%"><span>{{index + 1}}.</span>
+                                <span class="spelling_span">{{item.spelling}}</span>
+                            </div>
+                            <div style="width: 50%;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
+                                <span class="spelling_span">{{item.paraphrase}}</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="word_rank_div">
+                <h4>学习人数榜</h4>
+                <div class="word_rank_content_div">
+                    <div @click="theWordDetailBtn(item.wordid)" v-for="item in wordsRankStudyTimes"
+                         class="word_rank_item">
+                        <span>{{item.spelling}}</span>
+                        <span>{{item.studytimes}}</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    new Vue({
+        el: "#search_app",
+        data: {
+            inputText: '',
+            wordList: [],
+            userid: '',
+            daily: [],
+            fresh_rotate: false,   //动画播放
+            searchedword: 0,
+            wordHistoryList: [],   //所有单词历史
+            wordsRankSearchTimes: [],
+            wordsRankStudyTimes: [],
+            wordHistoryListLength: 1  //所有单词历史长度，用于显示是否有搜索历史
+
+        },
+        created() {
+            this.fetchUserId()
+            this.fetchDaily()
+            this.fetchAllWordHistory()
+            this.fetchWordsSearchTimesRankAxios()
+            this.fetchWordsStudyTimesRankAxios()
+        },
+        methods: {
+            fetchWordsSearchTimesRankAxios() {
+                let _this = this
+                axios({
+                    method: "get",
+                    url: "search/getWordsSearchTimesRank"
+                }).then(function (data) {
+                    _this.wordsRankSearchTimes = data.data
+                });
+            },
+            fetchWordsStudyTimesRankAxios() {
+                let _this = this
+                axios({
+                    method: "get",
+                    url: "search/getWordsStudyTimesRank"
+                }).then(function (data) {
+                    _this.wordsRankStudyTimes = data.data
+                });
+            },
+            fetchAllWordHistory() {
+                this.wordHistoryList = ""
+                let _this = this
+                let r = new Promise((resolve) => {
+                    let timer = setInterval(() => {   //定时器
+                        if (_this.wordHistoryList === "") {
+                            clearInterval(timer)
+                            resolve(true)
+                        }
+                    }, 100)
+                })
+                r.then(async (res) => {
+                    if (res) {
+                        await axios({
+                            method: "get",
+                            url: "search/getAllSearchWordHistory"
+                        }).then(function (data) {
+                            _this.wordHistoryList = data.data
+                        })
+                        _this.wordHistoryListLength = _this.wordHistoryList.length
+
+                    }
+                })
+            },
+            deleteAllSearchWordHistoryBtn() {
+                let _this = this
+                MessageBoxContent.openMessageBox("你确定要删除所有搜索历史吗？")
+                let r = new Promise((resolve) => {
+                    let timer = setInterval(() => {   //定时器
+                        let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
+                        if (messageBoxConfirmValue !== "null") {
+                            clearInterval(timer)
+                            resolve(messageBoxConfirmValue)
+                        }
+                    }, 100)
+                })
+                r.then(async (res) => {
+                    if (res === "true") {
+                        //确认操作逻辑
+                        await _this.deleteAllSearchWordHistoryAxios()
+                        _this.fetchAllWordHistory()
+                    }
+                })
+            },
+            /*将这个单词从搜索历史删除*/
+            deleteAllSearchWordHistoryAxios() {
+                axios({
+                    method: "post",
+                    url: "update/deleteAllSearchWordHistory"
+                })
+            },
+            deleteTheWordHistory(wordid) {
+                let _this = this
+                MessageBoxContent.openMessageBox("你确定要删除这个搜索历史吗？")
+                let r = new Promise((resolve) => {
+                    let timer = setInterval(() => {   //定时器
+                        let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
+                        if (messageBoxConfirmValue !== "null") {
+                            clearInterval(timer)
+                            resolve(messageBoxConfirmValue)
+                        }
+                    }, 100)
+                })
+                r.then(async (res) => {
+                    if (res === "true") {
+                        //确认操作逻辑
+                        await _this.deleteSearchWordHistoryAxios(wordid);
+                        _this.fetchAllWordHistory()
+                    }
+                })
+            },
+            deleteSearchWordHistoryAxios(wordid) {
+                axios({
+                    method: "post",
+                    url: "update/deleteSearchWordHistory?wordid=" + wordid
+                })
+            },
+            /*点击搜索的单词进入详情页面*/
+            theWordDetailBtn(wordid) {
+                sessionStorage.setItem("wordid", wordid);
+                sessionStorage.setItem("backFromWordDetailPageValue", "index_02_cha");
+                this.addSearchTimesAxios(wordid)
+                window.location.assign('wordDetailPage?wordid=' + wordid);
+            },
+            /*添加单词历史*/
+            addSearchedWordHistoryAxios(wordid, spelling) {
+                axios({
+                    method: "post",
+                    url: "update/addSearchedWordHistory?wordid=" + wordid + "&spelling=" + spelling
+                })
+            },
+            async fetchDaily() {
+                await this.getDailyAxios();
+                if (this.daily === "") {
+                    await this.creatDailyAxios();
+                } else {
+                    this.numberAddDirective()
+                }
+
+            },
+            creatDailyAxios() {
+                axios({
+                    method: "post",
+                    url: "update/creatDaily"
+                })
+            },
+            async getDailyAxios() {
+                let _this = this
+                await axios({
+                    method: "get",
+                    url: "search/dailyExist"
+                }).then(function (data) {
+                    _this.daily = data.data
+                })
+
+            },
+            /*增加用户搜索过的单词数*/
+            addSearchedWordCountAxios() {
+                axios({
+                    method: "post",
+                    url: "update/addSearchedWordCount"
+                })
+            },
+            closeSearchQuickDiv() {
+                this.wordList = []
+                this.inputText = ''
+            },
+            fetchUserId() {
+                const _this = this;
+                axios({
+                    method: "get",
+                    url: "search/getUserId"
+                }).then(function (data) {
+                    // console.log(data.data)
+                    _this.userid = data.data
+                })
+            },
+            searchWordInput() {
+                const _this = this;
+                if (this.inputText.length >= 1) {
+                    // console.log(this.inputText)
+                    /*发送ajax请求*/
+                    axios({
+                        method: "get",
+                        url: "search/searchWordByInput?inputText=" + this.inputText,
+                    }).then(function (data) {
+                        if (data.data == null) {
+                            _this.wordList = []
+                        } else {
+                            _this.wordList = data.data;
+                            // console.log(_this.wordList)
+                        }
+                    })
+                } else {
+                    _this.wordList = []
+                }
+            },
+            /*点击单词进入单词详情页面*/
+            async searchWordBtn(wordid, spelling) {
+                sessionStorage.setItem("wordid", wordid);
+                sessionStorage.setItem("backFromWordDetailPageValue", "index_02_cha");
+                this.addSearchedWordCountAxios()
+                this.addSearchTimesAxios(wordid)
+                this.addSearchedWordHistoryAxios(wordid, spelling)
+                window.location.assign('wordDetailPage?wordid=' + wordid);
+            },
+            /*增加单词的搜索次数*/
+            addSearchTimesAxios(e) {
+                axios({
+                    method: 'post',
+                    url: 'update/addSearchTimes?wordid=' + e,
+                })
+            },
+            async playFreshAnimation() {
+                this.fresh_rotate = true
+                await this.fetchDaily()
+            },
+
+            resetFreshAnimation() {
+                this.fresh_rotate = false
+            },
+            /*数字增加的方法*/
+            numberAddDirective() {
+                let _this = this
+                let count = 0 //初始值
+                let num = this.daily.searchedword
+                let rate = 30; //定时器间隔时间
+                let time = 1300
+                let average = num / (time / rate) //得到每次定时器跳动的值
+                let timer = setInterval(() => {
+                    // 将我们得到的值设置给count
+                    count += average
+                    _this.searchedword = count.toFixed(0)
+                    if (count > num) {
+                        count = num
+                        _this.searchedword = count.toFixed(0)
+                        //清除定时器
+                        clearInterval(timer)
+
+                    }
+                }, rate);
+            },
+        },
+
+
+    })
+
+    /*弹窗*/
+    const MessageBoxContent = new Vue({
+        el: "#MessageBoxContent",
+        data: {
+            messageBoxQuestion: "",
+            borderFramesValue:false
+        },
+        methods: {
+            /*public确认还是取消按钮并关闭弹窗*/
+            messageBoxConfirmBtn(v) {
+                // console.log("v="+v)
+                window.sessionStorage.setItem("messageBoxConfirmValue", v);
+                //关闭弹窗
+                let messageBox = document.getElementById("messageBox");
+                let MessageBoxContent = document.getElementById("MessageBoxContent");
+                MessageBoxContent.style.display = "none"
+                messageBox.style.marginTop = "-200px";
+                // console.log(window.sessionStorage.getItem("messageBoxConfirmValue")==="true")
+            },
+            /*打开弹窗 其他vue实例使用*/
+            openMessageBox(content) {
+                sessionStorage.setItem("messageBoxConfirmValue", "null");
+                this.messageBoxQuestion = content
+                // this.functionName = functionName
+                let messageBox = document.getElementById("messageBox");
+                let MessageBoxContent = document.getElementById("MessageBoxContent");
+                MessageBoxContent.style.display = "flex"
+                messageBox.style.marginTop = "20px";
+            },
+            tipEffection() {
+                console.log("123")
+                this.borderFramesValue = true
+            },
+            tipEffectionEnd() {
+                this.borderFramesValue = false
+            },
+        }
+    })
+    const topNavApp = new Vue({
+        el: '#topNavApp',
+        methods: {
+            chanPage() {
+                window.location.assign('translatePage')
+            },
+        }
+    })
+    /*消息vue*/
+    const NotificationVue = new Vue({
+        el: "#notification",
+        data: {
+            no_content: '',
+            no_type: '',   //error，message消息，warn警告,success成功
+            timer: null,
+            spantype: {
+                error: {
+                    value: '失败',
+                    src: 'image/public_notification/error.png'
+                },
+                message: {
+                    value: '消息',
+                    src: 'image/public_notification/message.png'
+                },
+                success: {
+                    value: '成功',
+                    src: 'image/public_notification/success.png'
+                },
+                warn: {
+                    value: '警告',
+                    src: 'image/public_notification/warn.png'
+                },
+            }
+        },
+        methods: {
+            showPublicNotification(type, content) {
+                if (this.timer) { //计时器已经存在则销毁
+                    clearTimeout(this.timer)
+                    this.timer = null
+                }
+                const id = document.getElementById("notification")
+                id.style.right = "30px";
+                this.no_content = content
+                this.no_type = type
+                this.timer = setTimeout(() => {
+                    this.no_content = ''
+                    this.no_type = ''
+                    id.style.right = "-300px"
+                }, 3000)
+                console.log(content);
+            }
+        },
+    })
+
+
+</script>
+
+
+</body>
+</html>

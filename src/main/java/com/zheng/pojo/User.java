@@ -1,5 +1,6 @@
 package com.zheng.pojo;
 
+
 public class User {
     int userid;
     String useremail;
@@ -13,6 +14,18 @@ public class User {
     String region;
     String phonenumber;
     int status;
+
+    String avatar;
+
+    String synopsis;
+
+    public String getSynopsis() {
+        return synopsis;
+    }
+
+    public void setSynopsis(String synopsis) {
+        this.synopsis = synopsis;
+    }
 
     public int getUserid() {
         return userid;
@@ -110,6 +123,14 @@ public class User {
         this.status = status;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -125,6 +146,8 @@ public class User {
                 ", region='" + region + '\'' +
                 ", phonenumber='" + phonenumber + '\'' +
                 ", status=" + status +
+                ", avatar='" + avatar + '\'' +
+                ", synopsis='" + synopsis + '\'' +
                 '}';
     }
 }

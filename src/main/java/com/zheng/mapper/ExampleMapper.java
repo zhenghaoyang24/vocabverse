@@ -33,7 +33,6 @@ public interface ExampleMapper {
     @Update("update tb_voc_examples set  heat = #{heat} where exapid = #{exapid}")
     boolean addHeat(@Param("heat") int heat,@Param("exapid") int exapid);
 
-
     /**
      * 添加例句
      */

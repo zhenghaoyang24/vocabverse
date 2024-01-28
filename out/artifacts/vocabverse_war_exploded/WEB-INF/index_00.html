@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <title>Werse词境 首页</title>
     <script src="js/jquery-3.7.0.min.js"></script>
     <script src="js/vue.js"></script>
-    <script src="js/element-ui@2.15.14-index.js"></script>
     <script src="js/axios-0.18.0.js"></script>
-    <link rel="icon" href="image/logo-black.png">
+    <link rel="icon" href="image/logo-white.png">
     <!-- 引入样式 -->
     <link rel="stylesheet" href="css/public/element-ui@2.15.14-index.css">
     <!-- 引入组件库 -->
@@ -17,7 +16,7 @@
 </head>
 <body>
 
-<div class="top-nav">
+<div class="top-nav" id="topNavApp">
     <div class="index-logo">
         <a href="homePage" class="index_logo_a">
             <img class="logo_img" src="image/topnav/topnavlogo.png" alt="Werse">
@@ -31,8 +30,12 @@
         <a href="homePage"
            style="color: #00e57b;box-sizing: border-box;border-top: 3px #00e57b solid;"><span>首页</span></a>
         <a href="studyPage"><span>学习</span></a>
-        <a href="searchPage"><span>翻译</span></a>
-        <a href="translatePage"><span>翻译</span></a>
+        <a><span>查</span><span>-</span><span>译</span></a>
+        <div class="cha_yi_div">
+            <a href="searchWordPage">查词</a>
+            <a href="translatePage">翻译</a>
+        </div>
+        <a href="wersebotPage"><span>WerseBot</span></a>
         <a href="dataPage"><span>数据</span></a>
     </div>
     <div class="more-nav">
@@ -45,103 +48,53 @@
 
 <!--内容-->
 <div class="content-body">
-    <div class="content-div">
-        <div style="width: 100%" id="search_app">
-
+    <div class="content-div" id="todayInformApp">
+        <div style="width: 100%">
             <div class="today_study_div">
                 <h1>今日已学</h1>
                 <div class="today_study_shuju">
-                    <div><span>120</span>个单词</div>
-                    <div><span>43450</span>分钟</div>
-                </div>
-            </div>
-            <div class="search_input_div">
-                <div style="display: flex">
-                    <input class="inputBox" placeholder="请输入英文或中文以查找单词"
-                           onkeyup="value=value.replace(/[^a-zA-Z^\u4e00-\u9fa5]/g,'')"
-                           type="text"
-                           v-on:input="searchWordInput"
-                           name="inputText" v-model="inputText" required>
-                    <a class="deleteInputBtn" @click="deleteInputText()" title="清除输入框 "></a>
-                </div>
-
-
-                <div class="searchQuickDiv" v-show="this.wordList.length>0">
-                    <ul>
-                        <li v-for="(item,index) in wordList" @click="searchWordBtn(item.wordid)">
-                            <div style="width: 50%"><span>{{index + 1}}.</span>
-                                <span class="spelling_span">{{item.spelling}}</span></div>
-                            <div style="width: 45%"><span class="spelling_span">{{item.paraphrase}}</span></div>
-                        </li>
-                    </ul>
+                    <div><span v-number-add-directive>{{todayWordNumber}}</span>个单词</div>
+                    <div><span v-number-add-directive>{{todayTime}}</span>分钟</div>
                 </div>
             </div>
         </div>
-
-
     </div>
 </div>
 
 <script>
+    Vue.directive('number-add-directive', {
+        inserted(el, binding) {
+            let count = 0 //初始值
+            let num = el.innerText //获取页面中的值
+            let rate = 30 //定时器间隔时间
+            let time = 1500
+            let average = num / (time / rate) //得到每次定时器跳动的值
+
+            let timer = setInterval(() => {
+                // 将我们得到的值设置给count
+                count += average
+                el.innerText = count.toFixed(0)
+                if (count > num) {
+                    count = num
+                    el.innerText = count.toFixed(0)
+                    //清除定时器
+                    timer = null
+                    clearInterval(timer)
+                }
+            }, rate);
+
+        },
+    });
 
     new Vue({
-        el: "#search_app",
+        el: '#todayInformApp',
         data: {
-            inputText: '',
-            wordList: [],
-            userid:''
-        },
-        created(){
-            this.fetchUserId()
-        },
-        methods: {
-            fetchUserId() {
-                const _this = this;
-                axios({
-                    method: "get",
-                    url: "search/getUserId"
-                }).then(function (data) {
-                    console.log(data.data)
-                    _this.userid = data.data
-                })
-            },
-            searchWordInput() {
-                const _this = this;
-                if (this.inputText.length >= 1) {
-                    console.log(this.inputText)
-                    /*发送ajax请求*/
-                    axios({
-                        method: "get",
-                        url: "search/searchWordByInput?inputText=" + this.inputText,
-                    }).then(function (data) {
-                        if (data.data == null) {
-                            _this.wordList = []
-                        } else {
-                            _this.wordList = data.data;
-                            console.log(_this.wordList)
-                        }
-                    })
-                } else {
-                    _this.wordList = []
-                }
-            },
-            deleteInputText() {
-                this.inputText = ''
-                this.wordList = []
-            },
-            searchWordBtn(e) {
-                sessionStorage.setItem("wordid", e);
-                // location.href = "toIndex_01";
-                window.location.assign('wordDetailPage?wordid=' + e);
-            },
-
-        },
-
-
+            todayWordNumber: 142,
+            todayTime: 49
+        }
     })
-
-
 </script>
+
 
 </body>
 </html>

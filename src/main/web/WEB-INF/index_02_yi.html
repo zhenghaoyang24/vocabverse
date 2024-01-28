@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Werse词境 翻译</title>
+    <script src="js/jquery-3.7.0.min.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+    <link rel="icon" href="image/logo-white.png">
+    <link rel="stylesheet" href="css/top-nav.css">
+    <link rel="stylesheet" href="css/public/main.css">
+    <link rel="stylesheet" href="css/index_02.css">
+    <style>
+        .cha {
+            transition: color 0.3s;
+        }
+
+        .cha:hover {
+            color: #00e57b;
+        }
+    </style>
+</head>
+<body>
+
+<!--通知-->
+<div id="notification" class="public_notification_div">
+    <div class="public_notification_title">
+        <div v-if="no_type==='error'" class="notification_item_tittle">
+            <img :src="spantype.error.src">
+            <span>{{spantype.error.value}}</span>
+        </div>
+        <div v-if="no_type==='message'" class="notification_item_tittle">
+            <img :src="spantype.message.src">
+            <span>{{spantype.message.value}}</span>
+        </div>
+        <div v-if="no_type==='warn'" class="notification_item_tittle">
+            <img :src="spantype.warn.src">
+            <span>{{spantype.warn.value}}</span>
+        </div>
+        <div v-if="no_type==='success'" class="notification_item_tittle">
+            <img :src="spantype.success.src">
+            <span>{{spantype.success.value}}</span>
+        </div>
+    </div>
+    <div class="public_notification_content">{{no_content}}</div>
+</div>
+<!-- 顶部导航栏，三个元素 -->
+<div class="top-nav" id="topNavApp">
+    <div class="index-logo">
+        <a href="homePage" class="index_logo_a">
+            <img class="logo_img" src="image/topnav/topnavlogo.png" alt="Werse">
+            <h2 class="logo_h2_e">e</h2>
+            <h2 class="logo_h2_r">r</h2>
+            <h2 class="logo_h2_s">s</h2>
+            <h2 class="logo_h2_e1">e</h2>
+        </a>
+    </div>
+    <div class="nav-content">
+        <a href="homePage"><span>首页</span></a>
+        <a href="studyPage"><span>学习</span></a>
+        <a style="color: whitesmoke;box-sizing: border-box;border-top: 3px #00e57b solid;">
+            <span @click="chanPage()" class="cha">查</span>
+            <span>-</span>
+            <span style="color: #00e57b">译</span></a>
+        <a href="wersebotPage"><span>WerseBot</span></a>
+        <a href="dataPage"><span>数据</span></a>
+    </div>
+    <div class="more-nav">
+
+    </div>
+</div>
+
+<!--内容-->
+<div class="content-body">
+    <div class="content-div">
+        <!--搜索框-->
+        <div id="translateApp" class="translateAppDiv">
+
+            <div class="translateControlDiv">
+                <span class="zidongjiance">自动检测</span>
+                <span class="zhuanhuan"> <img src="image/index-02/zhuanhuan.png"> </span>
+                <span class="yuyan">{{toLanguageCn}}</span>
+                <!--                <div class="selectDiv">-->
+                <div class="select_languages_item_div">
+                    <div v-for="(value,key,i) in languages" class="lan_item">
+                        <div :id="step(key)" @click="setLanguage($event)">{{ value }}</div>
+                    </div>
+                </div>
+                <span class="btnTranslate" @click="translate()">翻译</span>
+                <!--                </div>-->
+            </div>
+
+            <div class="translateContent">
+                <div class="translateContentLeft">
+                    <textarea autocomplete="off" spellcheck="false" maxlength="300"
+                              placeholder="请输入翻译文本" v-model:value="inputText"></textarea>
+                    <div class="zishudiv">{{inputText.length}}/300</div>
+                </div>
+                <div class="translateContentRight">
+                    <textarea autocomplete="off" :value="outText" spellcheck="false" readonly
+                              placeholder="没有翻译结果"></textarea>
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+
+
+<script>
+    const NotificationVue = new Vue({
+        el: "#notification",
+        data: {
+            no_content: '',
+            no_type: '',   //error，message消息，warn警告,success成功
+            timer: null,
+            spantype: {
+                error: {
+                    value: '失败',
+                    src: 'image/public_notification/error.png'
+                },
+                message: {
+                    value: '消息',
+                    src: 'image/public_notification/message.png'
+                },
+                success: {
+                    value: '成功',
+                    src: 'image/public_notification/success.png'
+                },
+                warn: {
+                    value: '警告',
+                    src: 'image/public_notification/warn.png'
+                },
+            }
+        },
+        methods: {
+            showPublicNotification(type, content) {
+                if (this.timer) { //计时器已经存在则销毁
+                    clearTimeout(this.timer)
+                    this.timer = null
+                }
+                const id = document.getElementById("notification")
+                id.style.right = "30px";
+                this.no_content = content
+                this.no_type = type
+                this.timer = setTimeout(() => {
+                    this.no_content = ''
+                    this.no_type = ''
+                    id.style.right = "-300px"
+                }, 3000)
+                console.log(content);
+            }
+        },
+    })
+    new Vue({
+        el: '#translateApp',
+        data: {
+            languages: {
+                en: "英语",
+                zh: "中文",
+                jp: "日语",
+                kor: "韩语",
+                fra: "法语",
+                spa: "西班牙语",
+                th: "泰语",
+                ara: "阿拉伯语",
+                ru: "俄语",
+                pt: "葡萄牙语",
+                de: "德语",
+                it: "意大利语",
+                el: "希腊语",
+                nl: "荷兰语",
+                pl: "波兰语",
+                bul: "保加利亚语",
+                est: "爱沙尼亚语",
+                dan: "丹麦语",
+                fin: "芬兰语",
+                cs: "捷克语",
+                rom: "罗马尼亚语",
+                slo: "斯洛文尼亚语",
+                swe: "瑞典语",
+                hu: "匈牙利语",
+                vie: "越南语",
+                cht: "繁体中文",
+
+            },
+            toLanguageEn: "en",
+            toLanguageCn: "英文",
+            inputText: "",
+            outText: ""
+
+        },
+        methods: {
+            step(i) {
+                return i
+            },
+            setLanguage(a) {
+                var id = a.currentTarget.id;
+                this.toLanguageCn = this.languages[id]
+                this.toLanguageEn = id
+            },
+            translate() {
+                if (this.inputText === "") {
+                    NotificationVue.showPublicNotification("error", "请输入要翻译的文本。")
+                }
+                const _this = this;
+                if (this.inputText !== '') {
+                    axios({
+                        method: "get",
+                        url: "translate/translateText?inputText=" + _this.inputText + "&toLanguageEn=" + _this.toLanguageEn
+                    }).then(function (data) {
+                        _this.outText = data.data.trans_result[0].dst
+                        console.log(_this.outText)
+
+                    })
+                }
+
+
+            },
+        }
+
+
+    })
+
+    let topNavApp = new Vue({
+        el: '#topNavApp',
+        methods: {
+            chanPage() {
+                window.location.assign('searchWordPage')
+            },
+        }
+    })
+
+</script>
+
+</body>
+</html>

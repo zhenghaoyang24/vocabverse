@@ -1,16 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Werse词境 查词</title>
+    <title>Werse词境 AI助学</title>
     <script src="js/jquery-3.7.0.min.js"></script>
-    <link rel="icon" href="image/logo-black.png">
+    <script src="js/vue.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+    <link rel="icon" href="image/logo-white.png">
     <link rel="stylesheet" href="css/top-nav.css">
     <link rel="stylesheet" href="css/public/main.css">
+    <link rel="stylesheet" href="css/index_03.css">
 </head>
 <body>
-<!-- 顶部导航栏，三个元素 -->
+<!--通知-->
+<div id="notification" class="public_notification_div">
+    <div class="public_notification_title">
+        <div v-if="no_type==='error'" class="notification_item_tittle">
+            <img :src="spantype.error.src">
+            <span>{{spantype.error.value}}</span>
+        </div>
+        <div v-if="no_type==='message'" class="notification_item_tittle">
+            <img :src="spantype.message.src">
+            <span>{{spantype.message.value}}</span>
+        </div>
+        <div v-if="no_type==='warn'" class="notification_item_tittle">
+            <img :src="spantype.warn.src">
+            <span>{{spantype.warn.value}}</span>
+        </div>
+        <div v-if="no_type==='success'" class="notification_item_tittle">
+            <img :src="spantype.success.src">
+            <span>{{spantype.success.value}}</span>
+        </div>
+    </div>
+    <div class="public_notification_content">{{no_content}}</div>
+</div>
+<!-- 顶部导航栏，三个元素-->
 <div class="top-nav">
     <div class="index-logo">
         <a href="homePage" class="index_logo_a">
@@ -24,29 +49,740 @@
     <div class="nav-content">
         <a href="homePage"><span>首页</span></a>
         <a href="studyPage"><span>学习</span></a>
-        <a href="searchPage"><span>翻译</span></a>
-        <a href="translatePage" style="color: #00e57b;box-sizing: border-box;border-top: 3px #00e57b solid;"><span>翻译</span></a>
+        <a><span>查</span><span>-</span><span>译</span></a>
+        <div class="cha_yi_div">
+            <a href="searchWordPage">查词</a>
+            <a href="translatePage">翻译</a>
+        </div>
+        <a href="wersebotPage"
+           style="color: #00e57b;box-sizing: border-box;border-top: 3px #00e57b solid;"><span>WerseBot</span></a>
         <a href="dataPage"><span>数据</span></a>
     </div>
     <div class="more-nav">
 
     </div>
 </div>
-
 <!--内容-->
 <div class="content-body">
-    <div class="content-div">
-        <div style="height: 1000px;"></div>
+    <div class="content-div" id="botApp">
+        <div class="bot_content_div">
+            <!--左侧选项卡-->
+            <div class="bot_category_content_div">
+                <div id="bot_category_item_xiezuo" @click="changeCategoryItem('xiezuo')"
+                     class="bot_category_item bot_category_item_active">
+                    <div id="category_item_xiezuo" class="bot_category_item_img bot_category_item_xiezuo"></div>
+                    <div id="category_item_xiezuo_text" class="bot_category_item_tittle bot_category_item_text">智能写作
+                    </div>
+                </div>
+                <div id="bot_category_item_wenda" @click="changeCategoryItem('wenda')" class="bot_category_item">
+                    <div id="category_item_wenda" class="bot_category_item_img bot_category_item_wenda"></div>
+                    <div id="category_item_wenda_text" class="bot_category_item_tittle">知识问答</div>
+                </div>
+                <div id="bot_category_item_zaoju" @click="changeCategoryItem('zaoju')" class="bot_category_item">
+                    <div id="category_item_zaoju" class="bot_category_item_img bot_category_item_zaoju"></div>
+                    <div id="category_item_zaoju_text" class="bot_category_item_tittle">
+                        单词造句
+                    </div>
+                </div>
+
+                <div id="bot_category_item_runse" @click="changeCategoryItem('runse')" class="bot_category_item">
+                    <div id="category_item_runse" class="bot_category_item_img bot_category_item_runse"></div>
+                    <div id="category_item_runse_text" class="bot_category_item_tittle">句子润色</div>
+                </div>
+<!--                <div id="bot_category_item_fanyi" @click="changeCategoryItem('fanyi')" class="bot_category_item">-->
+<!--                    <div id="category_item_fanyi" class="bot_category_item_img bot_category_item_fanyi"></div>-->
+<!--                    <div id="category_item_fanyi_text" class="bot_category_item_tittle">AI翻译</div>-->
+<!--                </div>-->
 
 
+            </div>
+            <!--写作-->
+            <div v-if="bot_category_item_status==='xiezuo'" class="bot_item_content_div">
+                <!--回答-->
+                <div class="bot_answer_content_div">
+                    <div class="bot_answer_title_div">
+                        <div class="bot_answer_title_image"><span></span>&nbsp;WerseBot的回答：</div>
+                        <div class="bot_bot_answer_title_botinform">
+                            <span>使用次数:{{bot.usedcount}}</span>&nbsp;
+                            <span>满意度:{{bot.satisfaction}}</span>
+                        </div>
+                    </div>
+                    <!--创作完成-->
+                    <div v-if="botResult.length>0&&!sendingStatus" class="bot_answer_div">
+                        <p v-type-writer-quick="botResult"></p>
+                    </div>
+                    <div v-if="botResult.length===0&&!sendingStatus" class="bot_answer_div">
+                        <p v-type-writer-slow="tipText"></p>
+                    </div>
+                    <!--正在创作状态-->
+                    <div v-if="sendingStatus" class="bot_answer_div">
+                        <p>{{sending_text}}（{{remainingTime}}秒内结束）</p>
+                    </div>
+                    <div v-if="type_writer_finish" class="bot_answer_feedback_div">
+                        <div class="bot_answer_feedback_control_div">
+                            <h4>你对本次回答满意吗？</h4>
+                            <div @click="feedbackBtn('yes')" class="bot_answer_feedback_btn">答得不错&nbsp;<span class="feedback_btn_yes"></span> </div>
+                            <div @click="feedbackBtn('no')"  class="bot_answer_feedback_btn">还不够好&nbsp<span class="feedback_btn_no"></span> </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!--介绍-->
+                <div class="user_control_content">
+                    <div class="bot_item_introduction">
+                        <span></span>&nbsp;{{introduction.xiezuo}}
+                    </div>
+                    <div style="justify-content: space-between;display: flex;align-items: center;padding-top: 10px">
+                        <div class="bot_item_commend_div">
+                            <span class="item_xiezuo_timu_span"><label>题目</label> <input v-model="xiezuoTitle" type="text" maxlength="20"></span>
+                            <div class="item_xiezuo_zishu_div">
+                                <label>字数</label>
+                                <span class="item_xiezuo_zishu_control">
+                                <span @click="zishuSetBtn('-')"></span>
+                                <span>{{zishuLength}}</span>
+                                <span @click="zishuSetBtn('+')"></span>
+                            </span>
+                            </div>
+                            <div class="item_xiezuo_level_div">
+                                <label>等级</label>
+                                <div class="item_xiezuo_level_list_btn">
+                                    <div tabindex="-1" @click="showLevelListBtn" @blur="closeLevelListBtn"
+                                         class="showLevelListBtn">
+                                        {{levelValue}}
+                                    </div>
+                                    <div id="item_xiezuo_level_list_text" class="item_xiezuo_level_list_text">
+                                        <div @mousedown="levelSetListBtn(item.text)" v-for="(item,index) in level">
+                                            {{item.text}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div @click="botConfirmBtn('xiezuo')" class="botConfirmBtn">
+                            <span class="botConfirmBtnText">确认</span>
+                            <span class="botConfirmBtnImg"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--造句-->
+            <div v-if="bot_category_item_status==='zaoju'" class="bot_item_content_div">
+                <!--回答-->
+                <div class="bot_answer_content_div">
+                    <div class="bot_answer_title_div">
+                        <div class="bot_answer_title_image"><span></span>&nbsp;WerseBot的回答：</div>
+                        <div class="bot_bot_answer_title_botinform">
+                            <span>使用次数:{{bot.usedcount}}</span>&nbsp;
+                            <span>满意度:{{bot.satisfaction}}</span>
+                        </div>
+                    </div>
+                    <!--创作完成-->
+                    <div v-if="botResult.length>0&&!sendingStatus" class="bot_answer_div">
+                        <p v-type-writer-quick="botResult"></p>
+                    </div>
+                    <div v-if="botResult.length===0&&!sendingStatus" class="bot_answer_div">
+                        <p v-type-writer-slow="tipText"></p>
+                    </div>
+                    <!--正在创作状态-->
+                    <div v-if="sendingStatus" class="bot_answer_div">
+                        <p>{{sending_text}}（{{remainingTime}}秒内结束）</p>
+                    </div>
+                    <div v-if="type_writer_finish" class="bot_answer_feedback_div">
+                        <div class="bot_answer_feedback_control_div">
+                            <h4>你对本次回答满意吗？</h4>
+                            <div @click="feedbackBtn('yes')" class="bot_answer_feedback_btn">答得不错&nbsp;<span class="feedback_btn_yes"></span> </div>
+                            <div @click="feedbackBtn('no')"  class="bot_answer_feedback_btn">还不够好&nbsp<span class="feedback_btn_no"></span> </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!--介绍-->
+                <div class="user_control_content">
+                    <div class="bot_item_introduction">
+                        <span></span>&nbsp;{{introduction.zaoju}}
+                    </div>
+                    <div style="justify-content: space-between;display: flex;align-items: center;padding-top: 10px">
+                        <!--单词-->
+                        <div class="bot_item_commend_div">
+                            <input v-model="zaojuWord_1" name="spelling" maxlength="15" placeholder="第一个单词" type="text" autocomplete="off" onkeyup="value=value.replace(/[^A-Za-z]/ig,'')">
+                            <input v-model="zaojuWord_2"  name="spelling" maxlength="15"  placeholder="第二个单词" type="text" autocomplete="off" onkeyup="value=value.replace(/[^A-Za-z]/ig,'')">
+                            <input v-model="zaojuWord_3"  name="spelling" maxlength="15"  placeholder="第三个单词" type="text" autocomplete="off" onkeyup="value=value.replace(/[^A-Za-z]/ig,'')">
+                            <input v-model="zaojuWord_4"  name="spelling" maxlength="15"  placeholder="第四个单词" type="text" autocomplete="off" onkeyup="value=value.replace(/[^A-Za-z]/ig,'')">
+                            <input v-model="zaojuWord_5"  name="spelling" maxlength="15"  placeholder="第五个单词" type="text" autocomplete="off" onkeyup="value=value.replace(/[^A-Za-z]/ig,'')">
+                        </div>
+                        <div @click="botConfirmBtn('zaoju')" class="botConfirmBtn">
+                            <span class="botConfirmBtnText">确认</span>
+                            <span class="botConfirmBtnImg"></span>
+                        </div>
+                    </div>
 
 
+                </div>
+            </div>
+            <!--润色-->
+            <div v-if="bot_category_item_status==='runse'" class="bot_item_content_div">
+                <!--回答-->
+                <div class="bot_answer_content_div">
+                    <div class="bot_answer_title_div">
+                        <div class="bot_answer_title_image"><span></span>&nbsp;WerseBot的回答：</div>
+                        <div class="bot_bot_answer_title_botinform">
+                            <span>使用次数:{{bot.usedcount}}</span>&nbsp;
+                            <span>满意度:{{bot.satisfaction}}</span>
+                        </div>
+                    </div>
+                    <!--创作完成-->
+                    <div v-if="botResult.length>0&&!sendingStatus" class="bot_answer_div">
+                        <p v-type-writer-quick="botResult"></p>
+                    </div>
+                    <div v-if="botResult.length===0&&!sendingStatus" class="bot_answer_div">
+                        <p v-type-writer-slow="tipText"></p>
+                    </div>
+                    <!--正在创作状态-->
+                    <div v-if="sendingStatus" class="bot_answer_div">
+                        <p>{{sending_text}}（{{remainingTime}}秒内结束）</p>
+                    </div>
+                    <div v-if="type_writer_finish" class="bot_answer_feedback_div">
+                        <div class="bot_answer_feedback_control_div">
+                            <h4>你对本次回答满意吗？</h4>
+                            <div @click="feedbackBtn('yes')" class="bot_answer_feedback_btn">答得不错&nbsp;<span class="feedback_btn_yes"></span> </div>
+                            <div @click="feedbackBtn('no')"  class="bot_answer_feedback_btn">还不够好&nbsp<span class="feedback_btn_no"></span> </div>
 
+                        </div>
+                    </div>
+                </div>
+                <!--介绍-->
+                <div class="user_control_content">
+                    <div class="bot_item_introduction">
+                        <span></span>&nbsp;{{introduction.runse}}
+                    </div>
+                    <div style="justify-content: space-between;display: flex;align-items: center;padding-top: 10px">
+                        <!--单词-->
+                        <div class="bot_item_commend_div bot_item_commend_runse_input">
+                            <input v-model="runse_sentence" maxlength="150" placeholder="请输入需要润色的句子" type="text" autocomplete="off">
+                            {{runse_sentence.length}}/150
+                        </div>
+
+                        <div @click="botConfirmBtn('runse')" class="botConfirmBtn">
+                            <span class="botConfirmBtnText">确认</span>
+                            <span class="botConfirmBtnImg"></span>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <!--问答-->
+            <div v-if="bot_category_item_status==='wenda'" class="bot_item_content_div">
+                <!--回答-->
+                <div class="bot_answer_content_div">
+                    <div class="bot_answer_title_div">
+                        <div class="bot_answer_title_image"><span></span>&nbsp;WerseBot的回答：</div>
+                        <div class="bot_bot_answer_title_botinform">
+                            <span>使用次数:{{bot.usedcount}}</span>&nbsp;
+                            <span>满意度:{{bot.satisfaction}}</span>
+                        </div>
+                    </div>
+                    <!--创作完成-->
+                    <div v-if="botResult.length>0&&!sendingStatus" class="bot_answer_div">
+                        <p v-type-writer-quick="botResult"></p>
+                    </div>
+                    <div v-if="botResult.length===0&&!sendingStatus"
+                         class="bot_answer_div">
+                        <p v-type-writer-slow="tipText"></p>
+                    </div>
+                    <!--正在创作状态-->
+                    <div v-if="sendingStatus" class="bot_answer_div">
+                        <p>{{sending_text}}（{{remainingTime}}秒内结束）</p>
+                    </div>
+                    <!--反馈-->
+                    <div v-if="type_writer_finish" class="bot_answer_feedback_div">
+                        <div class="bot_answer_feedback_control_div">
+                            <h4>你对本次回答满意吗？</h4>
+                            <div @click="feedbackBtn('yes')" class="bot_answer_feedback_btn">答得不错&nbsp;<span class="feedback_btn_yes"></span> </div>
+                            <div @click="feedbackBtn('no')"  class="bot_answer_feedback_btn">还不够好&nbsp<span class="feedback_btn_no"></span> </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!--介绍-->
+                <div class="user_control_content">
+                    <div class="bot_item_introduction">
+                        <span></span>&nbsp;{{introduction.wenda}}
+                    </div>
+                    <div style="justify-content: space-between;display: flex;align-items: center;padding-top: 10px">
+                        <!--单词-->
+                        <div class="bot_item_commend_div bot_item_commend_runse_input">
+                            <input v-model="wenda_question" maxlength="150" placeholder="请输入你的问题" type="text" autocomplete="off">
+                            {{wenda_question.length}}/150
+                        </div>
+
+                        <div @click="botConfirmBtn('wenda')" class="botConfirmBtn">
+                            <span class="botConfirmBtnText">确认</span>
+                            <span class="botConfirmBtnImg"></span>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+<!--            <div v-if="bot_category_item_status==='fanyi'" class="bot_item_content_div">-->
+
+            </div>
+
+        </div>
 
 
 
     </div>
+
 </div>
+</div>
+
+<script>
+    Vue.directive('type-writer-quick', {
+        inserted: function (el, binding) {
+            botApp.$data.type_writer_finish = false
+            const text = binding.value;
+            let index = 0;
+            function type() {
+                if (index < text.length) {
+                    el.innerHTML += text.charAt(index);
+                    index++;
+                    setTimeout(type, 40); // 设置打字速度
+                }else {
+                    botApp.$data.type_writer_finish = true
+                    // console.log("type_writer_finish="+botApp.$data.type_writer_finish)
+                }
+            }
+            type();
+        }
+    });
+    Vue.directive('type-writer-slow', {
+        inserted: function (el, binding) {
+            el.innerHTML = ""
+            const text = binding.value;
+            let index = 0;
+
+            function type() {
+                if (index < text.length) {
+                    el.innerHTML += text.charAt(index);
+                    index++;
+                    setTimeout(type, 70); // 设置打字速度
+                }
+            }
+
+            type();
+        }
+    });
+    const NotificationVue = new Vue({
+        el: "#notification",
+        data: {
+            no_content: '',
+            no_type: '',   //error，message消息，warn警告,success成功
+            timer: null,
+            spantype: {
+                error: {
+                    value: '失败',
+                    src: 'image/public_notification/error.png'
+                },
+                message: {
+                    value: '消息',
+                    src: 'image/public_notification/message.png'
+                },
+                success: {
+                    value: '成功',
+                    src: 'image/public_notification/success.png'
+                },
+                warn: {
+                    value: '警告',
+                    src: 'image/public_notification/warn.png'
+                },
+            }
+        },
+        methods: {
+            showPublicNotification(type, content) {
+                if (this.timer) { //计时器已经存在则销毁
+                    clearTimeout(this.timer)
+                    this.timer = null
+                }
+                const id = document.getElementById("notification")
+                id.style.right = "30px";
+                this.no_content = content
+                this.no_type = type
+                this.timer = setTimeout(() => {
+                    this.no_content = ''
+                    this.no_type = ''
+                    id.style.right = "-300px"
+                }, 3000)
+            }
+        },
+    })
+    const botApp = new Vue({
+        el: '#botApp',
+        data: {
+            tipText: "你好，我叫WerseBot，是一个可以帮助你学习英语的智能伙伴，如果你有什么问题，就向我提问吧。",
+            access_token: '',
+            wordlist: [],
+            bot_category_item_status: 'xiezuo',
+            zishuLength: 50,
+            zishuLengthTemp: 3000,  //控制字数求余
+            level: [
+                {
+                    id: 1,
+                    text: '考研'
+                },
+                {
+                    id: 2,
+                    text: 'CET6'
+                },
+                {
+                    id: 3,
+                    text: 'CET4'
+                },
+                {
+                    id: 4,
+                    text: '高中'
+                }
+            ],
+            levelValue: '考研',
+            introduction: {
+                xiezuo: "输入文章主题、字数要求以及写作能力等级，等待WerseBot创作英语作文。",
+                zaoju: "输入几个英语单词（至少一个，最多五个），等待WerseBot造句，加强对单词的记忆。",
+                runse: "输入一个英语句子，等待WerseBot进行润色。",
+                wenda:"输入一个英语学习相关的问题，等待WerseBot给你满意的回答吧。"
+            },
+            sendingStatus: false,  //是否正在发送
+            xiezuoTitle: "",
+            botResult: "",
+            remainingTime: 90,  //创作倒计时
+            zaojuWords: [],   //造句单词
+            zaojuWord_1: "",
+            zaojuWord_2: "",
+            zaojuWord_3: "",
+            zaojuWord_4: "",
+            zaojuWord_5: "",
+            runse_sentence:"",
+            wenda_question: "",
+            type_writer_finish: false,   //type_writer_quick是否完成,用于出现满意度div  true时出现
+            bot: [],
+            sending_text:"正在思考,请稍等..."
+
+        },
+        methods: {
+            /*反馈btn*/
+            async feedbackBtn(v) {
+                if (v === 'yes') {
+                    await this.bot_feedbackAxios(v);
+                    this.get_botAxios(this.bot_category_item_status)
+                    NotificationVue.showPublicNotification("message","感谢你的反馈，我会继续努力。")
+                }
+                if (v === 'no') {
+                    await this.bot_feedbackAxios(v);
+                    this.get_botAxios(this.bot_category_item_status)
+                    NotificationVue.showPublicNotification("message","感谢你的反馈，我会努力变得更好。")
+                }
+                this.type_writer_finish = false
+
+            },
+            /*设置按钮*/
+            botConfirmBtnEnable(v) {   //true。非思考状态
+                let botConfirmBtnImg = document.getElementsByClassName("botConfirmBtnImg")[0];
+                let botConfirmBtnText = document.getElementsByClassName("botConfirmBtnText")[0];
+                let botConfirmBtn = document.getElementsByClassName("botConfirmBtn")[0];
+                if (v) {   //设置btn为绿色 ，非创作状态
+                    botConfirmBtn.style.borderColor = "#00e57b"
+                    botConfirmBtnImg.style.backgroundImage = "url('image/index-03/send_icon.png')"
+                    botConfirmBtnText.style.color = "#00e57b"
+                    this.sendingStatus = false;  //不在创作状态
+                    this.remainingTime = 90 //还原时间
+                } else {   //设置为正在创作状态
+                    botConfirmBtn.style.borderColor = "#cdcdcd";
+                    botConfirmBtnImg.style.backgroundImage = "url('image/index-03/send_icon_disable.png')";
+                    botConfirmBtnText.style.color = "#cdcdcd";
+                    this.botResult = "";
+                    this.sendingStatus = true;   //正在创作状态
+                }
+
+            },
+            /*造句功能 将添加的单词加入到list*/
+            addWordToZaojuWords() {
+                if (this.zaojuWord_1 !== "")
+                    this.zaojuWords.push(this.zaojuWord_1)
+                if (this.zaojuWord_2 !== "")
+                    this.zaojuWords.push(this.zaojuWord_2)
+                if (this.zaojuWord_3 !== "")
+                    this.zaojuWords.push(this.zaojuWord_3)
+                if (this.zaojuWord_4 !== "")
+                    this.zaojuWords.push(this.zaojuWord_4)
+                if (this.zaojuWord_5 !== "")
+                    this.zaojuWords.push(this.zaojuWord_5)
+            },
+            /*造句功能 删除造句单词*/
+            deleteZaojuWords() {
+                this.zaojuWord_1 = ""
+                this.zaojuWord_2 = ""
+                this.zaojuWord_3 = ""
+                this.zaojuWord_4 = ""
+                this.zaojuWord_5 = ""
+                this.zaojuWords = []
+            },
+
+            /*确认*/
+            async botConfirmBtn(btn) {
+                if (!this.sendingStatus) {   //当不处于发送状态才可以点击
+                    this.type_writer_finish = false  //还原type_writer
+                    /*作文*/
+                    if (btn === 'xiezuo') {
+                        if (this.xiezuoTitle === "") {
+                            NotificationVue.showPublicNotification("error", "请输入文章标题再继续。");
+                        } else {
+                            await this.bot_usedAxios("xiezuo")   //添加使用次数
+                            this.get_botAxios("xiezuo")
+                            this.botConfirmBtnEnable(false);   //设置按钮为灰色
+                            await this.xiezuoAxios();
+                            const timer = setInterval(() => {
+                                if (this.remainingTime > 0 && this.botResult === "") {   //正在创作
+                                    this.remainingTime--;
+                                } else {
+                                    clearInterval(timer);
+                                    this.botConfirmBtnEnable(true);   //设置按钮为非创作状态
+                                }
+                            }, 1000);
+                        }
+                    }
+                    if (btn === 'zaoju') {
+                        this.zaojuWords = []   //先删除以前的造句单词列表
+                        await this.addWordToZaojuWords()   //添加单词到单词列表
+                        if (this.zaojuWords.length===0)
+                            NotificationVue.showPublicNotification("error", "请至少填写一个单词。");
+                        else{
+
+                            await this.bot_usedAxios("zaoju")   //添加使用次数
+                            this.get_botAxios("zaoju")
+                            this.botConfirmBtnEnable(false);   //设置按钮为灰色
+                            await this.zaojuAxios();
+                            const timer = setInterval(() => {
+                                if (this.remainingTime > 0 && this.botResult === "") {   //正在创作
+                                    this.remainingTime--;
+                                } else {
+                                    clearInterval(timer);
+                                    this.botConfirmBtnEnable(true);   //设置按钮为非创作状态
+                                }
+                            }, 1000);
+
+                        }
+                    }
+                    if (btn === 'runse') {
+                        if (this.runse_sentence.length===0)
+                            NotificationVue.showPublicNotification("error", "请输入要润色的英语句子。");
+                        else{
+                            await this.bot_usedAxios("runse")
+                            this.get_botAxios("runse")
+                            this.botConfirmBtnEnable(false);   //设置按钮为灰色
+                            await this.runseAxios();
+                            const timer = setInterval(() => {
+                                if (this.remainingTime > 0 && this.botResult === "") {   //正在创作
+                                    this.remainingTime--;
+                                } else {
+                                    clearInterval(timer);
+                                    this.botConfirmBtnEnable(true);   //设置按钮为非创作状态
+                                }
+                            }, 1000);
+
+                        }
+                    }
+                    if (btn === 'wenda') {
+                        if (this.wenda_question.length===0)
+                            NotificationVue.showPublicNotification("error", "请输入你的问题。");
+                        else{
+                            await this.bot_usedAxios("wenda")
+                            this.get_botAxios("wenda")
+                            this.botConfirmBtnEnable(false);   //设置按钮为灰色
+                            await this.wendaAxios();
+                            const timer = setInterval(() => {
+                                if (this.remainingTime > 0 && this.botResult === "") {   //正在创作
+                                    this.remainingTime--;
+                                } else {
+                                    clearInterval(timer);
+                                    this.botConfirmBtnEnable(true);   //设置按钮为非创作状态
+                                }
+                            }, 1000);
+
+                        }
+                    }
+                } else {
+                    NotificationVue.showPublicNotification("warn", "正在思考，请稍等。");
+                }
+            },
+            zaojuAxios() {
+                const _this = this;
+                // const service = axios.create({
+                //     timeout: 60000 // request timeout
+                // })
+                axios({
+                    method: "get",
+                    url: "getERNIEBotStudy/zaoju_making?zaojuWords=" + this.zaojuWords
+                }).then(function (data) {
+                    _this.botResult = data.data
+                    console.log(_this.botResult)
+                }).catch(error => {
+                    _this.botResult = error.message
+                    this.botConfirmBtnEnable(true);   //设置按钮为非创作状态
+                    NotificationVue.showPublicNotification("error", "发生未知错误，请稍后再试。")
+                })
+            },
+            xiezuoAxios() {
+                const _this = this;
+                // const service = axios.create({
+                //     timeout: 60000 // request timeout
+                // })
+                axios({
+                    method: "get",
+                    url: "getERNIEBotStudy/xiezuo_making?xiezuoTitle=" + this.xiezuoTitle + "&zishuLength=" + this.zishuLength + "&levelValue=" + this.levelValue,
+                }).then(function (data) {
+                    _this.botResult = data.data
+                    // console.log(this.botResult)
+                }).catch(error => {
+                    _this.botResult = error.message
+                    this.botConfirmBtnEnable(true);   //设置按钮为非创作状态
+                    NotificationVue.showPublicNotification("error", "发生未知错误，请稍后再试。")
+                })
+
+            },
+            runseAxios() {
+                const _this = this;
+                // const service = axios.create({
+                //     timeout: 60000 // request timeout
+                // })
+                axios({
+                    method: "get",
+                    url: "getERNIEBotStudy/runse_making?runse_sentence=" + this.runse_sentence
+                }).then(function (data) {
+                    _this.botResult = data.data
+                    // console.log(this.botResult)
+                }).catch(error => {
+                    _this.botResult = error.message
+                    this.botConfirmBtnEnable(true);   //设置按钮为非创作状态
+                    NotificationVue.showPublicNotification("error", "发生未知错误，请稍后再试。")
+                })
+            },
+            wendaAxios() {
+                const _this = this;
+                axios({
+                    method: "get",
+                    url: "getERNIEBotStudy/wenda_making?wenda_question=" + this.wenda_question
+                }).then(function (data) {
+                    _this.botResult = data.data
+                    // console.log(this.botResult)
+                }).catch(error => {
+                    _this.botResult = error.message
+                    this.botConfirmBtnEnable(true);   //设置按钮为非创作状态
+                    NotificationVue.showPublicNotification("error", "发生未知错误，请稍后再试。")
+                })
+            },
+            /*写作功能 设置level按钮 blur与click冲突，mousedown解决 */
+            async levelSetListBtn(v) {
+                this.levelValue = v
+            },
+            /*写作功能 等级改变按钮*/
+            showLevelListBtn() {
+                let elementById = document.getElementById("item_xiezuo_level_list_text");
+                elementById.style.display = "block"
+            },
+            closeLevelListBtn() {
+                let elementById = document.getElementById("item_xiezuo_level_list_text");
+                elementById.style.display = "none"
+            },
+            /*选项卡变换*/
+            changeCategoryItem(v) {
+                if (this.sendingStatus) {
+                    NotificationVue.showPublicNotification("warn", "请等待WerseBot思考完成后再切换。")
+                } else {
+                    let green = "#00e57b";
+                    let white = "#adadad";
+                    if (v !== this.bot_category_item_status) {
+                        let o_v = this.bot_category_item_status
+                        let o_id_item = document.getElementById(`category_item_${o_v}`)   //改变突变边框id
+                        let o_id_item_text = document.getElementById(`category_item_${o_v}_text`)   //改变突变边框id
+                        let o_bot_category_item = document.getElementById(`bot_category_item_${o_v}`)   //改变突变边框id
+                        let id_item = document.getElementById(`category_item_${v}`)   //改变突变边框id
+                        let id_item_text = document.getElementById(`category_item_${v}_text`)   //改变突变边框id
+                        let id_bot_category_item = document.getElementById(`bot_category_item_${v}`)   //改变突变边框id
+                        id_item.style.backgroundImage = "url('image/index-03/" + v + "_icon_color.png')"
+                        id_item.style.borderColor = green
+                        id_item_text.style.color = green
+                        id_bot_category_item.classList.add("bot_category_item_active")
+                        o_id_item.style.backgroundImage = "url('image/index-03/" + o_v + "_icon.png')"
+                        o_id_item.style.borderColor = "#e6e6e6"
+                        o_id_item_text.style.color = "#adadad"
+                        o_bot_category_item.classList.remove("bot_category_item_active")
+                    }
+                    this.get_botAxios(v);   //获取bot满意度
+                    this.bot_category_item_status = v
+                    /*清楚用户输入信息*/
+                    this.botResult = ""   //清除结果数据
+                    this.xiezuoTitle = ""   //清除造句title
+                    this.deleteZaojuWords()   //清除造句的单词
+                    this.runse_sentence =""  //清除润色句子
+                    this.wenda_question = ""  //清除问题
+                    this.type_writer_finish =false  //还原type_writer
+
+                }
+            },
+            /*字数设置btn*/
+            zishuSetBtn(v) {
+                if (v === '-') {
+                    this.zishuLengthTemp = this.zishuLengthTemp - 1
+                }
+                if (v === '+') {
+                    this.zishuLengthTemp = this.zishuLengthTemp + 1
+                }
+                if (this.zishuLengthTemp % 3 === 0)
+                    this.zishuLength = 50
+                if (this.zishuLengthTemp % 3 === 1)
+                    this.zishuLength = 100
+                if (this.zishuLengthTemp % 3 === 2)
+                    this.zishuLength = 150
+            },
+            get_botAxios(category) {
+                const _this = this;
+                axios({
+                    method: "get",
+                    url: "getERNIEBotStudy/get_bot?category=" +category
+                }).then(function (data) {
+                    _this.bot = data.data
+                })
+            },
+            bot_usedAxios(category) {
+                axios({
+                    method: "post",
+                    url: "getERNIEBotStudy/bot_used?category="+category
+                }).then(function (data) {
+                })
+            },
+            bot_feedbackAxios(feedbackvalue) {
+                axios({
+                    method: "post",
+                    url: "getERNIEBotStudy/bot_feedback?category=" +this.bot_category_item_status+"&feedbackvalue="+feedbackvalue
+                }).then(function (data) {
+                })
+            },
+
+
+        },
+        created() {
+            this.get_botAxios("xiezuo");
+        },
+
+
+    });
+
+
+
+</script>
 
 </body>
 </html>

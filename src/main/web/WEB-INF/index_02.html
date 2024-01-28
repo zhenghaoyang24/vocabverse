@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,13 +8,36 @@
     <script src="js/vue.js"></script>
     <script src="js/element-ui@2.15.14-index.js"></script>
     <script src="js/axios-0.18.0.js"></script>
-    <link rel="icon" href="image/logo-black.png">
+    <link rel="icon" href="image/logo-white.png">
     <link rel="stylesheet" href="css/public/element-ui@2.15.14-index.css">
     <link rel="stylesheet" href="css/top-nav.css">
     <link rel="stylesheet" href="css/public/main.css">
     <link rel="stylesheet" href="css/index_02.css">
 </head>
 <body>
+
+<!--通知-->
+<div id="notification" class="public_notification_div">
+    <div class="public_notification_title">
+        <div v-if="no_type==='error'" class="notification_item_tittle">
+            <img :src="spantype.error.src">
+            <span>{{spantype.error.value}}</span>
+        </div>
+        <div v-if="no_type==='message'" class="notification_item_tittle">
+            <img :src="spantype.message.src">
+            <span>{{spantype.message.value}}</span>
+        </div>
+        <div v-if="no_type==='warn'" class="notification_item_tittle">
+            <img :src="spantype.warn.src">
+            <span>{{spantype.warn.value}}</span>
+        </div>
+        <div v-if="no_type==='success'" class="notification_item_tittle">
+            <img :src="spantype.success.src">
+            <span>{{spantype.success.value}}</span>
+        </div>
+    </div>
+    <div class="public_notification_content">{{no_content}}</div>
+</div>
 <!-- 顶部导航栏，三个元素 -->
 <div class="top-nav">
     <div class="index-logo">
@@ -31,7 +54,7 @@
         <a href="studyPage"><span>学习</span></a>
         <a href="searchPage"
            style="color: #00e57b;box-sizing: border-box;border-top: 3px #00e57b solid;"><span>翻译</span></a>
-        <a href="translatePage"><span>翻译</span></a>
+        <a href="translatePage"><span>WerseBot</span></a>
         <a href="dataPage"><span>数据</span></a>
     </div>
     <div class="more-nav">
@@ -80,7 +103,50 @@
 
 
 <script>
-
+    const NotificationVue = new Vue({
+        el: "#notification",
+        data: {
+            no_content: '',
+            no_type: '',   //error，message消息，warn警告,success成功
+            timer: null,
+            spantype: {
+                error: {
+                    value: '失败',
+                    src: 'image/public_notification/error.png'
+                },
+                message: {
+                    value: '消息',
+                    src: 'image/public_notification/message.png'
+                },
+                success: {
+                    value: '成功',
+                    src: 'image/public_notification/success.png'
+                },
+                warn: {
+                    value: '警告',
+                    src: 'image/public_notification/warn.png'
+                },
+            }
+        },
+        methods: {
+            showPublicNotification(type, content) {
+                if (this.timer) { //计时器已经存在则销毁
+                    clearTimeout(this.timer)
+                    this.timer = null
+                }
+                const id = document.getElementById("notification")
+                id.style.right = "30px";
+                this.no_content = content
+                this.no_type = type
+                this.timer = setTimeout(() => {
+                    this.no_content = ''
+                    this.no_type = ''
+                    id.style.right = "-300px"
+                }, 3000)
+                console.log(content);
+            }
+        },
+    })
     new Vue({
         el: '#translateApp',
         data:{
@@ -129,6 +195,9 @@
                 this.toLanguageEn = id
             },
             translate() {
+                if (this.inputText ===""){
+                    NotificationVue.showPublicNotification("error","请输入要翻译的文本。")
+                }
                 const _this = this;
                 if (this.inputText!=='') {
                     axios({

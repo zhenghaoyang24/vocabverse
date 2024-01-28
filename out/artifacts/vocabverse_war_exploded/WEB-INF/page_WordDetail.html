@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <title>Werse词境 单词详情</title>
@@ -7,14 +7,33 @@
     <script src="js/vue.js"></script>
     <script src="js/element-ui@2.15.14-index.js"></script>
     <script src="js/axios-0.18.0.js"></script>
-    <link rel="icon" href="image/logo-black.png">
+    <link rel="icon" href="image/logo-white.png">
     <!-- 引入样式 -->
     <link rel="stylesheet" href="css/public/element-ui@2.15.14-index.css">
     <link rel="stylesheet" href="css/top-nav.css">
     <link rel="stylesheet" href="css/public/main.css">
     <link rel="stylesheet" href="css/wordDetail.css">
-
     <style>
+        /*弹出框动效*/
+        .MessageBoxBorderFrames{
+            animation: MessageBoxBorderFrames 0.3s linear;
+        }
+        .switch_btn_active {
+            background-color: #00e57b;
+            color: black;
+        }
+
+        .switch_btn {
+            cursor: pointer;
+            padding: 4px;
+            font-size: 0.9em;
+            font-weight: 800;
+            border: 2px solid #00e57b;
+            border-radius: 5px;
+            width: 50%;
+            height: 100%;
+        }
+
         .sort_span {
             cursor: pointer;
             margin-left: 5px;
@@ -55,46 +74,44 @@
     </div>
     <div class="public_notification_content">{{no_content}}</div>
 </div>
+<!--顶部导航栏-->
+<div class="top-nav">
+    <div class="index-logo">
+        <a href="homePage" class="index_logo_a">
+            <img class="logo_img" src="image/topnav/topnavlogo.png" alt="Werse">
+            <h2 class="logo_h2_e">e</h2>
+            <h2 class="logo_h2_r">r</h2>
+            <h2 class="logo_h2_s">s</h2>
+            <h2 class="logo_h2_e1">e</h2>
+        </a>
+    </div>
+    <div class="nav-content">
+        <a href="homePage"><span>首页</span></a>
+        <a href="studyPage"><span>学习</span></a>
+        <a style="color: whitesmoke;box-sizing: border-box;border-top: 3px #00e57b solid;"><span
+                style="color: #00e57b">查</span><span>-</span><span>译</span></a>
+        <div class="cha_yi_div">
+            <a href="searchWordPage">查词</a>
+            <a href="translatePage">翻译</a>
+        </div>
+        <a href="wersebotPage"><span>WerseBot</span></a>
+        <a href="dataPage"><span>数据</span></a>
+    </div>
+    <div class="more-nav">
 
+    </div>
+</div>
+<!--弹窗-->
+<div id="MessageBoxContent" class="MessageBoxDiv" @click="tipEffection">
+    <div id="messageBox" class="MessageBox" :class="{'MessageBoxBorderFrames':borderFramesValue}" @animationend="tipEffectionEnd">
+        <div class="MessageBoxContent">{{messageBoxQuestion}}</div>
+        <div class="MessageBoxController">
+            <span @click.stop="messageBoxConfirmBtn(true)">确认</span>
+            <span @click.stop="messageBoxConfirmBtn(false)">取消</span>
+        </div>
+    </div>
+</div>
 <div style="width: 100%" id="wordDetailApp">
-
-    <!--弹窗-->
-    <div id="MessageBoxDiv" class="MessageBoxDiv">
-        <div id="messageBox" class="MessageBox">
-            <div class="MessageBoxContent">{{messageBoxContent}}</div>
-            <div class="MessageBoxController">
-                <span @click="confirmValueBtn(true)">确认</span>
-                <span @click="confirmValueBtn(false)">取消</span>
-            </div>
-        </div>
-    </div>
-    <!--顶部导航栏-->
-    <div class="top-nav">
-        <div class="index-logo">
-            <a href="homePage" class="index_logo_a">
-                <img class="logo_img" src="image/topnav/topnavlogo.png" alt="Werse">
-                <h2 class="logo_h2_e">e</h2>
-                <h2 class="logo_h2_r">r</h2>
-                <h2 class="logo_h2_s">s</h2>
-                <h2 class="logo_h2_e1">e</h2>
-            </a>
-        </div>
-        <div class="nav-content">
-            <a href="homePage"
-               style="color: #00e57b;box-sizing: border-box;border-top: 3px #00e57b solid;"><span>首页</span></a>
-            <a href="studyPage"><span>学习</span></a>
-            <a href="searchPage"><span>查词</span></a>
-            <a href="translatePage"><span>翻译</span></a>
-            <a href="dataPage"><span>数据</span></a>
-        </div>
-        <div class="more-nav">
-            <div class="message_nav">
-                <img src="image/topnav/messagelogo_white.png" alt="">
-                <h3>消息</h3>
-            </div>
-        </div>
-    </div>
-    <!--内容-->
     <!--例句控制-->
     <div v-if="control_example_div_state" class="control_example_div">
         <div class="control_example_content_div">
@@ -115,16 +132,19 @@
                     <!--显示例句时渲染-->
                     <span class="backOradd" v-show="updateStatus==0" @click="addExampleBtn()">添加例句</span>
                     <!--添加与编辑时渲染-->
-                    <span class="backOradd" v-show="updateStatus!=0" @click="allExampleBtn()">查看所有例句</span>
+                    <span class="backOradd" v-show="updateStatus!=0" @click="allExampleBtn()">返回</span>
                     <!--添加时渲染-->
                     <span class="backOradd" v-show="updateStatus==1" @click="addExample(word.wordid)">确认添加</span>
                     <!--编辑时渲染-->
                     <span class="backOradd" v-show="updateStatus==2" @click="editExample(word.wordid)">确认编辑</span>
                 </div>
             </div>
-
             <!--显示页面-->
             <div v-show="allOrUpdateStatus" class="all_example_list">
+                <div v-if="cardExampleList.length==0"
+                     style="width: 100%;height: 100%;display:flex;justify-content: center;">
+                    <span style="margin: auto;color: whitesmoke;font-weight: 700">这里空空如也。这个单词还没有例句！</span>
+                </div>
                 <div v-for="(item,index) in cardExampleList" class="all_example_item">
                     <div class="example_text">{{item.en}}</div>
                     <div class="example_text">{{item.cn}}</div>
@@ -152,24 +172,99 @@
             </div>
         </div>
     </div>
-    <div class="content-body">
+    <!--自定义书籍卡-->
+    <div v-if="control_userbook_div_state" class="control_example_div">
+        <div class="control_example_content_div">
+            <!--标题-->
+            <div class="tittle_sort_div">
+                <div class="tittle_div">
+                    <span v-show="all_add_detail_userbook==0" class="tittle_span">我的词库</span>
+                    <span v-show="all_add_detail_userbook==1" class="tittle_span">新建词库</span>
+                    <span v-show="all_add_detail_userbook==2"
+                          class="tittle_span">{{theUserBookDetail.userbookname}}</span>
+                    <span @click="controlUserBookBtn" class="close_div_btn"></span>
+                </div>
 
+                <div class="sort_div">
+                    <!--显示例句时渲染-->
+                    <span class="backOradd" @click="addUserbookBtn"
+                          v-show="all_add_detail_userbook==0">新建词库</span>
+                    <span class="backOradd" @click="userBookBackBtn" v-show="all_add_detail_userbook!==0">返回</span>
+                    <span class="backOradd" @click="addUserBookConfirmBtn"
+                          v-show="all_add_detail_userbook==1">确认添加</span>
+                </div>
+            </div>
+            <!--我的所有词库-->
+            <div v-if="all_add_detail_userbook==0" class="all_example_list">
+                <div v-if="alMyUserBooks.length==0"
+                     style="width: 100%;height: 100%;display:flex;justify-content: center;">
+                    <span style="margin: auto;color: whitesmoke;font-weight: 700">这里空空如也。你还没有任何词库！</span>
+                </div>
+                <div v-else v-for="(item,index) in alMyUserBooks" class="userBookItemDiv"
+                     @click="theUserBookDetailBtn(item.userbookid)">
+                    <div class="userBookNameDiv">
+                        <span class="userBookNameDiv_child1"></span>
+                        <span class="userBookNameDiv_child2">{{item.userbookname}}</span>
+                    </div>
+                    <span class="addTheWordToCikuBtn"
+                          @click.stop="addWordToUserBookBtn(item.userbookid)">加入该词库</span>
+                </div>
+            </div>
+            <!--添加云词库-->
+            <div v-if="all_add_detail_userbook==1" class="all_example_list">
+                <div class="addUserBookDiv">
+                    <label>词库名称&nbsp;</label> <input v-model="userbookname" maxlength="20" type="text"
+                                                         placeholder="词库名称(必须向)">
+                </div>
+                <div class="addUserBookDiv_jianjie">
+                    <label>词库简介&nbsp;</label>
+                    <textarea v-model="bookdescribe" placeholder="词库简介(非必须向)" maxlength="50"></textarea>
+                </div>
+                <div class="double_switch_div">
+                    <label>词库属性&nbsp;</label>
+                    <div class="double_switch_div_btn">
+                        <span class="switch_btn switch_btn_active" id="switchBtnStatus_0"
+                              @click="switchBtn(0)">私密</span>
+                        <span class="switch_btn" id="switchBtnStatus_1" @click="switchBtn(1)">公开</span>
+                    </div>
+                </div>
+            </div>
+            <!--词库详情-->
+            <div v-if="all_add_detail_userbook==2" class="the_book_all_words_div">
+                <div v-show="all_add_detail_userbook==2" class="userbook_detail_tittle_div">
+                    <div>简介:{{theUserBookDetail.bookdescribe}}</div>
+                    <div>属性:{{theUserBookDetail.share == 0 ? "私密词库" : "公开词库" }}</div>
+                </div>
+                <div class="all_words_div">
+                    <div @click="theWordDetail(item.wordid)" v-for="(item,index) in theUserBookOfAllWords">
+                        <span class="all_words_div_item_span">{{item.word.spelling}}</span>
+                        <span @click.stop="deleteTheWordFormUserBookBtn(item.wordid,item.bookid)" class="word_item_span"
+                              style="width: 20px;height: 20px">&nbsp;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="content-body">
         <div class="content-div">
 
             <div class="wordDetailDivCon">
                 <div class="backBtn" @click="backBtn()">返回</div>
                 <div class="topControlDiv">
-                    <span class="topBtn addBtn"></span>
-                    <span class="topBtn addBtn"></span>
-                    <span class="topBtn addBtn"></span>
+                    <span @click="controlUserBookBtn" class="topBtn addShoucangBtn"></span>
                 </div>
                 <div class="wordDetailDivCon">
                     <div class="wordspelling">
                         <span>{{word.spelling}}</span>
                         <div class="wordOtherInform">
-                            <div>词频: {{numFilter(word.frequency)}}</div>
-                            <div>难度等级: {{word.difficulty}}/10</div>
-                            <div>学习人数: {{word.studycount}}</div>
+                            <span>
+                                <div>词频: {{numFilter(word.frequency)}}</div>
+                                <div>难度等级: {{word.difficulty}}/10</div>
+                            </span>
+                            <span>
+                                <div>被搜次数: {{word.searchtimes}}</div>
+                                <div>学习人数: {{word.studytimes}}</div>
+                            </span>
                         </div>
                     </div>
                     <div class="yinbiao_div">
@@ -183,7 +278,7 @@
                     </div>
                     <div class="wordParaphraseDiv">
                         <h3 style="color: var(--greenColor00e57b)">释义</h3>
-                        <div>{{word.paraphrase}}</div>
+                        <div style="user-select: text">{{word.paraphrase}}</div>
                         <div class="otherVocDiv">
                             <span>其他词典</span>
                             <a :href="bingHref" target="_blank" title="必应词典">
@@ -215,7 +310,7 @@
                             <h3 style="color: var(--greenColor00e57b)">例句</h3>
                             <span @click="controlExampleBtn()"></span>
                         </div>
-                        <div v-for="(item,index) in exampleList.slice(0, 7)" class="exampleItemDiv">
+                        <div v-for="(item,index) in exampleList.slice(0, 4)" class="exampleItemDiv">
                             <div>{{item.en}}</div>
                             <div>{{item.cn}}</div>
                         </div>
@@ -227,55 +322,10 @@
 </div>
 
 <script type="text/javascript">
-    /*消息vue*/
-    const NotificationVue = new Vue({
-        el: "#notification",
-        data: {
-            no_content: '',
-            no_type: '',   //error，message消息，warn警告,success成功
-            timer: null,
-            spantype: {
-                error: {
-                    value: '失败',
-                    src: 'image/public_notification/error.png'
-                },
-                message: {
-                    value: '消息',
-                    src: 'image/public_notification/message.png'
-                },
-                success: {
-                    value: '成功',
-                    src: 'image/public_notification/success.png'
-                },
-                warn: {
-                    value: '警告',
-                    src: 'image/public_notification/warn.png'
-                },
-            }
-        },
-        methods: {
-            showPublicNotification(type, content) {
-                if (this.timer) { //计时器已经存在则销毁
-                    clearTimeout(this.timer)
-                    this.timer = null
-                }
-                const id = document.getElementById("notification")
-                id.style.right = "30px";
-                this.no_content = content
-                this.no_type = type
-                this.timer = setTimeout(() => {
-                    this.no_content = ''
-                    this.no_type = ''
-                    id.style.right = "-300px"
-                }, 3000)
-                console.log(content);
-            }
-        },
-    })
-
     new Vue({
         el: "#wordDetailApp",
         data: {
+            control_userbook_div_state: false,
             messageBoxContent: "",   //弹出框消息
             messageBoxValue: null,  //弹出框选择的值
             userid: '',
@@ -295,14 +345,20 @@
             heatSortState: false, //true正序 FALSE倒叙
             dateSortState: true, //true正序 FALSE倒叙
             allOrUpdateStatus: true, //true为显示,false为添加或编辑
-            updateStatus: 0,  //控制操作按钮  值为 0：显示，1：添加，2：编辑
-            // editStatus: false, //是否为编辑状态
-
+            updateStatus: 0,  //控制例句操作按钮  值为 0：显示，1：添加，2：编辑
+            all_add_detail_userbook: 0,  //0为所有书籍，1为添加书籍，2为书籍详情
             en: '',
             cn: '',
             editExampleId: null,   //编辑的例句id
             alreadyDddStates: false,  //是否成功添加过例句
             alreadyEditStatus: false,  //是否编辑过
+            alreadyUserBookUpdate: false,  //是否更改过自定义词典
+            alMyUserBooks: [],
+            public_privacy_status: 0,  //书籍属性
+            userbookname: '',  //书名
+            bookdescribe: '',  //简介
+            theUserBookDetail: [],      //书籍详情
+            theUserBookOfAllWords: [],   //书籍的所有单词
         },
         created() {
             this.fetchWordId();
@@ -311,6 +367,196 @@
             this.fetchUserId();
         },
         methods: {
+            /*跳转到单词详情*/
+            async theWordDetail(wordid) {
+                sessionStorage.setItem("wordid", wordid);
+                sessionStorage.setItem("backFromWordDetailPageValue", "page_WordDetail");
+                await axios({
+                    method: 'post',
+                    url: 'update/addSearchTimes?wordid=' + wordid,
+                }).then((data) => {
+                })
+                window.location.assign('wordDetailPage?wordid=' + wordid);
+            },
+            /*从书籍删除该单词按钮*/
+            deleteTheWordFormUserBookBtn(wordid, bookid) {
+                console.log(wordid)
+                console.log(bookid)
+                MessageBoxVue.openMessageBox("你确定要将这个单词从这个词库删除吗？")
+                let r = new Promise((resolve) => {
+                    let timer = setInterval(() => {   //定时器
+                        let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
+                        if (messageBoxConfirmValue !== "null") {
+                            clearInterval(timer)
+                            resolve(messageBoxConfirmValue)
+                        }
+                    }, 100)
+                })
+                r.then(async (res) => {
+                    if (res === "true") {  //删除例句
+                        let v = await this.deleteTheWordFromUserBookAxios(wordid, bookid)
+                        if (v) {
+                            await this.getTheUserBookOfWords(bookid);
+                            NotificationVue.showPublicNotification("success", "删除成功。")
+                        } else {
+                            NotificationVue.showPublicNotification("error", "发生位置错误，删除失败。")
+                        }
+                    }
+                })
+
+            },
+            /*从书籍删除该单词axios*/
+            async deleteTheWordFromUserBookAxios(wordid, bookid) {
+                let result;
+                await axios({
+                    method: 'post',
+                    url: "update/deleteWordFromUserBookMapper?wordid=" + wordid + "&bookid=" + bookid
+                }).then(function (data) {
+                    result = data.data
+                });
+                return result
+            },
+            /*跳转词库详情按钮*/
+            async theUserBookDetailBtn(userbookid) {
+                await this.getTheUserBookOfWords(userbookid);
+                this.theUserBookDetail = this.alMyUserBooks.find(item => item.userbookid === userbookid);
+                this.all_add_detail_userbook = 2
+            },
+            /*获取某词库的单词*/
+            getTheUserBookOfWords(bookid) {
+                const _this = this
+                axios({
+                    method: 'get',
+                    url: "search/getUserBookOfAllWords?bookid=" + bookid
+                }).then(function (data) {
+                    _this.theUserBookOfAllWords = data.data
+                    console.log(_this.theUserBookOfAllWords)
+                });
+            },
+            /*加入该词到词库*/
+            async addWordToUserBookBtn(userbookid) {
+                const _this = this
+                let value = false;
+                await axios({
+                    method: 'get',
+                    url: "search/judgeTheWordInTheBook?wordid=" + _this.wordid + "&bookid=" + userbookid
+                }).then(function (data) {
+                    value = data.data
+                });
+                if (value == false) {
+                    axios({
+                        method: 'post',
+                        url: "update/addWordToUserBook?wordid=" + _this.wordid + "&userbookid=" + userbookid
+                    }).then(function (data) {
+                        if (data.data = true)
+                            NotificationVue.showPublicNotification("success", "添加成功！")
+                        else
+                            NotificationVue.showPublicNotification("success", "添加失败！")
+                    });
+                } else {
+                    NotificationVue.showPublicNotification("error", "该单词已在这个词库里！")
+                }
+
+            },
+            /*双开关按钮 私密或者公开*/
+            switchBtn(v) {
+                const switchBtnStatus_0 = document.getElementById("switchBtnStatus_0");
+                const switchBtnStatus_1 = document.getElementById("switchBtnStatus_1");
+                if (v !== this.public_privacy_status) {
+                    if (v === 0) {
+                        switchBtnStatus_0.classList.add("switch_btn_active")
+                        switchBtnStatus_1.classList.remove("switch_btn_active")
+                        this.public_privacy_status = 0
+                    }
+                    if (v === 1) {
+                        switchBtnStatus_0.classList.remove("switch_btn_active")
+                        switchBtnStatus_1.classList.add("switch_btn_active")
+                        this.public_privacy_status = 1
+                    }
+                }
+            },
+
+            /*确认添加书籍按钮axios*/
+            async addUserBookConfirmBtn() {
+                const _this = this;
+                await axios({
+                    method: 'post',
+                    url: "update/addUserBook?holderid=" + _this.userid + "&userbookname=" + _this.userbookname + "&bookdescribe=" + _this.bookdescribe + "&share=" + _this.public_privacy_status
+                }).then(function (data) {
+                    if (data.data === "NoUserBookName")
+                        NotificationVue.showPublicNotification("error", "请填写词库名称。");
+                    if (data.data === false)
+                        NotificationVue.showPublicNotification("error", "发生未知错误，请稍后再试。")
+                    if (data.data === true) {
+                        NotificationVue.showPublicNotification("success", "添加成功")
+                    }
+                });
+                _this.public_privacy_status = 0  //书籍属性
+                _this.userbookname = ''  //书名
+                _this.bookdescribe = ''  //简介
+                _this.alreadyUserBookUpdate = true
+            },
+            sortFun(s) {
+                const heat_span = document.getElementById("heat_span")
+                const date_span = document.getElementById("date_span")
+                if (s === 1) {
+                    date_span.classList.remove("sort_span_focus")
+                    heat_span.classList.add("sort_span_focus")
+                    if (this.heatSortState) {
+                        this.cardExampleList.sort((a, b) => b.heat - a.heat);
+                        this.heatSortState = false
+                    } else {
+                        this.cardExampleList.sort((a, b) => a.heat - b.heat);
+                        this.heatSortState = true
+                    }
+                }
+                if (s === 2) {
+                    heat_span.classList.remove("sort_span_focus")
+                    date_span.classList.add("sort_span_focus")
+                    if (this.dateSortState) {
+                        this.cardExampleList.sort((a, b) => this.getTimeDate(b.adddate) - this.getTimeDate(a.adddate));
+                        this.dateSortState = false
+                    } else {
+                        this.cardExampleList.sort((a, b) => this.getTimeDate(a.adddate) - this.getTimeDate(b.adddate));
+                        this.dateSortState = true
+                    }
+                }
+
+            },
+            /*显示我的所有云词本*/
+            showMyUserBook() {
+                const _this = this;
+                axios({
+                    method: 'get',
+                    url: "search/allMyUserBooks?holderid=" + _this.userid
+                }).then(function (data) {
+                    _this.alMyUserBooks = data.data;
+                    console.log(_this.alMyUserBooks)
+                });
+            },
+            /*添加云词库按钮*/
+            addUserbookBtn() {
+                this.all_add_detail_userbook = 1
+            },
+            /*自定义书籍返回按钮*/
+            async userBookBackBtn() {
+                if (this.alreadyUserBookUpdate) {
+                    await this.showMyUserBook()
+                    this.alreadyUserBookUpdate = false
+                }
+                this.all_add_detail_userbook = 0
+                this.theUserBookOfAllWords = []
+
+            },
+            /*自定义书籍卡打开关闭按钮*/
+            async controlUserBookBtn() {
+                if (!this.control_userbook_div_state) {
+                    await this.showMyUserBook()
+                    this.all_add_detail_userbook = 0
+                    this.control_userbook_div_state = true
+                } else
+                    this.control_userbook_div_state = false
+            },
             /*public弹窗弹出*/
             showMessageBox(content) {
                 this.messageBoxValue = null
@@ -332,21 +578,20 @@
             },
             /*public确认是否删除例句*/
             async deleteExampleOrNot(exapid) {
-                this.showMessageBox("你确定要删除这个例句吗？");
+                MessageBoxVue.openMessageBox("你确定要删除这个例句吗？")
                 let r = new Promise((resolve) => {
                     let timer = setInterval(() => {   //定时器
-                        if (this.messageBoxValue != null) {
+                        let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
+                        if (messageBoxConfirmValue !== "null") {
                             clearInterval(timer)
-                            resolve(this.messageBoxValue)
+                            resolve(messageBoxConfirmValue)
                         }
                     }, 100)
                 })
                 r.then((res) => {
-                    if (res) {  //删除例句
+                    if (res === "true") {  //删除例句
                         this.deleteExample(exapid)
                     }
-                    this.messageBoxValue = null
-                    console.log("res=" + res);
                 })
             },
             /*删除例句*/
@@ -397,7 +642,6 @@
                     }
                 });
             },
-
             freshExample() {
                 const _this = this;
                 axios({
@@ -476,33 +720,7 @@
                 });
 
             },
-            sortFun(s) {
-                const heat_span = document.getElementById("heat_span")
-                const date_span = document.getElementById("date_span")
-                if (s === 1) {
-                    date_span.classList.remove("sort_span_focus")
-                    heat_span.classList.add("sort_span_focus")
-                    if (this.heatSortState) {
-                        this.cardExampleList.sort((a, b) => b.heat - a.heat);
-                        this.heatSortState = false
-                    } else {
-                        this.cardExampleList.sort((a, b) => a.heat - b.heat);
-                        this.heatSortState = true
-                    }
-                }
-                if (s === 2) {
-                    heat_span.classList.remove("sort_span_focus")
-                    date_span.classList.add("sort_span_focus")
-                    if (this.dateSortState) {
-                        this.cardExampleList.sort((a, b) => this.getTimeDate(b.adddate) - this.getTimeDate(a.adddate));
-                        this.dateSortState = false
-                    } else {
-                        this.cardExampleList.sort((a, b) => this.getTimeDate(a.adddate) - this.getTimeDate(b.adddate));
-                        this.dateSortState = true
-                    }
-                }
 
-            },
             fetchWordId() {
                 const _this = this;
                 _this.wordid = sessionStorage.getItem("wordid");
@@ -533,6 +751,7 @@
                     url: "search/findExamplesByWordId?wordid=" + _this.wordid
                 }).then(function (data) {
                     _this.exampleList = data.data;
+
                 });
             },
             playAudio(a) {
@@ -551,13 +770,15 @@
 
             },
             backBtn() {
-                // window.history.go(-1);  //返回上一页
-                window.history.back();  //返回上一页
-
+                let item = sessionStorage.getItem("backFromWordDetailPageValue");
+                if (item === "index_02_cha")
+                    window.location.assign('searchWordPage')
+                if (item === "page_WordDetail")
+                    window.history.back();
             },
             numFilter(value) {
                 if (value !== 0)
-                    return Number(value).toFixed(4);
+                    return Number(value).toFixed(5);
                 else
                     return 0;
             },
@@ -571,12 +792,10 @@
                         _this.cardExampleList = data.data;
                         _this.cardExampleList.sort((a, b) => b.heat - a.heat);
                         _this.heatSortState = false
-                        // console.log(_this.cardExampleList)
                     });
                     this.control_example_div_state = true
                 } else {
                     this.control_example_div_state = false //关闭例句div
-                    this.allOrAddStatus = true  //将allOrAddStatus改为所有例句状态
                 }
             },
             /*事件转换*/
@@ -591,6 +810,89 @@
 
     })
 
+    /*消息vue*/
+    const NotificationVue = new Vue({
+        el: "#notification",
+        data: {
+            no_content: '',
+            no_type: '',   //error，message消息，warn警告,success成功
+            timer: null,
+            spantype: {
+                error: {
+                    value: '失败',
+                    src: 'image/public_notification/error.png'
+                },
+                message: {
+                    value: '消息',
+                    src: 'image/public_notification/message.png'
+                },
+                success: {
+                    value: '成功',
+                    src: 'image/public_notification/success.png'
+                },
+                warn: {
+                    value: '警告',
+                    src: 'image/public_notification/warn.png'
+                },
+            }
+        },
+        methods: {
+            showPublicNotification(type, content) {
+                if (this.timer) { //计时器已经存在则销毁
+                    clearTimeout(this.timer)
+                    this.timer = null
+                }
+                const id = document.getElementById("notification")
+                id.style.right = "30px";
+                this.no_content = content
+                this.no_type = type
+                this.timer = setTimeout(() => {
+                    this.no_content = ''
+                    this.no_type = ''
+                    id.style.right = "-300px"
+                }, 3000)
+                console.log(content);
+            }
+        },
+    })
+    /*弹窗*/
+    const MessageBoxVue = new Vue({
+        el: "#MessageBoxContent",
+        data: {
+            messageBoxQuestion: "",
+            borderFramesValue:false
+        },
+        methods: {
+            /*public确认还是取消按钮并关闭弹窗*/
+            messageBoxConfirmBtn(v) {
+                // console.log("v="+v)
+                window.sessionStorage.setItem("messageBoxConfirmValue", v);
+                //关闭弹窗
+                let messageBox = document.getElementById("messageBox");
+                let MessageBoxContent = document.getElementById("MessageBoxContent");
+                MessageBoxContent.style.display = "none"
+                messageBox.style.marginTop = "-200px";
+                // console.log(window.sessionStorage.getItem("messageBoxConfirmValue")==="true")
+            },
+            /*打开弹窗 其他vue实例使用*/
+            openMessageBox(content) {
+                sessionStorage.setItem("messageBoxConfirmValue", "null");
+                this.messageBoxQuestion = content
+                // this.functionName = functionName
+                let messageBox = document.getElementById("messageBox");
+                let MessageBoxContent = document.getElementById("MessageBoxContent");
+                MessageBoxContent.style.display = "flex"
+                messageBox.style.marginTop = "20px";
+            },
+            tipEffection() {
+                console.log("123")
+                this.borderFramesValue = true
+            },
+            tipEffectionEnd() {
+                this.borderFramesValue = false
+            },
+        }
+    })
 
 </script>
 

@@ -1,6 +1,7 @@
 package zhy.testmapper;
 
 import com.zheng.mapper.VocabularyMapper;
+import com.zheng.pojo.SearchWordHistory;
 import com.zheng.pojo.Word;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -50,6 +51,47 @@ public class TestVocabularyMapper {
         Word wordById = mapper.findWordById(12);
         System.out.println(wordById);
     }
+
+    @Test
+    public void addSearchTimes() {
+        boolean b = mapper.addSearchTimes(1);
+        System.out.println(b);
+    }
+
+    @Test
+    public void addHistory() {
+        SearchWordHistory searchHistory = new SearchWordHistory();
+        searchHistory.setWordid(3);
+        searchHistory.setUserid(1);
+        searchHistory.setSpelling("a");
+        boolean b = mapper.addSearchedWordHistory(searchHistory);
+        System.out.println(b);
+    }
+
+    @Test
+    public void judgSearchWordHistory() {
+        SearchWordHistory searchWordHistory = mapper.judgSearchWordHistory(2, 1);
+        System.out.println(searchWordHistory);
+    }
+
+    @Test
+    public void getAllSearchWordHistory() {
+        List<SearchWordHistory> history = mapper.getAllSearchWordHistory(1);
+        System.out.println(history);
+    }
+
+    @Test
+    public void deleteSearchWordHistory() {
+        boolean b = mapper.deleteSearchWordHistory(1, 1);
+    }
+
+    @Test
+    public void getWordsSearchTimesRank() {
+        List<Word> wordsSearchTimesRank = mapper.getWordsSearchTimesRank();
+        System.out.println(wordsSearchTimesRank);
+    }
+
+
 
 
 

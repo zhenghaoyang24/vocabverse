@@ -46,10 +46,22 @@ public class ToPageController {
         return "index_01";
     }
 
-    @RequestMapping("/searchPage")
-    public String To_index02(HttpServletRequest request) {
+//    @RequestMapping("/searchPage")
+//    public String To_index02(HttpServletRequest request) {
+////        setUserIDSessionUtil(request);
+//        return "index_02";
+//    }
+
+    @RequestMapping("/searchWordPage")
+    public String To_index02_cha(HttpServletRequest request) {
 //        setUserIDSessionUtil(request);
-        return "index_02";
+        return "index_02_cha";
+    }
+
+    @RequestMapping("/translatePage")
+    public String To_index02_yi(HttpServletRequest request) {
+//        setUserIDSessionUtil(request);
+        return "index_02_yi";
     }
 
     @RequestMapping( "/wordDetailPage")
@@ -59,7 +71,7 @@ public class ToPageController {
     }
 
 
-    @RequestMapping("/translatePage")
+    @RequestMapping("/wersebotPage")
     public String To_index03(HttpServletRequest request) {
 //        setUserIDSessionUtil(request);
         return "index_03";

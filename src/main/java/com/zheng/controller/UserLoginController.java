@@ -145,7 +145,9 @@ public class UserLoginController {
             System.out.println("signup success");
             String nowData = GetNowDataUtil.getNowData();
             user.setRegtime(nowData);
-//            System.out.println(user);
+            user.setLevel(0);
+            user.setGender(2);
+            user.setAvatar("image/avatar/avatar_default.png");
             userService.userSignUp(user);
             //设置cookie
             UserSessionCookieUtil.setUserCookie(user.getUseremail(), user.getUserpassword(), response);

@@ -58,6 +58,37 @@ public class UserServiceImpl implements UserService {
         return userByUserEmailMapper;
     }
 
+    @Override
+    public boolean updateUserDataService(String newValue, String category, int userid) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        if (category.equals("avatar")) {
+            return mapper.updateAvatarMapper(newValue, userid);
+        }
+        if (category.equals("synopsis")) {
+            return mapper.updateSynopsisMapper(newValue, userid);
+        }
+        if (category.equals("nickname")) {
+            return mapper.updateNicknameMapper(newValue, userid);
+        }
+        if (category.equals("gender")) {
+            return mapper.updateGenderMapper(newValue, userid);
+        }
+        if (category.equals("birthday")) {
+            return mapper.updateBirthdayMapper(newValue, userid);
+        }
+        if (category.equals("phonenumber")) {
+            return mapper.updatePhonenumberMapper(newValue, userid);
+        }
+        if (category.equals("school")) {
+            return mapper.updateSchoolMapper(newValue, userid);
+        }
+        if (category.equals("region")) {
+            return mapper.updateRegionMapper(newValue, userid);
+        }
+        sqlSession.close();
+        return false;
+    }
 
 
 }
