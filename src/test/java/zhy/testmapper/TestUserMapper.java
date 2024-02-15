@@ -54,6 +54,9 @@ public class TestUserMapper {
         user.setUseremail("1ddd32q@qq.c2om");
         user.setUserpassword("12223");
         user.setRegtime("2023-12-12");
+        user.setLevel(0);
+        user.setGender(2);  //2为外星人
+        user.setAvatar("image/avatar/avatar_default.png");
         System.out.println(user);
         mapper.userSignUpMapper(user);
     }

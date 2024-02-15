@@ -52,5 +52,13 @@ public class TestExampleMapper {
         example.setCn("啊啊啊啊");
         boolean b = mapper.editExample(example);
     }
+
+
+    @Test
+    public void findExampleByExapid() {
+
+        Example example = mapper.findExampleByExapid(1);
+        System.out.println(example);
+    }
 }
 

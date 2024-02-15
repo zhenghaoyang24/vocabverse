@@ -2,9 +2,12 @@ package com.zheng.controller;
 
 import com.zheng.pojo.User;
 import com.zheng.service.UserService;
+import com.zheng.utils.JudgeUserAgentUtil;
+import com.zheng.utils.UserSessionCookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -18,25 +21,41 @@ public class ToPageController {
 
     @RequestMapping("/")
     public String toSystem() {
-        return "login";
-    }
-
-
-    @RequestMapping("/loginPage")
-    public String toLoginPage() {
-        return "login";
-    }
-
-    @RequestMapping("/registerPage")
-    public String toRegisterPage() {
         return "page_register";
     }
 
 
+    //旧登录
+//    @RequestMapping("/loginPage")
+//    public String toLoginPage() {
+//        return "login";
+//    }
+
+    @RequestMapping("/registerPage")
+    public String toRegisterPage(HttpServletRequest request) {
+        if (JudgeUserAgentUtil.getUserAgnet(request)) {
+            String session = UserSessionCookieUtil.getUserIDSession(request);
+            if (session != null) {
+                return "index_00";
+            } else {
+                User user = UserSessionCookieUtil.getUserByCookie(request);
+                if (user != null) {  //session为空 cookie存在
+                    UserSessionCookieUtil.setUserIDSession(String.valueOf(user.getUserid()), request);
+                    return "index_00";
+                } else {
+                    return "page_register";
+                }
+            }
+        }else{
+            return "page_warn";
+        }
+
+    }
+
 
     @RequestMapping("/homePage")
     public String toIndex00(HttpServletRequest request) {
-//        setUserIDSessionUtil(request);
+
         return "index_00";
     }
 
@@ -64,8 +83,8 @@ public class ToPageController {
         return "index_02_yi";
     }
 
-    @RequestMapping( "/wordDetailPage")
-    public String searchWordDetail(int wordid,HttpServletRequest request) {
+    @RequestMapping("/wordDetailPage")
+    public String searchWordDetail(int wordid, HttpServletRequest request) {
         request.getSession().setAttribute("wordid", wordid);
         return "page_WordDetail";
     }
@@ -83,6 +102,11 @@ public class ToPageController {
         return "index_04";
     }
 
+    @RequestMapping("/warnPage")
+    public String warnPage(HttpServletRequest request) {
+
+        return "page_warn";
+    }
 
 
 //    public void setUserIDSessionUtil(HttpServletRequest request){

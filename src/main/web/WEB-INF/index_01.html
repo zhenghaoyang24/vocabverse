@@ -11,22 +11,6 @@
     <link rel="stylesheet" href="css/public/main.css">
     <link rel="stylesheet" href="css/top-nav.css">
     <link rel="stylesheet" href="css/index_01.css">
-    <style>
-        .sort_span {
-            cursor: pointer;
-            border-radius: 4px;
-            padding: 4px;
-            width: auto;
-            font-size: 0.9em;
-            font-weight: 800;
-            background-color: #a1a1a1;
-            color: #000000;
-        }
-
-        .sort_span_focus {
-            background-color: var(--greenColor00e57b);
-        }
-    </style>
 </head>
 <body>
 <!-- 顶部导航栏，三个元素 -->
@@ -84,30 +68,14 @@
 <!--内容-->
 <div class="content-body">
     <div class="content-div" id="studyApp">
-        <div class="select_word_body_div">
-            <div class="wordListTitle_div">
-                {{wordListTitle}}
-            </div>
-            <div class="wordList_content_div">
-                <div class="control_div">
-                    <span id="defaultBookId" @click="changeBook(false)" class="sort_span sort_span_focus">默认词库</span>
-                    <span id="publicBookId" @click="changeBook(true)" class="sort_span">共享词库</span>
-                </div>
-                <div v-show="!bookDefaultOrPublic" class="book_div">
-                   <div class="book_item_div">
-                       <h4>题目</h4>
-                       <div class="book_item_inform">
-                           <div></div>
-                           <div></div>
-                       </div>
-                   </div>
-                </div>
-                <div v-show="bookDefaultOrPublic" class="book_div">
-                    <div class="book_item_div">
+        <div class="study_rate_div">
+            <span>1</span>
+            <span>3</span>
+        </div>
+        <div class="study_content_div">
 
-                    </div>
-                </div>
-            </div>
+
+
         </div>
     </div>
 </div>
@@ -116,32 +84,10 @@
     const studyApp = new Vue({
         el: '#studyApp',
         data: {
-            wordListTitle: "单词列表",
-            bookOrWord: false,   //false为显示书籍，true为显示单词
-            bookDefaultOrPublic: false,  //false默认，true公共书籍
-
-
+            studyFinished: false,   //是否还有单词未学习，显示记单词还是已经打卡页面
         },
-        methods: {
-            changeBook(v) {
-                if (v!==this.bookDefaultOrPublic){
-                    let defaultBookId = document.getElementById("defaultBookId");
-                    let publicBookId = document.getElementById("publicBookId");
-                    if (v) {
-                        defaultBookId.classList.remove("sort_span_focus")
-                        publicBookId.classList.add("sort_span_focus")
-                    }else {
-                        defaultBookId.classList.add("sort_span_focus")
-                        publicBookId.classList.remove("sort_span_focus")
-                    }
-                    this.bookDefaultOrPublic = v;
-                }
-            },
-
-        }
+        methods: {}
     })
-
-
     const NotificationVue = new Vue({
         el: "#notification",
         data: {

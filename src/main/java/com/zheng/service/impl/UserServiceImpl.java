@@ -90,5 +90,14 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    @Override
+    public boolean updatePasswordService(String userpassword, int userid) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        UserMapper usermapper = sqlSession.getMapper(UserMapper.class);
+        boolean b = usermapper.updatePasswordMapper(userpassword, userid);
+        sqlSession.close();
+        return b;
+    }
+
 
 }

@@ -1,7 +1,10 @@
 .wordDetailDivCon {
     user-select: none;
     width: 100%;
-    /*border: 1px red solid;*/
+    /*border: 1px #d7d7d7 solid;*/
+    padding-top: 30px;
+    margin-top: -30px;
+    padding-bottom: 40px;
 }
 
 .backBtn {
@@ -25,6 +28,27 @@
 
 .backBtn:hover {
     color: var(--greenColor00e57b);
+}
+
+.add_word_plan_span {
+    margin-left: 10px;
+    padding: 0 5px 0 5px;
+    color: #dedede;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /*border: 1px red solid;*/
+    border-radius: 5px;
+    box-shadow: 0 0 4px 1px #858585;
+    height: 40px;
+    transition: all 0.2s;
+}
+
+.add_word_plan_span:hover {
+    color: #00e57b;
 }
 
 .topBtn {
@@ -66,9 +90,16 @@
 }
 
 .topControlDiv {
+    box-shadow: 0 3px 5px 3px #1a1a1a;
+    z-index: 99;
+    /*padding-top: 50px;*/
+    /*border: 1px red solid;*/
+    position: sticky;
+    padding-top: 10px;
+    top: 60px;
     display: flex;
     justify-content: right;
-    width: auto;
+    width: 100%;
     /*padding: 10px;*/
     padding-bottom: 10px;
     background-color: var(--blackBackgroung);
@@ -601,7 +632,8 @@
     padding-bottom: 10px;
     border-bottom: 2px #4f4f4f solid;
 }
-.userbook_detail_tittle_div>div{
+
+.userbook_detail_tittle_div > div {
     padding-top: 5px;
     padding-left: 5px;
 }
@@ -611,13 +643,15 @@
     padding: 10px;
     padding-top: 100px;
 }
-.all_words_div{
+
+.all_words_div {
     overflow: auto;
     display: flex;
     flex-wrap: wrap;
     width: auto;
 }
-.all_words_div>div{
+
+.all_words_div > div {
     display: flex;
     width: auto;
     transition: all 0.2s;
@@ -628,20 +662,22 @@
     border: 1px solid #00e57b;
     border-radius: 3px;
 }
-.all_words_div>div:hover .all_words_div_item_span{
+
+.all_words_div > div:hover .all_words_div_item_span {
     color: #00e57b;
     transition: all 0.2s;
 }
-.all_words_div_item_span{
+
+.all_words_div_item_span {
     color: #eaeaea;
     font-size: 20px;
 }
 
-.all_words_div>div:hover{
+.all_words_div > div:hover {
     color: #00e57b;
 }
 
-.word_item_span{
+.word_item_span {
     /*margin-left: 10px;*/
     transition: all 0.2s;
     margin: auto;
@@ -653,8 +689,74 @@
     background-position: center;
     background-image: url("../image/pageWordDetail/chacha_white.png");
 }
-.word_item_span:hover{
+
+.word_item_span:hover {
     background-image: url("../image/pageWordDetail/chacha_green.png");
+}
+
+.word_detail_statistic {
+    /*padding-left: 20px;*/
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    width: auto;
+}
+
+.word_detail_statistic > span {
+    padding-left: 5px;
+    display: block;
+    width: 20px;
+    height: 20px;
+    background-image: url("../image/public_icon/statistic/tiaoxing_green.png");
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+}
+
+.word_detail_statistic > h3 {
+    color: #00e57b;
+    margin: 0;
+    /*padding-left: 20px;*/
+}
+.study_word_history{
+    padding-top: 5px;
+    width: auto;
+    display: flex;
+    flex-wrap: wrap;
+}
+.study_word_history>div>span{
+    margin-bottom: 5px;
+    margin-right:5px ;
+    color: #ffffff;
+    border-radius: 3px;
+    /*height: 20px;*/
+    padding: 3px;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.study_word_information {
+    padding:10px 0 20px 0;
+    width: auto;
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 1px #4f4f4f solid;
+}
+
+.study_word_information  span {
+    margin-left: 5px;
+    margin-top: 5px;
+    color: #000000;
+    border-radius: 3px;
+    /*height: 20px;*/
+    padding: 3px;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 

@@ -1,18 +1,14 @@
 package com.zheng.utils;
 
-import org.springframework.stereotype.Component;
-
 import javax.mail.*;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
-import java.util.Random;
 
 //@Component
 public class SendMailCodeUtil {
 
-    public static String test = "123";
+//    public static String test = "123";
 
     /**
      * 外网邮件发送
@@ -21,6 +17,7 @@ public class SendMailCodeUtil {
      * @param code
      */
     public static void  sendMail(String to, String code) {
+        System.out.println("send email...");
         String myEmailAddr = "vocabverse@foxmail.com";
 
         // Session对象:
@@ -49,23 +46,26 @@ public class SendMailCodeUtil {
             // 6.设置主题
             message.setSubject("来自VocabVerse词境的验证码");
             // 7.设置正文
-            message.setContent("您的验证码为：" + code, "text/html;charset=UTF-8");
+            message.setContent(to+"你好："+"<br/>您的邮箱验证码为：" + code+"<br/>验证码有效时长2分钟。", "text/html;charset=UTF-8");
 
             // 8.准备发送，得到火箭
             Transport transport = session.getTransport("smtp");
             // 9.设置火箭的发射目标
             //transport.connect("smtp.163.com", "发送者@163.com", "biao********");
-            transport.connect("smtp.qq.com", myEmailAddr, "lclmsphalkhwjcba");//jxzk..这个就是你的授权码
+            transport.connect("smtp.qq.com", myEmailAddr, "lclmsphalkhwjcba");//授权码
             // 10.发送
             transport.sendMessage(message, message.getAllRecipients());
 
             // Transport对象:
             // Transport.send(message);
-        } catch (AddressException e) {
-            e.printStackTrace();
         } catch (MessagingException e) {
             e.printStackTrace();
         }
     }
+
+    public static void main(String[] args) {
+        sendMail("2463193508@qq.com", "112456");
+    }
+
 }
 

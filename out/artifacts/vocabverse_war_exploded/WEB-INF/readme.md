@@ -3,8 +3,11 @@ zhenghaoyang24@foxmail.com
 zhenghy10246417
 ### 色调
 
-绿色:#00e57b
 黑色:#1a1a1a
+绿色:#00e57b
+蓝色:#50a7ff
+橙色:#ff9000
+红色:#ff0000
 
 ## 开发中的问题
 

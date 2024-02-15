@@ -1,26 +1,20 @@
 package com.zheng.controller;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import com.zheng.pojo.User;
 import com.zheng.service.UserService;
 import com.zheng.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.mail.internet.AddressException;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 import java.util.Random;
 
@@ -84,28 +78,78 @@ public class UserLoginController {
 
 
     //发送验证码
-//    @RequestMapping("/send")
-//    @ResponseBody
-//    public String sendEmail(HttpSession httpSession, String username, String email, HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//        // 获取用户的邮箱
-//        // 实例化用户对象
-//        User user = null;
-//        // 实例化一个发送邮件的对象
-//        SendMail mySendMail = new SendMail();
-//        //生成六位数验证码
-//        String Captcha = String.valueOf(new Random().nextInt(899999) + 100000);
-//        //存储验证码
-//        httpSession.setAttribute("Captcha", Captcha);
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        //邮件主题
-//        message.setSubject("验证码");
-//        //邮件内容
-//        message.setText("验证码:" + Captcha);
-//        mySendMail.sendMail(email, "您的验证码为：" + Captcha);
-//        return Captcha;
-//    }
+    @RequestMapping("/getCode")
+    @ResponseBody
+    public String sendEmail(HttpSession httpSession, String username, String email) {
+        //生成六位数验证码
+        String emailCode = String.valueOf(new Random().nextInt(899999) + 100000);
+        //存储验证码
+        SendMailCodeUtil.sendMail(email, emailCode);
+        return emailCode;
+    }
 
+
+    //修改密码
+    @RequestMapping(value = "/updatePassword", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
+    @ResponseBody
+    public String updatePassword(String oldPassword, String newPassword1, HttpServletRequest request) {
+        System.out.println(oldPassword);
+        System.out.println(newPassword1);
+
+        //验证旧密码是否正确
+        String s_updatePassword = Md5Utils.md5Code(oldPassword);
+        System.out.println(s_updatePassword);
+        User user = userService.findUserById(Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request)));
+        System.out.println(user.getUserpassword());
+        if (user.getUserpassword().equals(s_updatePassword)) {  //旧密码正确  看新旧密码是否一样
+            System.out.println("test");
+            if (oldPassword.equals(newPassword1)) {
+                return "旧密码不能与新密码一样";
+            } else {  //允许更改
+                boolean b = userService.updatePasswordService(Md5Utils.md5Code(newPassword1), Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request)));
+                if (b) {
+                    return "密码更改成功";
+                } else {
+                    return "发送未知错误，密码更改失败";
+                }
+            }
+        } else {
+            return "旧密码不正确";
+        }
+
+    }
+
+    //忘记密码页面
+    //重置密码
+    @RequestMapping(value = "/resetPassword", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
+    @ResponseBody
+    public String resetPassword(String newPassword1,String email, HttpServletRequest request) {
+        User user = userService.findUserByEmail(email);
+        if (user == null) {
+            return "该邮箱还没有注册";
+        }else{
+            boolean b = userService.updatePasswordService(Md5Utils.md5Code(newPassword1), user.getUserid());
+            if (b) {
+                return "密码更改成功,请登录";
+            } else {
+                return "发送未知错误，密码更改失败";
+            }
+        }
+
+
+
+    }
+
+    /*退出登录*/
+    @RequestMapping("/loginOut")
+    @ResponseBody
+    public boolean loginOut(HttpServletRequest request, HttpServletResponse response) {
+        UserSessionCookieUtil.removeUserCookieAndSession(request, response);  //删除cookie与session
+        String session = UserSessionCookieUtil.getUserIDSession(request);
+        UserSessionCookieUtil.getUserByCookie(request);
+        System.out.println("userid=" + session);
+        return true;
+    }
 
     /**
      * 注册
@@ -146,11 +190,17 @@ public class UserLoginController {
             String nowData = GetNowDataUtil.getNowData();
             user.setRegtime(nowData);
             user.setLevel(0);
-            user.setGender(2);
+            user.setGender(2);  //2为外星人
             user.setAvatar("image/avatar/avatar_default.png");
             userService.userSignUp(user);
-            //设置cookie
-            UserSessionCookieUtil.setUserCookie(user.getUseremail(), user.getUserpassword(), response);
+
+            if (UserSessionCookieUtil.getUserByCookie(request) != null) {  //若存在cookie这先删除
+                UserSessionCookieUtil.removeUserCookieAndSession(request, response);
+                UserSessionCookieUtil.setUserCookie(user.getUseremail(), user.getUserpassword(), response);//设置cookie
+            } else {
+                UserSessionCookieUtil.setUserCookie(user.getUseremail(), user.getUserpassword(), response);
+            }
+
             //设置session
             UserSessionCookieUtil.setUserIDSession(String.valueOf(user.getUserid()), request);
             //重定向
@@ -170,7 +220,7 @@ public class UserLoginController {
      */
     @RequestMapping(value = "/userSignIn", method = RequestMethod.POST)
     @ResponseBody
-    public String userSignIn(User user, boolean checkboxIsChecked, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+    public String userSignIn(User user, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
         System.out.println("-----------------------------");
         System.out.println("exe_RequestMapping_userSignIn");
         request.setCharacterEncoding("utf-8");
@@ -193,20 +243,13 @@ public class UserLoginController {
             } else {
                 System.out.println("password right");
                 /*session*/
-                UserSessionCookieUtil.setUserIDSession(String.valueOf(userByEmail.getUserid()),request);
-//                session.setAttribute("userid", userByEmail.getUserid());//保存当前登录用户Id
-                if (checkboxIsChecked)  //是否勾选记住我，设置cookie
-                {
-                    UserSessionCookieUtil.setUserCookie(userByEmail.getUseremail(),userByEmail.getUserpassword(),response);
-//                    Cookie useremail = new Cookie("useremail", userByEmail.getUseremail());
-//                    Cookie userpassword1 = new Cookie("userpassword", userByEmail.getUserpassword());
-//                    useremail.setMaxAge(3600 * 24 * 3);
-//                    useremail.setPath("/");  //同域名全部路径均可使用该Cookie
-//                    userpassword1.setMaxAge(3600 * 24 * 3);
-//                    userpassword1.setPath("/");  //同域名全部路径均可使用该Cookie
-//                    /*发送cookie*/
-//                    response.addCookie(useremail);
-//                    response.addCookie(userpassword1);
+                UserSessionCookieUtil.setUserIDSession(String.valueOf(userByEmail.getUserid()), request);
+
+                if (UserSessionCookieUtil.getUserByCookie(request) != null) {  //若存在cookie这先删除
+                    UserSessionCookieUtil.removeUserCookieAndSession(request, response);
+                    UserSessionCookieUtil.setUserCookie(userByEmail.getUseremail(), userByEmail.getUserpassword(), response);//设置cookie
+                } else {
+                    UserSessionCookieUtil.setUserCookie(userByEmail.getUseremail(), userByEmail.getUserpassword(), response);
                 }
                 return "succession";
             }
@@ -214,8 +257,6 @@ public class UserLoginController {
 
 
     }
-
-
 
 
 }

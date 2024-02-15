@@ -24,11 +24,6 @@
 <!--        </property>-->
 <!--    </bean>-->
 
-
-
-<!--        <bean id="sendMail" class="com.zheng.utils.SendMail"/>-->
-
-
     <!--1.mvc注解驱动-->
     <mvc:annotation-driven/>
 
@@ -57,8 +52,9 @@
         <!--配置自定义拦截器-->
         <mvc:interceptor>
             <mvc:mapping path="/*"/>
-            <mvc:exclude-mapping path="/loginPage"/>
-<!--            <mvc:exclude-mapping path="/registerPage"/>-->
+<!--            <mvc:exclude-mapping path="/loginPage"/>-->
+            <mvc:exclude-mapping path="/registerPage"/>
+            <mvc:exclude-mapping path="/warnPage"/>
             <bean class="com.zheng.interceptor.MyInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>

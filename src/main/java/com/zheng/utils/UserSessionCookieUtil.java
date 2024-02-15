@@ -16,15 +16,14 @@ public class UserSessionCookieUtil {
     UserService userService;
 
 
-
-    public static void setUserIDSession(String userid,HttpServletRequest request){
+    public static void setUserIDSession(String userid, HttpServletRequest request) {
         request.getSession().setAttribute("userid", userid);
 //        System.out.println("setUserIDSession userid = " +request.getSession().getAttribute("userid"));
     }
 
 
-    public static String getUserIDSession(HttpServletRequest request){
-//        System.out.println("getUserIDSession = "+request.getSession().getAttribute("userid"));
+    public static String getUserIDSession(HttpServletRequest request) {
+//        System.out.println((String) request.getSession().getAttribute("userid"));
         return (String) request.getSession().getAttribute("userid");
     }
 
@@ -35,25 +34,49 @@ public class UserSessionCookieUtil {
         coo_kieuseremail.setPath("/");  //同域名全部路径均可使用该Cookie
         cookie_userpassword1.setMaxAge(3600 * 24 * 3);
         cookie_userpassword1.setPath("/");  //同域名全部路径均可使用该Cookie
+
         /*发送cookie*/
         response.addCookie(coo_kieuseremail);
         response.addCookie(cookie_userpassword1);
     }
 
     public static User getUserByCookie(HttpServletRequest request) {
-        String useremail=null ,userpassword = null;
+        String useremail = null, userpassword = null;
         Cookie[] cookies = request.getCookies();
         UserService userService = new UserServiceImpl();
         User user;
         for (int i = 0; i < cookies.length; i++) {
             if (Objects.equals(cookies[i].getName(), "useremail"))
-                useremail= cookies[i].getValue();
+                useremail = cookies[i].getValue();
             if (Objects.equals(cookies[i].getName(), "userpassword"))
-                userpassword= cookies[i].getValue();
+                userpassword = cookies[i].getValue();
         }
-//        System.out.println("cookie useremail= "+useremail +",userpassword = "+userpassword);
-        return  userService.findUserByNameAndEmail(useremail, userpassword);
+//        System.out.println(userService.findUserByNameAndEmail(useremail, userpassword));
+        return userService.findUserByNameAndEmail(useremail, userpassword);
 
+    }
+
+    public static void removeUserCookieAndSession(HttpServletRequest request, HttpServletResponse response) {
+        request.getSession().removeAttribute("userid");  //删除session
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            System.out.println("no cookie");
+        } else {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("useremail")) {
+                    cookie.setValue(null);
+                    cookie.setMaxAge(0);// 立即销毁cookie
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
+                }
+                if (cookie.getName().equals("userpassword")) {
+                    cookie.setValue(null);
+                    cookie.setMaxAge(0);// 立即销毁cookie
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
+                }
+            }
+        }
     }
 
 

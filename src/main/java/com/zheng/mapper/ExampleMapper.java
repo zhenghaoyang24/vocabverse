@@ -24,6 +24,20 @@ public interface ExampleMapper {
     List<Example> findExampleByWordId(@Param("wordid") int wordid);
 
 
+    @Select("SELECT * FROM tb_voc_examples WHERE exapid  = #{exapid}")
+    @Results({
+            @Result(id = true, column = "exapid", property = "exapid"),
+            @Result(column = "wordid", property = "wordid"),
+            @Result(column = "en", property = "en"),
+            @Result(column = "cn", property = "cn"),
+            @Result(column = "heat", property = "heat"),
+            @Result(column = "adddate", property = "adddate"),
+            @Result(column = "holderid", property = "holderid"),
+            @Result( property = "holder",column = "holderid",one = @One(select = "com.zheng.mapper.UserMapper.findUserNicknameByIdMapper")),
+    })
+    Example findExampleByExapid(@Param("exapid") int exapid);
+
+
     /**
      * 修改热度
      * @param heat

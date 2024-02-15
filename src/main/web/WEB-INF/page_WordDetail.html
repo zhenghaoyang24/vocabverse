@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Werse词境 单词详情</title>
+    <script src="js/echarts.min.js"></script>
     <script src="js/jquery-3.7.0.min.js"></script>
     <script src="js/vue.js"></script>
     <script src="js/element-ui@2.15.14-index.js"></script>
@@ -15,9 +16,10 @@
     <link rel="stylesheet" href="css/wordDetail.css">
     <style>
         /*弹出框动效*/
-        .MessageBoxBorderFrames{
+        .MessageBoxBorderFrames {
             animation: MessageBoxBorderFrames 0.3s linear;
         }
+
         .switch_btn_active {
             background-color: #00e57b;
             color: black;
@@ -102,8 +104,9 @@
     </div>
 </div>
 <!--弹窗-->
-<div id="MessageBoxContent" class="MessageBoxDiv" @click="tipEffection">
-    <div id="messageBox" class="MessageBox" :class="{'MessageBoxBorderFrames':borderFramesValue}" @animationend="tipEffectionEnd">
+<div @touchmove.prevent="false" id="MessageBoxContent" class="MessageBoxDiv" @click="tipEffection">
+    <div id="messageBox" class="MessageBox" :class="{'MessageBoxBorderFrames':borderFramesValue}"
+         @animationend="tipEffectionEnd">
         <div class="MessageBoxContent">{{messageBoxQuestion}}</div>
         <div class="MessageBoxController">
             <span @click.stop="messageBoxConfirmBtn(true)">确认</span>
@@ -251,9 +254,16 @@
             <div class="wordDetailDivCon">
                 <div class="backBtn" @click="backBtn()">返回</div>
                 <div class="topControlDiv">
+                    <span v-if="studyWord.length===0" class="add_word_plan_span"
+                          @click="studyWordPlanningBtn(0)">加入学习计划</span>
+                    <span v-else class="add_word_plan_span" @click="studyWordPlanningBtn(1)">移出学习计划</span>
+                    <span v-if="studyWord.length!==0&&studyWord.state===0" class="add_word_plan_span"
+                          @click="alreadyKnownBtn(1)">标记熟知</span>
+                    <span v-else-if="studyWord.length!==0&&studyWord.state===1" class="add_word_plan_span"
+                          @click="alreadyKnownBtn(0)">移出熟知</span>
                     <span @click="controlUserBookBtn" class="topBtn addShoucangBtn"></span>
                 </div>
-                <div class="wordDetailDivCon">
+                <div>
                     <div class="wordspelling">
                         <span>{{word.spelling}}</span>
                         <div class="wordOtherInform">
@@ -276,45 +286,103 @@
                             <span class="ying_laba"></span></div>
                         <audio id="USA_audio" preload="metadata" :src="audio_type2"></audio>
                     </div>
-                    <div class="wordParaphraseDiv">
-                        <h3 style="color: var(--greenColor00e57b)">释义</h3>
-                        <div style="user-select: text">{{word.paraphrase}}</div>
-                        <div class="otherVocDiv">
-                            <span>其他词典</span>
-                            <a :href="bingHref" target="_blank" title="必应词典">
-                                <div class="otherVocItem"><img src="image/pageWordDetail/bingLogo.png" alt=""></div>
-                            </a>
-                            <a :href="jianqiaoHref " target="_blank" title="剑桥词典">
-                                <div class="otherVocItem"><img src="image/pageWordDetail/jianqiaoLogo.png" alt="">
+                    <div style="display: flex">
+                        <div style="width: 100%;">
+                            <div class="wordParaphraseDiv">
+                                <h3 style="color: var(--greenColor00e57b)">释义</h3>
+                                <div style="user-select: text">{{word.paraphrase}}</div>
+                                <div class="otherVocDiv">
+                                    <span>其他词典</span>
+                                    <a :href="bingHref" target="_blank" title="必应词典">
+                                        <div class="otherVocItem"><img src="image/pageWordDetail/bingLogo.png" alt="">
+                                        </div>
+                                    </a>
+                                    <a :href="jianqiaoHref " target="_blank" title="剑桥词典">
+                                        <div class="otherVocItem"><img src="image/pageWordDetail/jianqiaoLogo.png"
+                                                                       alt="">
+                                        </div>
+                                    </a>
+                                    <a :href="ouluHref " target="_blank" title="欧陆词典">
+                                        <div class="otherVocItem"><img src="image/pageWordDetail/ouluLogo.png" alt="">
+                                        </div>
+                                    </a>
+                                    <a :href="youdaoHref" target="_blank" title="有道词典">
+                                        <div class="otherVocItem"><img src="image/pageWordDetail/youdaoLogo.png" alt="">
+                                        </div>
+                                    </a>
+                                    <a :href="jinshanHref " target="_blank" title="金山词典">
+                                        <div class="otherVocItem"><img src="image/pageWordDetail/jinshanLogo.png"
+                                                                       alt="">
+                                        </div>
+                                    </a>
+                                    <a :href="baiduHref " target="_blank" title="百度词典">
+                                        <div class="otherVocItem"><img src="image/pageWordDetail/baiduLogo.png" alt="">
+                                        </div>
+                                    </a>
                                 </div>
-                            </a>
-                            <a :href="ouluHref " target="_blank" title="欧陆词典">
-                                <div class="otherVocItem"><img src="image/pageWordDetail/ouluLogo.png" alt=""></div>
-                            </a>
-                            <a :href="youdaoHref" target="_blank" title="有道词典">
-                                <div class="otherVocItem"><img src="image/pageWordDetail/youdaoLogo.png" alt="">
+                            </div>
+                            <div class="wordExamplesDiv">
+                                <div class="liju_title_div">
+                                    <h3 style="color: var(--greenColor00e57b)">例句</h3>
+                                    <span @click="controlExampleBtn()"></span>
                                 </div>
-                            </a>
-                            <a :href="jinshanHref " target="_blank" title="金山词典">
-                                <div class="otherVocItem"><img src="image/pageWordDetail/jinshanLogo.png" alt="">
+                                <div v-for="(item,index) in exampleList.slice(0, 7)" class="exampleItemDiv">
+                                    <div>{{item.en}}</div>
+                                    <div>{{item.cn}}</div>
                                 </div>
-                            </a>
-                            <a :href="baiduHref " target="_blank" title="百度词典">
-                                <div class="otherVocItem"><img src="image/pageWordDetail/baiduLogo.png" alt="">
+                            </div>
+                        </div>
+                        <div style="width: 500px;padding-left: 20px">
+                            <div class="word_detail_statistic">
+                                <span></span>
+                                <h3>我的学习情况</h3>
+                            </div>
+                            <div v-if="studyWord.length!==0">
+                                <div style="width: auto">
+                                    <h4 style="padding: 0;margin: 0;color: whitesmoke">学习标签</h4>
+                                    <div class="study_word_information">
+                                        <div style="display: flex" v-if="this.studyWord.state===0">
+                                            <span style="background-color: #ff9000;"
+                                                  v-if="this.studyWord.intervalday>0">{{this.studyWord.intervalday}}天后复习</span>
+                                            <span style="background-color: #00e57b;"
+                                                  v-else-if="this.studyWord.intervalday===0">今天复习</span>
+                                            <span style="background-color: #ff0000;"
+                                                  v-else>逾期{{Math.abs(this.studyWord.intervalday)}}天</span>
+                                        </div>
+                                        <div style="display: flex" v-else-if="this.studyWord.state===1">
+                                            <span style="background-color: #00e57b;">熟知单词</span>
+                                        </div>
+                                        <span style="background-color: #50a7ff;">共复习{{studyWord.studycount}}次</span>
+                                        <span style="background-color: #50a7ff;">{{studyWord.adddate}}加入计划</span>
+                                        <span v-if="studyWord.laststudydate!==null" style="background-color: #50a7ff;">上次复习{{studyWord.laststudydate}}</span>
+                                    </div>
                                 </div>
-                            </a>
+                                <!--                            <div style="color: #c5c5c5;padding-left: 20px;font-size: 15px">该单词未在学习计划</div>-->
+                                <div id="word_detail_statistic_tiaoxing" style=";width: 95%;height: 400px;padding: 10px 0 10px 0;"></div>
+                                <div style="width: auto;margin-top: -30px;border-top: 1px #4f4f4f solid;padding-top: 10px">
+                                    <h4 style="padding: 0;margin: 0;color: whitesmoke">记忆历史</h4>
+                                    <div v-if="studyWordRememberHistory.length!==0">
+                                        <h4 style="padding: 0;margin: 0;color: #adadad">{{studyWordRememberHistory[0].selectdate}}至{{studyWordRememberHistory[studyWordRememberHistory.length-1].selectdate}}</h4>
+                                        <div class="study_word_history">
+                                            <div v-for="(item,index) in studyWordRememberHistory" style="display: flex">
+                                                <span v-if="item.opt===0"  style="background-color: #ff0000">忘记</span>
+                                                <span v-if="item.opt===1"  style="background-color: #50a7ff">能想起</span>
+                                                <span v-if="item.opt===2"  style="background-color: #ff9000">模糊</span>
+                                                <span v-if="item.opt===3"  style="background-color: #00e57b">认识</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="padding-top: 5px;color: #b7b7b7" v-else>数据太少，复习几天再来看看吧。</div>
+
+                                </div>
+                            </div>
+                            <div v-else style="color: #c2c2c2;font-size: 0.9em;padding-top: 10px;">
+                                该单词未在你的学习计划中，没有任何学习数据。
+                            </div>
+
                         </div>
                     </div>
-                    <div class="wordExamplesDiv">
-                        <div class="liju_title_div">
-                            <h3 style="color: var(--greenColor00e57b)">例句</h3>
-                            <span @click="controlExampleBtn()"></span>
-                        </div>
-                        <div v-for="(item,index) in exampleList.slice(0, 4)" class="exampleItemDiv">
-                            <div>{{item.en}}</div>
-                            <div>{{item.cn}}</div>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -359,14 +427,173 @@
             bookdescribe: '',  //简介
             theUserBookDetail: [],      //书籍详情
             theUserBookOfAllWords: [],   //书籍的所有单词
+            studyWord: [],
+            studyWordRememberHistory: [],
+
+
         },
         created() {
             this.fetchWordId();
             this.fetchWordDetail();
             this.fetchExamples();
             this.fetchUserId();
+            this.fetchMyStudyInfor()
+
         },
         methods: {
+            async fetchStudyWordRememberHistory() {
+                let _this = this
+                await axios({
+                    method: 'get',
+                    url: 'search/getStudyWordRememberHistory?wordid=' + _this.wordid,
+                }).then(function (data) {
+                    _this.studyWordRememberHistory = data.data
+                })
+                this.studyWordRememberHistory.sort((a, b) => _this.getTimeDate(a.selectdate) - _this.getTimeDate(b.selectdate));
+            },
+            async fetchMyStudyInfor() {
+                let _this = this
+                await axios({
+                    method: 'get',
+                    url: 'search/getStudyWordInformation?wordid=' + _this.wordid,
+                }).then(function (data) {
+                    _this.studyWord = data.data
+                })
+                if (_this.studyWord.length !== 0) {
+                    this.studyWord.intervalday = this.datedifference(this.getNowDate(), this.studyWord.nextstudydate);
+                    await this.fetchStudyWordRememberHistory()
+                    this.renderChart()
+                }
+            },
+            /*设置熟知*/
+            setStudyWordState(v) {
+                let _this = this
+                axios({
+                    method: 'post',
+                    url: 'update/setStudyWordState?state=' + v + '&wordid=' + _this.wordid
+                }).then(function (data) {
+                    if (data.data === true) {
+                        _this.fetchMyStudyInfor()
+                        NotificationVue.showPublicNotification("success", "已将该单词标记为熟知单词。");
+                    } else {
+                        NotificationVue.showPublicNotification("error", "发生位置错误。");
+                    }
+                })
+            },
+            /*标记熟知按钮*/
+            alreadyKnownBtn(v) {
+                if (v === 1) {
+                    MessageBoxVue.openMessageBox("标记熟知后，该词将不会安排再次复习。");
+                } else {
+                    MessageBoxVue.openMessageBox("取消标记熟知后，单词将按照原规划时间复习。");
+                }
+                let r = new Promise((resolve) => {
+                    let timer = setInterval(() => {   //定时器
+                        let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
+                        if (messageBoxConfirmValue !== "null") {
+                            clearInterval(timer)
+                            resolve(messageBoxConfirmValue)
+                        }
+                    }, 100)
+                })
+                r.then((res) => {
+                    if (res === "true") {
+                        this.setStudyWordState(v)
+
+                    }
+                })
+
+
+            },
+            /*学习计划按钮*/
+            studyWordPlanningBtn(v) {
+                if (v === 0) { //加入计划
+
+
+                } else { //移除计划
+                    MessageBoxVue.openMessageBox("移除学习规划将删除你学习该单词的所有学习数据，且此操作不可逆，请慎重考虑。");
+                }
+
+
+            },
+            /*加入学习计划*/
+            addStudyWord(v) {
+                axios({})
+            },
+            /*图表*/
+            renderChart() {
+                let _this = this
+                // 基于准备好的dom，初始化echarts实例
+                const myChart = echarts.init(document.getElementById('word_detail_statistic_tiaoxing'));
+                // 指定图表的配置项和数据
+                const option = {
+                    tooltip: {},
+                    title: {
+                        text: '该单词学习反馈统计',
+                        textStyle: {
+                            color: '#ffffff',  //更改坐标轴文字颜色
+                            fontSize: 15      //更改坐标轴文字大小
+                        }
+                    },
+                    xAxis: {
+                        data: ['忘记', '能想起', '模糊', '认识'],
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#ffffff',  //更改坐标轴文字颜色
+                                fontSize: 13      //更改坐标轴文字大小
+                            }
+                        }
+                    },
+                    yAxis: {
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#ffffff',  //更改坐标轴文字颜色
+                                fontSize: 13      //更改坐标轴文字大小
+                            }
+                        }
+                    },
+                    series: [
+                        {
+                            name: '次数',
+                            type: 'bar',
+                            data: [
+                                {
+                                    value: _this.studyWord.q_0,
+                                    // 设置单个柱子的样式
+                                    itemStyle: {
+                                        color: '#ff0000',
+                                    }
+                                },
+                                {
+                                    value: _this.studyWord.q_1,
+                                    // 设置单个柱子的样式
+                                    itemStyle: {
+                                        color: '#50a7ff',
+                                    }
+                                },
+                                {
+                                    value: _this.studyWord.q_2,
+                                    // 设置单个柱子的样式
+                                    itemStyle: {
+                                        color: '#ff9000',
+                                    }
+                                },
+                                {
+                                    value: _this.studyWord.q_3,
+                                    // 设置单个柱子的样式
+                                    itemStyle: {
+                                        color: '#00e57b',
+                                    }
+                                },
+                            ]
+                        }
+                    ]
+                };
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+            },
             /*跳转到单词详情*/
             async theWordDetail(wordid) {
                 sessionStorage.setItem("wordid", wordid);
@@ -380,8 +607,6 @@
             },
             /*从书籍删除该单词按钮*/
             deleteTheWordFormUserBookBtn(wordid, bookid) {
-                console.log(wordid)
-                console.log(bookid)
                 MessageBoxVue.openMessageBox("你确定要将这个单词从这个词库删除吗？")
                 let r = new Promise((resolve) => {
                     let timer = setInterval(() => {   //定时器
@@ -430,7 +655,6 @@
                     url: "search/getUserBookOfAllWords?bookid=" + bookid
                 }).then(function (data) {
                     _this.theUserBookOfAllWords = data.data
-                    console.log(_this.theUserBookOfAllWords)
                 });
             },
             /*加入该词到词库*/
@@ -531,7 +755,6 @@
                     url: "search/allMyUserBooks?holderid=" + _this.userid
                 }).then(function (data) {
                     _this.alMyUserBooks = data.data;
-                    console.log(_this.alMyUserBooks)
                 });
             },
             /*添加云词库按钮*/
@@ -600,7 +823,6 @@
                     method: "post",
                     url: "update/deleteExample?exapid=" + exapid
                 }).then(function (data) {
-                    console.log(data.data)
                     if (data.data)
                         NotificationVue.showPublicNotification("success", "删除成功。");
                     else
@@ -659,7 +881,6 @@
                     method: "get",
                     url: "search/getUserId"
                 }).then(function (data) {
-                    console.log(data.data)
                     _this.userid = data.data
                 })
             },
@@ -706,7 +927,6 @@
                 this.editExampleId = null
             },
             heatBtn(exapid) {
-                console.log(exapid);
                 const itemToRemove = this.cardExampleList.find(item => item.exapid === exapid);
                 itemToRemove.heat = itemToRemove.heat + 1
                 axios({
@@ -724,7 +944,7 @@
             fetchWordId() {
                 const _this = this;
                 _this.wordid = sessionStorage.getItem("wordid");
-                console.log(_this.wordid)
+                // console.log(_this.wordid)
             },
             fetchWordDetail() {
                 const _this = this;
@@ -741,7 +961,6 @@
                     _this.baiduHref = "https://fanyi.baidu.com/#en/zh/" + _this.word.spelling;
                     _this.jianqiaoHref = "https://dictionary.cambridge.org/zhs/%E8%AF%8D%E5%85%B8/%E8%8B%B1%E8%AF%AD-%E6%B1%89%E8%AF%AD-%E7%AE%80%E4%BD%93/" + _this.word.spelling;
                     _this.ouluHref = "https://dict.eudic.net/dicts/en/" + _this.word.spelling;
-                    console.log(_this.word)
                 })
             },
             fetchExamples() {
@@ -758,7 +977,6 @@
                 const UK_audio = document.getElementById("UK_audio");
                 const USA_audio = document.getElementById("USA_audio");
                 var id = a.currentTarget.id;
-                console.log(id)
                 if (id == "UK_audio_btn") {
                     // USA_audio.pause()
                     UK_audio.play()
@@ -801,7 +1019,20 @@
             /*事件转换*/
             getTimeDate(date) {
                 return new Date(date).getTime();
-
+            },
+            //获取日期
+            getNowDate() {
+                let date = new Date()
+                return (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()).toString()
+            },
+            //计算两个日期差值（天）
+            datedifference(sDate1, sDate2) {    //sDate1现在的时间  sDate2下次时间
+                let dateSpan, tempDate, iDays
+                sDate1 = Date.parse(sDate1)
+                sDate2 = Date.parse(sDate2)
+                dateSpan = sDate2 - sDate1
+                iDays = Math.floor(dateSpan / (24 * 3600 * 1000))
+                return iDays
             },
 
 
@@ -851,7 +1082,6 @@
                     this.no_type = ''
                     id.style.right = "-300px"
                 }, 3000)
-                console.log(content);
             }
         },
     })
@@ -860,7 +1090,7 @@
         el: "#MessageBoxContent",
         data: {
             messageBoxQuestion: "",
-            borderFramesValue:false
+            borderFramesValue: false
         },
         methods: {
             /*public确认还是取消按钮并关闭弹窗*/
@@ -872,10 +1102,20 @@
                 let MessageBoxContent = document.getElementById("MessageBoxContent");
                 MessageBoxContent.style.display = "none"
                 messageBox.style.marginTop = "-200px";
+                let m = function (e) {
+                    e.preventDefault();
+                };
+                document.body.style.overflow = '';
+                document.addEventListener('touchmove', m, {passive: true});//禁止页面滑动
                 // console.log(window.sessionStorage.getItem("messageBoxConfirmValue")==="true")
             },
             /*打开弹窗 其他vue实例使用*/
             openMessageBox(content) {
+                let m = function (e) {
+                    e.preventDefault();
+                };
+                document.body.style.overflow = 'hidden';
+                document.addEventListener('touchmove', m, {passive: false});//禁止页面滑动
                 sessionStorage.setItem("messageBoxConfirmValue", "null");
                 this.messageBoxQuestion = content
                 // this.functionName = functionName
@@ -885,7 +1125,6 @@
                 messageBox.style.marginTop = "20px";
             },
             tipEffection() {
-                console.log("123")
                 this.borderFramesValue = true
             },
             tipEffectionEnd() {

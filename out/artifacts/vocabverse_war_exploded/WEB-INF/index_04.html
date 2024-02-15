@@ -39,10 +39,12 @@
         }
 
         .updateBtn {
+            cursor: not-allowed;
             background-color: #858585;
         }
 
         .updateBtn_active {
+            cursor: pointer;
             background-color: #00e57b;
         }
 
@@ -125,19 +127,129 @@
         <div v-if="updateCategory==='avatar'" style="margin-top: 50px">
             <div style="display: flex;justify-content: center;">
                 <div style="width: 490px; background-color: #1e1e1e;padding-top: 20px;padding-bottom: 20px; display:flex;justify-content: center;flex-direction: column;align-items: center;position: fixed">
-                    <img v-if="newUpdateValue===null" style="width: 70px;height: 70px" :src="dataValue" alt="头像">
+                    <img v-if="newUpdateValue.length===0" style="width: 70px;height: 70px" :src="dataValue" alt="头像">
                     <img v-else style="width: 70px;height: 70px" :src="newUpdateValue" alt="头像">
                     <div class="uploadAvatarBtn_div">
                         <span class="updateBtn_active">上传头像</span>
-                        <span :class="newUpdateValue===null? 'updateBtn':'updateBtn_active'" @click="updateConfirmBtn">确定</span>
+                        <span :class="(newUpdateValue===dataValue)||(newUpdateValue.length===0)? 'updateBtn':'updateBtn_active'"
+                              @click="updateConfirmBtn">确定</span>
                     </div>
                 </div>
+
             </div>
             <div style="z-index: 999;display: flex;justify-content: left;flex-wrap: wrap;padding: 180px 21px 20px;min-width: 497px">
                 <img :id="item.url" @click="avatarImgBtn(item.url)" class="update_avatar_img"
                      v-for="(item,index) in avatarUrl" :src="item.url" alt="gif">
             </div>
         </div>
+        <!--修改简介-->
+        <div v-if="updateCategory==='synopsis'" style="margin-top: 50px;">
+            <div @click="updateConfirmBtn()"
+                 :class="(newUpdateValue===dataValue)||(newUpdateValue.length===0)? 'updateBtn':'updateBtn_active' "
+                 class="user_data_update_confirm_btn">
+                保存
+            </div>
+            <div class="user_data_update_synopsis_content">
+                <h4>简介：</h4>
+                <textarea type="text" maxlength="70" autocomplete="off" spellcheck="false" placeholder="请填写你的签名。"
+                          v-model="newUpdateValue"></textarea>
+                <div style="color: whitesmoke;float: right;">{{newUpdateValue.length}}/70</div>
+            </div>
+        </div>
+        <!--修改昵称 地区 学校-->
+        <div v-if="updateCategory==='nickname'||updateCategory==='region'||updateCategory==='school'"
+             style="margin-top: 50px;">
+            <div @click="updateConfirmBtn()"
+                 :class="(newUpdateValue===dataValue)||(newUpdateValue.length===0)? 'updateBtn':'updateBtn_active' "
+                 class="user_data_update_confirm_btn">
+                保存
+            </div>
+            <div class="user_data_update_synopsis_content">
+                <h4 v-if="updateCategory==='nickname'">昵称：</h4>
+                <h4 v-if="updateCategory==='region'">地区：</h4>
+                <h4 v-if="updateCategory==='school'">学校：</h4>
+                <input type="text" maxlength="15" autocomplete="off" spellcheck="false" placeholder="请填写你的信息"
+                       v-model="newUpdateValue">
+            </div>
+        </div>
+        <!--修改手机号-->
+        <div v-if="updateCategory==='phonenumber'" style="margin-top: 50px;">
+            <div @click="updateConfirmBtn()"
+                 :class="(newUpdateValue===dataValue)||(newUpdateValue.length===0)? 'updateBtn':'updateBtn_active' "
+                 class="user_data_update_confirm_btn">
+                保存
+            </div>
+            <div class="user_data_update_synopsis_content">
+                <h4>手机号：</h4>
+                <input type="number" oninput="if(value>19999999999)value=19999999999" autocomplete="off"
+                       placeholder="请填写你的信息"
+                       v-model="newUpdateValue">
+            </div>
+        </div>
+        <!--修改性别-->
+        <div v-if="updateCategory==='gender'" style="margin-top: 50px;">
+            <div @click="updateConfirmBtn()"
+                 :class="(newUpdateValue===dataValue)||(newUpdateValue.length===0)? 'updateBtn':'updateBtn_active' "
+                 class="user_data_update_confirm_btn">
+                保存
+            </div>
+            <div class="user_data_update_synopsis_content">
+                <h4>性别：</h4>
+                <div style="display: flex;justify-content: center;">
+                    <img :src="updateCardGenderImgUrl" style="width: 70px;height: 70px;margin-top: 20px;display: block">
+                </div>
+                <div class="gender_select_div">
+                    <span @click="selectGenderBtn(2)"
+                          :class="newUpdateValue===2? 'updateBtn_active':'updateBtn'">外星人</span>
+                    <span @click="selectGenderBtn(1)"
+                          :class="newUpdateValue===1? 'updateBtn_active':'updateBtn'">男孩</span>
+                    <span @click="selectGenderBtn(0)"
+                          :class="newUpdateValue===0? 'updateBtn_active':'updateBtn'">女孩</span>
+                </div>
+            </div>
+        </div>
+        <!--修改生日-->
+        <div v-if="updateCategory==='birthday'" style="margin-top: 50px;">
+            <div @click="updateBirthdayConfirmBtn()"
+                 :class="(newUpdateValue===dataValue)||(newUpdateValue.length===0)? 'updateBtn':'updateBtn_active' "
+                 class="user_data_update_confirm_btn">
+                保存
+            </div>
+            <div class="date_select__div">
+                <h4>生日：</h4>
+                <div class="data_select_picker_title">
+                    <span>年</span>
+                    <span>月</span>
+                    <span>日</span>
+                </div>
+                <div class="data_select_picker_div">
+                    <span id="picker_year_column" class="picker_year_column_span"
+                          @mousedown="setPointerDownTrue('year')"
+                          @mousemove="selectYearMove('year')"
+                          @mouseup="setPointerDownFalse('year')" @mouseleave="setPointerDownFalse('year')">
+                        <li :id="'picker_year_item_'+index" class="picker_year_item"
+                            v-for="(item,index) in picker_years">{{item}}</li>
+                    </span>
+                    <span class="picker_month_column_span" id="picker_month_column"
+                          @mousedown="setPointerDownTrue('month')"
+                          @mousemove="selectYearMove('month')"
+                          @mouseup="setPointerDownFalse('month')" @mouseleave="setPointerDownFalse('month')">
+                        <li class="picker_month_item" v-for="item in picker_months">{{item}}</li>
+                    </span>
+                    <span class="picker_day_column_span" id="picker_day_column"
+                          @mousedown="setPointerDownTrue('day')"
+                          @mousemove="selectYearMove('day')"
+                          @mouseup="setPointerDownFalse('day')" @mouseleave="setPointerDownFalse('day')">
+                        <li class="picker_day_item" v-for="item in picker_days">{{item}}</li>
+                    </span>
+                    <div class="selector_div"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 </div>
 <!--内容-->
@@ -157,9 +269,9 @@
                             <div class="user_data_name_sex_level_uid">
                                 <h4>{{user.nickname}}</h4>
                                 <div class="user_data_sex_level_uid">
-                                    <span v-if="user.gender===1" class="user_sex_male"></span>
-                                    <span v-else-if="user.gender===0" class="user_sex_female"></span>
-                                    <span v-else class="user_sex_sex"></span>
+                                    <span v-if="user.gender===0" class="user_sex_female"></span>
+                                    <span v-else-if="user.gender===1" class="user_sex_male"></span>
+                                    <span v-else class="user_sex_alien"></span>
                                     <span class="user_level">LVL{{user.level}}</span>
                                     <span class="user_uid">UID:{{user.userid}}</span>
                                 </div>
@@ -204,7 +316,7 @@
                             <div @click="updatePasswordBtn">修改密码</div>
                         </div>
                         <div class="loginOut_div" @click="loginOut">
-                            <span class="loginOuText">退出登录</span>
+                            <span class="loginOuText">注销登录</span>
                             <span class="loginOutImg"></span>
                         </div>
                     </div>
@@ -287,65 +399,32 @@
             <transition name="fade">
                 <div v-if="cardStateValue==='updatePassword'" class="user_data_div">
                     <!--头像 名字 性别-->
-                    <div class="user_data_content">
-                        <div style="width: 100%;display: flex">
-                            <div class="user_data_avatar">
-                                <img :src="user.avatar" alt="头像">
-                            </div>
-                            <div class="user_data_name_sex_level_uid">
-                                <h4>{{user.nickname}}</h4>
-                                <div class="user_data_sex_level_uid">
-                                    <span v-if="user.gender===1" class="user_sex_male"></span>
-                                    <span v-else-if="user.gender===0" class="user_sex_female"></span>
-                                    <span v-else class="user_sex_sex"></span>
-                                    <span class="user_level">LVL{{user.level}}</span>
-                                    <span class="user_uid">UID:{{user.userid}}</span>
-                                </div>
-                            </div>
+                    <div style="width: auto">
+                        <div @click="updateBackBtn" class="update_information_div_back_btn">
+                            <span class="update_information_div_back_btn_img"></span>返回
                         </div>
-                        <div class="user_other_data_div">
-                            <!--签名-->
-                            <div class="user_synopsis">
-                                签名：{{user.synopsis === null ? "你还没有签名，快去写个签名吧。" : user.synopsis}}
-                            </div>
-                            <div class="user_other_data_item">
-                                <span>生日：</span>
-                                <span>{{user.birthday === null ? "无" : user.birthday}}</span>
-                            </div>
-                            <div class="user_other_data_item">
-                                <span>学校：</span>
-                                <span>{{user.school === null ? "无" : user.school}}</span>
-                            </div>
-                            <div class="user_other_data_item">
-                                <span>地区：</span>
-                                <span>{{user.region === null ? "无" : user.region}}</span>
-                            </div>
-                            <div class="user_other_data_item">
-                                <span>邮箱：</span>
-                                <span>{{user.useremail}}</span>
-                            </div>
-                            <div class="user_other_data_item">
-                                <span>手机：</span>
-                                <span>{{user.phonenumber === null ? "无" : user.phonenumber}}</span>
-                            </div>
-                            <div class="user_other_data_item">
-                                <span>注册时间：</span>
-                                <span>{{user.regtime === null ? "无" : user.regtime}}</span>
-                            </div>
-
+                        <div class="update_password_input_div">
+                            <h4>旧密码</h4>
+                            <input v-model="oldPassword" onkeyup="value=value.replace(/[^\w\.\/]/ig,'')" maxlength="16"
+                                   type="password"
+                                   placeholder="请输入旧密码">
+                            <h4 style="margin-top: 20px">新密码</h4>
+                            <input v-model="newPassword1" onkeyup="value=value.replace(/[^\w\.\/]/ig,'')" maxlength="16"
+                                   type="password" placeholder="请设置新密码(密码长度6-16位)">
+                            <input v-model="newPassword2" onkeyup="value=value.replace(/[^\w\.\/]/ig,'')"
+                                   style="margin-top: 10px" maxlength="16" type="password"
+                                   placeholder="请再次输入新密码">
                         </div>
+                        <div class="update_password_message_div">{{updateMessage}}</div>
                     </div>
                     <!--底部控制-->
-                    <div class="user_data_update_div">
-                        <div>修改信息</div>
-                        <div>修改密码</div>
-                        <div>退出登录</div>
-                    </div>
-
+                    <div class="update_password_btn" @click="updatePasswordConfirmBtn">确认更改</div>
                 </div>
             </transition>
             <!--右侧-->
-            <div class="user_study_data_div"></div>
+            <div class="user_study_data_div">
+
+            </div>
 
 
         </div>
@@ -355,12 +434,20 @@
 
 <script>
 
+
+    /*我的信息*/
     const userDataApp = new Vue({
         el: "#userDataApp",
         data: {
 
             user: [],
-            cardStateValue: "allInformation"  //左侧显示状态  allInformation  updateInformation   updatePassword
+            cardStateValue: "allInformation",  //左侧显示状态  allInformation  updateInformation   updatePassword
+            updateMessage: "",//提示消息
+            /*修改密码 data*/
+            oldPassword: "",
+            newPassword1: "",
+            newPassword2: "",
+            passwordUpdateState: false  //是否成功修改密码
         },
         created() {
             this.fetchUserInformationAxios()
@@ -384,19 +471,82 @@
             updateInformationBtn() {
                 this.cardStateValue = "updateInformation"
             },
-            /*修改也买你顶部返回按钮*/
+            /*修改返回顶部返回按钮*/
             updateBackBtn() {
+                this.updateMessage = ""
+                this.newPassword1 = ""
+                this.newPassword2 = ""
+                this.oldPassword = ""
                 this.cardStateValue = "allInformation"
             },
+            /*修改密码按钮*/
             updatePasswordBtn() {
-
+                this.cardStateValue = "updatePassword"
             },
+            /*确认修改密码按钮*/
+            updatePasswordConfirmBtn() {
+                if (this.oldPassword.length === 0) {
+                    this.updateMessage = "请输入你的旧密码"
+                    return null
+                } else if (this.newPassword1.length === 0 || this.newPassword2.length === 0) {
+                    this.updateMessage = "请输入你的新密码"
+                    return null
+                } else if ((this.newPassword1.length < 6 || this.newPassword1.length > 16) || (this.newPassword2.length < 6 || this.newPassword2.length > 16)) {
+                    this.updateMessage = "密码须为6-16位"
+                    return null
+                } else if (this.newPassword1 !== this.newPassword2) {
+                    this.updateMessage = "两次新密码不一致"
+                    return null
+                } else {
+                    //axios
+                    let _this = this
+                    axios({
+                        method: "post",
+                        url: "register/updatePassword?oldPassword=" + _this.oldPassword + "&newPassword1=" + _this.newPassword1
+                    }).then(function (data) {
+                        if (data.data === '密码更改成功') {
+                            _this.newPassword1 = ""
+                            _this.newPassword2 = ""
+                            _this.oldPassword = ""
+                        }
+                        _this.updateMessage = data.data
+                    })
+                }
+            },
+            /*注销登录按钮*/
             loginOut() {
+                let _this = this
+                MessageBoxVue.openMessageBox("你确定要注销登录吗？")
+                let r = new Promise((resolve) => {
+                    let timer = setInterval(() => {   //定时器
+                        let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
+                        if (messageBoxConfirmValue !== "null") {
+                            clearInterval(timer)
+                            resolve(messageBoxConfirmValue)
+                        }
+                    }, 100)
+                })
+                r.then(async (res) => {
+                    if (res === "true") {
+                        //确认操作逻辑
+                        sessionStorage.clear()  //清楚所有前端session
+                        await axios({  //清除后端session与cookie
+                            method: "get",
+                            url: "register/loginOut"
+                        }).then(function (data) {
+                            if (data.data === true) {
+                                window.location.replace('registerPage');
+                            }
+                        });
+                    }
+                })
+
 
             },
         }
 
     })
+    /*修改数据卡*/
     const updateCardApp = new Vue({
         el: "#updateCardApp",
         data: {
@@ -508,18 +658,267 @@
             cardTitle: "",  //标题
             cardShowValue: false,
             dataValue: "",    //要修改的值
-            newUpdateValue: null,    //更改的新值
+            newUpdateValue: "",    //更改的新值
             updateCategory: "",   //类别
             oldAvatarId: "null",
+            updateCardGenderImgUrl: "",  //修改性别是显示的图片
+
+            /*picker*/
+            picker_years: Array.from({length: 40}, (_, index) => new Date().getFullYear() - index),   //年份
+            picker_months: Array.from({length: 12}, (_, index) => new Date().getMonth() + index + 1),   //月份
+            picker_days: null,  //天
+            pointerDown: false,               //鼠标/手指是否按下
+            itemHeight: 38,                   //每个picker_item高5rem=5*16=80px
+            // picker_column从初始状态到达最高点的y轴移动量  正值
+            yearHighPoint: 0,          // 年份最顶部 一直是0
+            monthHighPoint: 0,  //初始化改变
+            dayHighPoint: 0, //初始化改变
+            // picker_column从初始状态到达最低点的y轴移动量  负值
+            yearLowPoint: -1482,
+            monthLowPoint: -418,//初始化改变
+            dayLowPoint: 0,//初始化改变
+
+            lastPoint: 0,                  //鼠标/手指按下且移动，刚才的y轴位置
+            currentPoint: 0,                  //鼠标/手指保持按下且移动，此时的y轴位置
+            friction: 1.5,                 //摩擦系数。鼠标拖动距离*friction=picker滚动距离
+
+            //坐标
+            year_downInitialY: 0,
+            month_downInitialY: 0,
+            day_downInitialY: 0,
+            //距离
+            year_distance: 0,  //鼠标/手指的移动距离=currentPoint-lastPoint
+            month_distance: 0,  //鼠标/手指的移动距离=currentPoint-lastPoint
+            day_distance: 0,  //鼠标/手指的移动距离=currentPoint-lastPoint
+            //id
+            picker_year_column_id: null,
+            picker_month_column_id: null,
+            picker_day_column_id: null,
+            //class
+            picker_year_item: document.getElementsByClassName("picker_year_item"),
+            picker_month_item: document.getElementsByClassName("picker_month_item"),
+            picker_day_item: null,
+            //选中的index
+            selectedYearIndex: 0,
+            selectedMonthIndex: 0,
+            selectedDayIndex: 0,
+            //选中的日期
+            selectedYear: '0',
+            selectedMonth: '0',
+            selectedDay: '0',
 
         },
-        created() {
-        },
         methods: {
-            /*确认修改按钮*/
+            /*修改生日 打开修改卡时初始化*/
+            initPickerItem() {
+                this.picker_day_item = document.getElementsByClassName("picker_day_item")
+                //日期
+                this.selectedYear = new Date().getFullYear().toString()
+                this.selectedMonth = '1'
+                this.selectedDay = '1'
+                //下标
+                this.selectedYearIndex = 0
+                this.selectedMonthIndex = 0
+                this.selectedDayIndex = 0
+
+                this.picker_year_item[0].style.color = 'rgb(0, 229, 123)'
+                this.picker_month_item[0].style.color = 'rgb(0, 229, 123)'
+                this.picker_day_item[0].style.color = 'rgb(0, 229, 123)'
+
+            },
+            /*根据选中的年月，改变每月天数*/
+            setPicker_days() {
+                let year = this.selectedYear
+                let month = this.selectedMonth
+                const days = new Date(year, month, 0).getDate() // 28
+                this.dayLowPoint = -(days - 1) * this.itemHeight
+                this.picker_days = Array.from({length: days}, (_, index) => 1 + index)
+            },
+            /*改变选中的颜色*/
+            filterPickerItem(v, old_index, new_index) {
+                if (v === 'year') {
+                    this.picker_year_item[old_index].style.color = 'rgb(143, 143, 143)'
+                    this.picker_year_item[new_index].style.color = 'rgb(0, 229, 123)'
+                    // this.selectedYearIndex = new_index
+                }
+                if (v === 'month') {
+                    this.picker_month_item[old_index].style.color = 'rgb(143, 143, 143)'
+                    this.picker_month_item[new_index].style.color = 'rgb(0, 229, 123)'
+                    // this.selectedMonIndex = new_index
+                }
+                if (v === 'day') {
+                    this.picker_day_item[old_index].style.color = 'rgb(143, 143, 143)'
+                    this.picker_day_item[new_index].style.color = 'rgb(0, 229, 123)'
+                    // this.selectedYearIndex = new_index
+                }
+            },
+            /*按下鼠标*/
+            setPointerDownTrue(v) {
+                if (v === 'year') {
+                    this.picker_year_column_id = document.getElementById("picker_year_column")
+                    this.picker_year_column_id.style.transition = "initial"
+                    this.year_downInitialY = event.clientY;
+                }
+                if (v === 'month') {
+                    this.picker_month_column_id = document.getElementById("picker_month_column")
+                    this.picker_month_column_id.style.transition = "initial"
+                    this.month_downInitialY = event.clientY;
+                }
+                if (v === 'day') {
+                    this.picker_day_column_id = document.getElementById("picker_day_column")
+                    this.picker_day_column_id.style.transition = "initial"
+                    this.day_downInitialY = event.clientY;
+                }
+                this.pointerDown = true;
+            },
+            /*移动鼠标*/
+            selectYearMove(v) {
+                let _this = this
+                if (this.pointerDown) {
+                    if (v === 'year') {
+                        const initialY = event.clientY
+                        this.year_distance += (initialY - this.year_downInitialY) * this.friction
+                        if ((this.year_distance <= this.yearHighPoint) && (this.year_distance >= this.yearLowPoint)) {
+                            this.picker_year_column_id.style.transform = `translate(0px,${this.year_distance}px)`
+                            this.year_downInitialY = initialY
+                        } else if (this.year_distance > this.yearHighPoint) {
+                            this.year_distance = this.yearHighPoint
+                        } else if (this.year_distance < this.yearLowPoint) {
+                            this.year_distance = this.yearLowPoint
+                        }
+                    }
+                    if (v === 'month') {
+                        const initialY = event.clientY
+                        this.month_distance += (initialY - this.month_downInitialY) * this.friction
+                        if ((this.month_distance <= this.monthHighPoint) && (this.month_distance >= this.monthLowPoint)) {
+                            this.picker_month_column_id.style.transform = `translate(0px,${this.month_distance}px)`
+                            this.month_downInitialY = initialY
+                        } else if (this.month_distance > this.monthHighPoint) {
+                            this.month_distance = this.monthHighPoint
+                        } else if (this.month_distance < this.monthLowPoint) {
+                            this.month_distance = this.monthLowPoint
+                        }
+                    }
+                    if (v === 'day') {
+                        const initialY = event.clientY
+                        this.day_distance += (initialY - this.day_downInitialY) * this.friction
+                        if ((this.day_distance <= this.dayHighPoint) && (this.day_distance >= this.dayLowPoint)) {
+                            this.picker_day_column_id.style.transform = `translate(0px,${this.day_distance}px)`
+                            this.day_downInitialY = initialY
+                        } else if (this.day_distance > this.dayHighPoint) {
+                            this.day_distance = this.dayHighPoint
+                        } else if (this.day_distance < this.dayLowPoint) {
+                            this.day_distance = this.dayLowPoint
+                        }
+                    }
+
+                }
+            },
+            /*抬起鼠标*/
+            setPointerDownFalse(v) {
+                if (this.pointerDown === true) {
+                    if (v === 'year') {
+                        var remainder = this.year_distance % this.itemHeight;
+                        //2、distance为itemHeight的整数倍，这样就可以对齐picker_selector
+                        if (this.year_distance < 0 && Math.abs(remainder) < 0.5 * this.itemHeight) {
+                            this.year_distance -= remainder
+                        } else if (this.year_distance < 0 && Math.abs(remainder) >= 0.5 * this.itemHeight) {
+                            this.year_distance = this.year_distance - remainder - this.itemHeight
+                        } else if (this.year_distance >= 0 && Math.abs(remainder) < 0.5 * this.itemHeight) {
+                            this.year_distance -= remainder
+                        } else if (this.year_distance >= 0 && Math.abs(remainder) >= 0.5 * this.itemHeight) {
+                            this.year_distance = this.year_distance - remainder + this.itemHeight
+                        }
+                        /*粘性*/
+                        this.picker_year_column_id.style.transition = "transform 0.5s"
+                        this.picker_year_column_id.style.transform = `translate(0px,${this.year_distance}px)`
+                        let new_index = 0 - this.year_distance / this.itemHeight
+                        this.filterPickerItem('year', this.selectedYearIndex, new_index)
+                        this.selectedYearIndex = new_index
+                        this.selectedYear = this.picker_year_item[new_index].innerHTML
+                    }
+                    if (v === 'month') {
+                        var remainder = this.month_distance % this.itemHeight;
+                        //2、distance为itemHeight的整数倍，这样就可以对齐picker_selector
+                        if (this.month_distance < 0 && Math.abs(remainder) < 0.5 * this.itemHeight) {
+                            this.month_distance -= remainder
+                        } else if (this.month_distance < 0 && Math.abs(remainder) >= 0.5 * this.itemHeight) {
+                            this.month_distance = this.month_distance - remainder - this.itemHeight
+                        } else if (this.month_distance >= 0 && Math.abs(remainder) < 0.5 * this.itemHeight) {
+                            this.month_distance -= remainder
+                        } else if (this.month_distance >= 0 && Math.abs(remainder) >= 0.5 * this.itemHeight) {
+                            this.month_distance = this.month_distance - remainder + this.itemHeight
+                        }
+                        /*粘性*/
+                        this.picker_month_column_id.style.transition = "transform 0.5s"
+                        this.picker_month_column_id.style.transform = `translate(0px,${this.month_distance}px)`
+                        let new_index = 0 - this.month_distance / this.itemHeight
+                        this.filterPickerItem('month', this.selectedMonthIndex, new_index)
+                        this.selectedMonthIndex = new_index
+                        this.selectedMonth = this.picker_month_item[new_index].innerHTML
+                        this.setPicker_days()
+                    }
+                    if (v === 'day') {
+                        var remainder = this.day_distance % this.itemHeight;
+                        //2、distance为itemHeight的整数倍，这样就可以对齐picker_selector
+                        if (this.day_distance < 0 && Math.abs(remainder) < 0.5 * this.itemHeight) {
+                            this.day_distance -= remainder
+                        } else if (this.day_distance < 0 && Math.abs(remainder) >= 0.5 * this.itemHeight) {
+                            this.day_distance = this.day_distance - remainder - this.itemHeight
+                        } else if (this.day_distance >= 0 && Math.abs(remainder) < 0.5 * this.itemHeight) {
+                            this.day_distance -= remainder
+                        } else if (this.day_distance >= 0 && Math.abs(remainder) >= 0.5 * this.itemHeight) {
+                            this.day_distance = this.day_distance - remainder + this.itemHeight
+                        }
+                        /*粘性*/
+                        this.picker_day_column_id.style.transition = "transform 0.5s"
+                        this.picker_day_column_id.style.transform = `translate(0px,${this.day_distance}px)`
+                        let new_index = 0 - this.day_distance / this.itemHeight
+                        this.filterPickerItem('day', this.selectedDayIndex, new_index)
+                        this.selectedDayIndex = new_index
+                        this.selectedDay = this.picker_day_item[new_index].innerHTML
+                    }
+                }
+                this.newUpdateValue = this.selectedYear + '-' + this.selectedMonth + '-' + this.selectedDay  //新日期
+                this.pointerDown = false
+            },
+
+            /*选择性别按钮*/
+            selectGenderBtn(v) {
+                this.newUpdateValue = v
+                if (v === 0)   //复制性别图片
+                    this.updateCardGenderImgUrl = "image/index_04/girl_icon.png"
+                if (v === 1)
+                    this.updateCardGenderImgUrl = "image/index_04/boy_icon.png"
+                if (v === 2)
+                    this.updateCardGenderImgUrl = "image/index_04/alien_icon.png"
+
+            },
+            /*确认修改生日按钮*/
+            updateBirthdayConfirmBtn() {
+                let new_date = this.getTimeDate(this.newUpdateValue)
+                let old_date = this.getTimeDate(this.getNowDate())
+                if (new_date - old_date > 0) {
+                    NotificationVue.showPublicNotification("warn", "此时你还没有出生，换一个日期吧。")
+                } else if (this.newUpdateValue !== this.dataValue) {
+                    let _this = this;
+                    axios({
+                        method: "post",
+                        url: "update/updateUserData?newValue=" + this.newUpdateValue + "&category=" + this.updateCategory
+                    }).then(async function (data) {
+                        if (data.data) {
+                            await userDataApp.fetchUserInformationAxios()  //如修改成功  这刷新user数据
+                            _this.closeUpdateCard()   //关闭选卡片
+                            NotificationVue.showPublicNotification("success", "修改成功！")
+                        } else {
+                            NotificationVue.showPublicNotification("error", "发生未知错误，修改失败！")
+                        }
+                    });
+                }
+            },
             updateConfirmBtn() {
                 let _this = this
-                if (this.newUpdateValue !== null) {
+                if ((this.newUpdateValue.length !== 0) && (this.newUpdateValue !== this.dataValue)) {
                     axios({
                         method: "post",
                         url: "update/updateUserData?newValue=" + this.newUpdateValue + "&category=" + this.updateCategory
@@ -535,31 +934,58 @@
                 }
             },
             openUpdateCard(category, value) {
-                if (category === 'avatar')
-                    this.cardTitle = "修改头像"
-                if (category === 'synopsis')
-                    this.cardTitle = "修改简介"
-                if (category === 'nickname')
-                    this.cardTitle = "修改昵称"
-                if (category === 'gender')
-                    this.cardTitle = "修改性别"
-                if (category === 'birthday')
-                    this.cardTitle = "修改生日"
-                if (category === 'phonenumber')
-                    this.cardTitle = "修改手机号"
-                if (category === 'region')
-                    this.cardTitle = "修改地区"
-                if (category === 'school')
-                    this.cardTitle = "修改学校"
                 this.updateCategory = category
                 this.dataValue = value  //要修改的值
                 this.cardShowValue = true
+                if (category === 'avatar')
+                    this.cardTitle = "修改头像"
+                if (category === 'synopsis') {
+                    this.newUpdateValue = this.dataValue
+                    this.cardTitle = "修改简介"
+                }
+                if (category === 'nickname') {
+                    this.newUpdateValue = this.dataValue
+                    this.cardTitle = "修改昵称"
+                }
+                if (category === 'gender') {
+                    this.newUpdateValue = this.dataValue
+                    this.cardTitle = "修改性别"
+                    if (this.newUpdateValue === 0)   //复制性别图片
+                        this.updateCardGenderImgUrl = "image/index_04/girl_icon.png"
+                    if (this.newUpdateValue === 1)
+                        this.updateCardGenderImgUrl = "image/index_04/boy_icon.png"
+                    if (this.newUpdateValue === 2)
+                        this.updateCardGenderImgUrl = "image/index_04/alien_icon.png"
+                }
+                if (category === 'birthday') {
+                    this.cardTitle = "修改生日"
+                    this.newUpdateValue = this.dataValue
+                    /*初始化*/
+                    this.setPicker_days()
+                    setTimeout(() => {
+                        this.initPickerItem()
+                    }, 10);
+                }
+
+                if (category === 'phonenumber') {
+                    this.newUpdateValue = this.dataValue
+                    this.cardTitle = "修改手机号"
+                }
+                if (category === 'region') {
+                    this.newUpdateValue = this.dataValue
+                    this.cardTitle = "修改地区"
+                }
+                if (category === 'school') {
+                    this.newUpdateValue = this.dataValue
+                    this.cardTitle = "修改学校"
+                }
+
 
             },
             closeUpdateCard() {
                 this.cardShowValue = false
                 this.dataValue = ""    //要修改的值
-                this.newUpdateValue = null    //更改的新值
+                this.newUpdateValue = ""    //更改的新值
                 this.updateCategory = ""   //类别
                 this.oldAvatarId = "null"
             },
@@ -568,7 +994,7 @@
                 if (v === this.oldAvatarId) {  //点击同一个
                     new_id.classList.remove("avatar_border_active")
                     this.oldAvatarId = "null"
-                    this.newUpdateValue = null
+                    this.newUpdateValue = ""
                 } else {
                     if (this.oldAvatarId === "null") {   //第一次点击
                         this.oldAvatarId = v
@@ -583,26 +1009,35 @@
                 }
 
             },
+            /*时间转换*/
+            getTimeDate(date) {
+                return new Date(date).getTime();
+            },
+            //获取日期
+            getNowDate() {
+                let date = new Date()
+                return (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()).toString()
+            },
         }
     })
-
-
     /*弹窗*/
-    const MessageBoxContent = new Vue({
+    const MessageBoxVue = new Vue({
         el: "#MessageBoxContent",
         data: {
             messageBoxQuestion: "",
-            borderFramesValue: false,
+            borderFramesValue: false
         },
         methods: {
             /*public确认还是取消按钮并关闭弹窗*/
             messageBoxConfirmBtn(v) {
+                // console.log("v="+v)
                 window.sessionStorage.setItem("messageBoxConfirmValue", v);
                 //关闭弹窗
                 let messageBox = document.getElementById("messageBox");
                 let MessageBoxContent = document.getElementById("MessageBoxContent");
                 MessageBoxContent.style.display = "none"
                 messageBox.style.marginTop = "-200px";
+                // console.log(window.sessionStorage.getItem("messageBoxConfirmValue")==="true")
             },
             /*打开弹窗 其他vue实例使用*/
             openMessageBox(content) {
@@ -615,12 +1050,12 @@
                 messageBox.style.marginTop = "20px";
             },
             tipEffection() {
+                console.log("123")
                 this.borderFramesValue = true
             },
             tipEffectionEnd() {
                 this.borderFramesValue = false
             },
-
         }
     })
     /*消息vue*/

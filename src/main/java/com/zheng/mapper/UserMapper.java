@@ -15,7 +15,7 @@ public interface UserMapper {
 
 
     /*注册*/
-    @Insert(value = "insert into tb_user(userid,nickname,useremail,userpassword,regtime) values (#{userid},#{nickname},#{useremail},#{userpassword},#{regtime});")
+    @Insert(value = "insert into tb_user(userid,nickname,useremail,userpassword,regtime,level,gender,avatar) values (#{userid},#{nickname},#{useremail},#{userpassword},#{regtime},#{level},#{gender},#{avatar});")
     boolean userSignUpMapper(User user);
 
     /*根据id查找用户*/
@@ -64,6 +64,9 @@ public interface UserMapper {
     //地区
     @Update("update tb_user set region=#{region} where userid = #{userid}")
     boolean updateRegionMapper(@Param("region")String region,@Param("userid") int userid);
+
+    @Update("update tb_user set userpassword=#{userpassword} where userid = #{userid}")
+    boolean updatePasswordMapper(@Param("userpassword")String userpassword,@Param("userid") int userid);
 
 
 

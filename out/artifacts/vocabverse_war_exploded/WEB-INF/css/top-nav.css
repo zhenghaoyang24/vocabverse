@@ -166,7 +166,7 @@
     flex-direction: column;
     justify-content: space-evenly; /* 行与行之间留有均匀间隔。 */
     margin-top: -65px;
-    transition: margin-top 0.2s;
+    transition: margin-top 0.15s;
 }
 .cha_yi_div>a{
     text-decoration: none;

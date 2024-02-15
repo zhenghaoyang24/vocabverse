@@ -59,7 +59,7 @@
 }
 
 .user_data_sex_level_uid > span {
-    margin-right: 5px;
+    margin-right: 10px;
     display: inline-flex;
     align-items: center;
     border-radius: 3px;
@@ -85,11 +85,11 @@
     background-position: center;
 }
 
-.user_sex_sex {
+.user_sex_alien {
     display: block;
     width: 25px;
     height: 25px;
-    background-image: url("../image/index_04/sex_icon.png");
+    background-image: url("../image/index_04/alien_icon.png");
     background-size: 100% 100%;
     background-position: center;
 }
@@ -188,6 +188,7 @@
 .user_data_update_div > div:hover {
     color: #ffffff;
 }
+
 
 .user_data_update_div > div:nth-child(1) {
     background-color: #1086c2;
@@ -372,7 +373,7 @@
     z-index: 12;
     width: 500px;
     height: 90%;
-    min-height: 520px;
+    min-height: 650px;
     background-color: #1e1e1e;
     border-radius: 5px;
     margin: auto;
@@ -438,7 +439,8 @@
     display: flex;
     justify-content: space-between;
 }
-.uploadAvatarBtn_div>span{
+
+.uploadAvatarBtn_div > span {
     display: flex;
     justify-content: center;
     /*text-align: center;*/
@@ -446,18 +448,249 @@
     width: 130px;
     font-size: 0.9em;
     color: #000000;
-    cursor: pointer;
     font-weight: 600;
     border-radius: 5px;
     transition: all 0.2s;
 }
 
+.uploadAvatarBtn_div > span:nth-child(1) {
+    cursor: pointer;
+}
+
 .update_avatar_img {
-    border:4px rgba(255, 0, 0, 0) solid;
+    border: 4px rgba(255, 0, 0, 0) solid;
     border-radius: 25px;
     width: 50px;
     height: 50px;
     margin: 4px;
     cursor: pointer;
 }
+
+.user_data_update_confirm_btn {
+    margin: 7px 5px;
+    display: inline-block;
+    border-radius: 5px;
+    /*height: 40px;*/
+    padding: 5px 20px;
+    color: #000000;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.user_data_update_synopsis_content {
+    padding: 10px;
+    display: block;
+}
+
+.user_data_update_synopsis_content > h4 {
+    color: whitesmoke;
+    padding: 0;
+    margin: 0;
+}
+
+.user_data_update_synopsis_content > textarea {
+    white-space: pre-wrap;
+    width: 460px;
+    margin-top: 10px;
+    outline: none;
+    border: 1px rgba(255, 0, 0, 0) solid;
+    height: 200px;
+    resize: none;
+    background-color: #262626;
+    border-radius: 5px;
+    font-family: "Microsoft YaHei UI", serif;
+    font-size: 1em;
+    color: whitesmoke;
+    padding: 7px;
+}
+
+.user_data_update_synopsis_content > input::-webkit-outer-spin-button,
+.user_data_update_synopsis_content > input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+.user_data_update_synopsis_content > input {
+    outline: none;
+    margin-top: 10px;
+    padding: 7px;
+    width: 460px;
+    border: 1px rgba(255, 0, 0, 0) solid;
+    color: whitesmoke;
+    border-radius: 3px;
+    font-family: "Microsoft YaHei UI", serif;
+    font-size: 1em;
+    background-color: #2f2f2f;
+}
+
+.user_data_update_synopsis_content > textarea:focus {
+    border: 1px #00e57b solid;
+}
+
+.user_data_update_synopsis_content > input:focus {
+    border: 1px #00e57b solid;
+}
+
+.user_data_update_gender_content {
+    width: auto;
+
+}
+
+.gender_select_div {
+    width: 400px;
+    display: flex;
+    justify-content: space-between;
+    /*border: 1px red solid;*/
+    margin: 40px auto;
+}
+
+.gender_select_div > span {
+    text-align: center;
+    font-weight: 700;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 10px 0;
+    width: 100px;
+    color: #000000;
+    transition: all 0.2s;
+}
+
+
+.date_select__div {
+    padding: 10px;
+    display: block;
+}
+
+.date_select__div > h4 {
+    color: whitesmoke;
+    padding: 0;
+    margin: 0;
+}
+
+
+.data_select_picker_title {
+    padding-top: 10px;
+    margin: 0 auto;
+    width: 400px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.data_select_picker_title > span {
+    color: whitesmoke;
+    font-size: 1.5em;
+    width: 100px;
+    display: block;
+
+    text-align: center;
+}
+
+.data_select_picker_div {
+    position: relative;
+    overflow: hidden;
+    touch-action: none;
+    display: flex;
+    justify-content: space-around;
+    width: 400px;
+    height: 450px;
+    margin: 10px auto;
+    /*border: 1px red solid;*/
+}
+
+.data_select_picker_div > span {
+
+
+    padding-top: 114px;
+
+    font-size: 1em;
+    width: 100px;
+    height: 200px;
+    display: block;
+    text-align: center;
+}
+
+.data_select_picker_div > span > li {
+    /*border: 1px red solid;*/
+    transition: all 0.2s;
+
+    height: 38px;
+    list-style: none;
+    color: rgb(143, 143, 143);
+    font-size: 1.3em;
+    line-height: 38px;
+    /*padding: 5px;*/
+}
+
+.picker_year_item[selectedYearIndex] {
+    color: #00e57b;
+}
+
+.selector_div {
+    pointer-events: none;
+    width: 100%;
+    border: 1px #00e57b solid;
+    position: absolute;
+    margin-top: 114px;
+    height: 38px;
+}
+
+.update_password_btn {
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
+    color: whitesmoke;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    line-height: 40px;
+    height: 40px;
+    background-color: red;
+    margin: 0 auto;
+    transition: all 0.2s;
+}
+
+.update_password_btn:hover {
+    background-color: #ff4f4f;
+}
+
+.update_password_input_div {
+    padding-top: 30px;
+    width: auto;
+}
+
+.update_password_input_div > h4 {
+    margin: 0;
+    padding: 10px 0;
+    color: whitesmoke;
+}
+
+.update_password_input_div > input {
+    width: 265px;
+    background-color: #2f2f2f;
+    outline: none;
+    border: 1px solid whitesmoke;
+    color: whitesmoke;
+    padding: 15px;
+    font-size: 1em;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.update_password_input_div > input:focus {
+    border: 1px solid #00e57b;
+}
+
+.update_password_message_div {
+    color: #009dff;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+
+
+
+
+
 

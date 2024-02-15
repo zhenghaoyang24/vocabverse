@@ -12,6 +12,9 @@
 
     <style>
         .codeButtonDivTrue {
+            display: flex;
+            justify-content: center;
+            text-align: center;
             border: none;
             cursor: pointer;
             width: 160px;
@@ -23,7 +26,19 @@
             line-height: 37px;
         }
 
+        .stepColorFinished {
+            border-color: #00e57b;
+            color: #00e57b;
+        }
+
+        .stepColor {
+            color: #8a8a8a;
+            border-color: #8a8a8a;
+        }
+
         .codeButtonDivFalse {
+            display: flex;
+            justify-content: center;
             border: none;
             cursor: pointer;
             width: 160px;
@@ -34,15 +49,28 @@
             border-radius: 5px;
             line-height: 37px;
         }
+
+        /*v-if动画*/
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+
+        .fade-enter, .fade-leave-to {
+            opacity: 0;
+        }
     </style>
 </head>
 <body>
+
+<!--通知-->
+
 <div id="app">
     <!--登录-->
+
     <div v-if="loginstatus==0" class="register-body">
         <div class="web_title">
             <div class="web_title_img"><img src="image/logo-white.png"></div>
-            <div class="web_title_text">词本无意，意由境生</div>
+            <div class="web_title_text">词本无意，意由境生。</div>
         </div>
         <div class="title">
             <h4>请登录您的Werse账号</h4>
@@ -66,24 +94,27 @@
                 <iframe name="signInIframe" id="signInIframe"
                         style="display: none"></iframe>
                 <div class="remembered_div">
-                    <div style="color: white"><input type="checkbox" @click="remenberMe()"
-                                                     v-model:value="checkboxIsChecked" name="checkboxIsChecked">记住我
-                    </div>
-                    <a href="#" style="color: white">忘记密码</a>
+                    <!--                    <div style="color: white"><input type="checkbox" @click="remenberMe()"-->
+                    <!--                                                     v-model:value="checkboxIsChecked" name="checkboxIsChecked">记住我-->
+                    <!--                    </div>-->
                 </div>
 
                 <div class="lo-button">
                     <input @click="subSignIn()" type="submit" :value="btnValue">
                 </div>
             </form>
+
         </div>
-        <div @click="loginTranslate()"
-             style="color: white;text-decoration-line: underline;font-size: 0.9em;margin:auto;width: 80%;padding-left: 20px;cursor: pointer">
-            还没有账号？去注册。
+        <div
+                style="color: white;width: 75%;margin :auto;display: flex;justify-content: space-between;">
+            <span @click="loginTranslate(1)" style="font-size: 1em;text-decoration-line: underline;cursor: pointer">还没有账号？去注册。</span>
+            <span @click="loginTranslate(2)"
+                  style="font-size: 1em;text-decoration-line: underline;cursor: pointer">忘记密码</span>
         </div>
+        <div style="height: 30px"></div>
     </div>
     <!--注册-->
-    <div v-else class="register-body">
+    <div v-if="loginstatus===1" class="register-body">
         <div class="web_title">
             <div class="web_title_img"><img src="image/logo-white.png"></div>
             <div class="web_title_text">词本无意，意由境生。</div>
@@ -114,7 +145,9 @@
                 <!--验证码-->
                 <div class="input_div_yige_code">
                     <input class="code_input" type="number" id="sign_up_code" name="signupcode"
-                           placeholder="验证码" autocomplete="off" required="required" minlength="6" maxlength="6"/>
+                           v-model="emailCode" placeholder="验证码" autocomplete="off" required="required"
+                           minlength="6"
+                           maxlength="6"/>
                     <div id="codeBtn" @click="startCountdown()" type="submit" class="codeButtonDivTrue"
                          :disabled="countingDown">{{countingDown ? "获取验证码" : remainingTime + "秒后获取"}}
                     </div>
@@ -130,11 +163,77 @@
             </form>
 
         </div>
-        <div @click="loginTranslate()"
+        <div @click="loginTranslate(0)"
              style="color: white;text-decoration-line: underline;font-size: 0.9em;margin:auto;width: 80%;padding-left: 20px;cursor: pointer">
             已经有账号？去登录。
         </div>
     </div>
+    <!--忘记密码-->
+    <div v-if="loginstatus===2" class="register-body">
+        <div class="web_title">
+            <div class="web_title_img"><img src="image/logo-white.png"></div>
+            <div class="web_title_text">词本无意，意由境生。</div>
+        </div>
+        <div class="title">
+            <h4>重置您的Werse账号密码</h4>
+        </div>
+        <div class="update_password_step_div">
+            <span style="border: 2px solid #00e57b;color: #00e57b">1</span>
+            <span
+                    :class="emailCodeCheck===true? 'stepColorFinished':'stepColor'">验证邮箱</span>
+            <span
+                    :class="emailCodeCheck===true? 'stepColorFinished':'stepColor'">2</span>
+            <span :class="passwordUpdateSet===true? 'stepColorFinished':'stepColor'">更改密码</span>
+            <span :class="passwordUpdateSet===true? 'stepColorFinished':'stepColor'">✓</span>
+        </div>
+        <!--验证邮箱-->
+        <div v-if="emailCodeCheck===false" class="update_password_form_div">
+            <div class="update_password_form_email_div">
+                <input autocomplete="off" type="email" v-bind:readonly="!countingDownUpdatePassword"
+                       v-model="loginImfor.useremail" placeholder="邮箱">
+            </div>
+            <div class="up_pass_code_div">
+                <input class="code_input" type="number" id="update_password_code" name="signupcode"
+                       v-model="emailCode" placeholder="验证码" autocomplete="off" required="required"
+                />
+                <div id="update_password_code_btn" @click="startUpdateCountdown()"
+                     class="codeButtonDivTrue"
+                     :disabled="countingDownUpdatePassword">
+                    {{countingDownUpdatePassword ? "获取验证码" : remainingTimeUpdatePassword + "秒后获取"}}
+                </div>
+            </div>
+            <div class="update_password_message_div">
+                {{updatePasswordMessage.length === 0 ? " " : updatePasswordMessage}}
+            </div>
+            <div class="code_confirm_div_btn" @click="upUpdatePasswordEmailCodeBtn">提交</div>
+            <div @click="loginTranslate(0)"
+                 style="color: white;text-decoration-line: underline;font-size: 1em;width: 80%;cursor: pointer;margin-top: 20px">
+                想起了密码，去登录。
+            </div>
+            <div style="height: 30px"></div>
+        </div>
+        <!--修改密码-->
+        <div v-else class="update_password_form_div">
+            <input v-bind:readonly="passwordUpdateSet" maxlength="16" autocomplete="off"
+                   onkeyup="value=value.replace(/[^\w\.\/]/ig,'')" type="password"
+                   v-model="newPassword1" placeholder="新密码">
+            <input v-bind:readonly="passwordUpdateSet" maxlength="16" autocomplete="off" type="password"
+                   v-model="newPassword2" placeholder="确认密码">
+
+            <div class="update_password_message_div">
+                {{updatePasswordMessage.length === 0 ? " " : updatePasswordMessage}}
+            </div>
+            <div class="code_confirm_div_btn" @click="updatePasswordBtn">确认修改</div>
+            <div @click="loginTranslate(0)"
+                 style="color: white;text-decoration-line: underline;font-size: 1em;width: 80%;cursor: pointer;margin-top: 20px">
+                想起了密码，去登录。
+            </div>
+            <div style="height: 30px"></div>
+        </div>
+
+
+    </div>
+    <div></div>
 </div>
 
 <script>
@@ -142,33 +241,41 @@
     const sign_in_app = new Vue({
         el: "#app",
         data: {
+
             btnValue: "登录",
             loginImfor: {
                 nickname: '',
                 useremail: '',
                 userpassword: ''
             },
+            updatePasswordMessage: "",   //修改密码消息
+            emailCode: "",
             otherMsg: '',
             loginMsg: '', //注册消息
-            //0为登录，1为注册
+            //0为登录，1为注册，2为忘记密码
             loginstatus: 0,
             seen: false,
             openeye: 'image/login/眼睛_显示.png', //小眼睛图片地址
             nopeneye: 'image/login/眼睛_隐藏.png',
             pwdType: "password", //密码类型
             checkboxIsChecked: true, //是否勾选记住我
-            remainingTime: 60,
+            remainingTime: 90,
+            remainingTimeUpdatePassword: 90,
             countingDown: true,
+            countingDownUpdatePassword: true,
+            newPassword1: "",
+            newPassword2: "",
+            emailCodeCheck: false,  //忘记密码 邮箱是否验证成功
+            passwordUpdateSet: false,   //密码是否更改成功
+
         },
         methods: {
             remenberMe() {
                 // console.log(this.checkboxIsChecked);
                 if (this.checkboxIsChecked) {
                     this.checkboxIsChecked = false;
-                    console.log(this.checkboxIsChecked);
                 } else {
                     this.checkboxIsChecked = true;
-                    console.log(this.checkboxIsChecked);
                 }
             },
             // 点击眼睛icon查看密码
@@ -178,22 +285,34 @@
                 this.seen = !this.seen; //小眼睛的变化,切换图片
             },
             /*切换注册与登录*/
-            loginTranslate() {
+            loginTranslate(v) {
+                sessionStorage.clear()
+                this.checkboxIsChecked = true //是否勾选记住我
+                this.remainingTime = 90
+                this.remainingTimeUpdatePassword = 90
+                this.countingDown = true
+                this.countingDownUpdatePassword = true
+                this.emailCode = ""
+                this.loginMsg = '';
+                this.otherMsg = '';
+                this.emailCodeCheck = false  //忘记密码 邮箱是否验证成功
+                this.passwordUpdateSet = false
+                this.updatePasswordMessage = ""
+                this.loginstatus = v;
                 /*切换登录注册时，清除反馈消息。*/
-                if (this.loginstatus === 0) { //切换为注册
-                    this.loginstatus = 1;
-                    this.loginMsg = '';
-                    this.otherMsg = '';
+                if (v === 1) { //切换为注册
+                    this.emailCode = "";
                     this.seen = false;
                     this.btnValue = '注册'
+                } else if (v === 0) {
+
+                    this.seen = false;
+                    this.checkboxIsChecked = true;   //记住我FALSE
+                    this.btnValue = '登录'
+                    // window.location.replace('loginPage');
                 } else {
-                    // this.loginstatus = 0;
-                    // this.loginMsg = '';
-                    // this.otherMsg = '';
-                    // this.seen = false;
-                    // this.checkboxIsChecked=true;   //记住我FALSE
-                    // this.btnValue = '登录'
-                    window.location.replace('loginPage');
+                    this.newPassword1 = ""
+                    this.newPassword2 = ""
                 }
 
             },
@@ -216,8 +335,8 @@
                 if (otherMsg === 'emailexit') {
                     this.loginMsg = '此邮箱已经被注册。'
                 } else if (otherMsg === 'success') {
-                    this.loginMsg = '注册成功，请登录。'
-
+                    this.loginMsg = '注册成功，正在登录。'
+                    window.location.replace('homePage');
                 } else {
                     this.loginMsg = '发生错误，请稍后再试。'
                 }
@@ -232,18 +351,57 @@
                     } else if (otherMsg === 'succession') {
                         this.loginMsg = '正在登录...'
                         window.location.replace('homePage');
-                        // location.href = "toIndex_01";
                     } else {
                         this.loginMsg = '发生错误，请稍后再试。'
                     }
                 }
             },
+            /*提交验证码 更改密码*/
+            upUpdatePasswordEmailCodeBtn() {
+                let emailCode = sessionStorage.getItem("emailCode");
+                if (this.emailCode === emailCode) {
+                    this.emailCodeCheck = true
+                    this.updatePasswordMessage = ""
+                } else {
+                    this.updatePasswordMessage = "验证码错误"
+                }
+
+            },
+            /*确认修改密码 忘记密码*/
+            updatePasswordBtn() {
+                if (this.newPassword1.length === 0 || this.newPassword2.length === 0) {
+                    this.updatePasswordMessage = "请输入你的密码"
+                    return null
+                } else if ((this.newPassword1.length < 6 || this.newPassword1.length > 16) || (this.newPassword2.length < 6 || this.newPassword2.length > 16)) {
+                    this.updatePasswordMessage = "密码须为6-16位"
+                    return null
+                } else if (this.newPassword1 !== this.newPassword2) {
+                    this.updatePasswordMessage = "两次新密码不一致"
+                    return null
+                }  else {
+                    //axios
+                    let _this = this
+                    axios({
+                        method: "post",
+                        url: "register/resetPassword?newPassword1=" + _this.newPassword1+"&email="+this.loginImfor.useremail
+                    }).then(function (data) {
+                        if (data.data === '密码更改成功,请登录') {
+                            _this.passwordUpdateSet = true
+                        }
+                        _this.updatePasswordMessage = data.data
+                    })
+                }
+
+            },
             /*注册*/
             subSignUp() {
+                let emailCode = sessionStorage.getItem("emailCode");
                 if (this.loginImfor.nickname === '' || this.loginImfor.userpassword === '' || this.loginImfor.useremail === '') {
                     this.loginMsg = '请完善注册信息。'
                 } else if (this.loginImfor.userpassword.length < 6 || this.loginImfor.userpassword.length > 16) {
                     this.loginMsg = '密码长度为6-16位，请重新输入。'
+                } else if (emailCode !== this.emailCode) {
+                    this.loginMsg = '验证码错误。'
                 } else {
                     setTimeout(() => {
                         this.showSignUpMsg();
@@ -254,8 +412,6 @@
                         // console.log(innerHTML)
                     }, 800);
                 }
-
-
             },
             /*登录*/
             subSignIn() {
@@ -272,33 +428,85 @@
                     }, 500);
                 }
             },
+            /*获取验证码 更改密码*/
+            startUpdateCountdown() {
+                const reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+                let _this = this
+                let timer = null;
+                const id = document.getElementById('update_password_code_btn');
+                if (reg.test(this.loginImfor.useremail)) {
+                    if (this.countingDownUpdatePassword) {
+                        /*发送ajax请求*/
+                        axios({
+                            method: "get",
+                            url: "register/getCode?email=" + this.loginImfor.useremail,
+                        }).then(function (data) {
+                            sessionStorage.setItem("emailCode", data.data)
+                            setTimeout(() => {
+                                sessionStorage.removeItem("emailCode")
+                            }, 120000);
+                        });
+                        _this.countingDownUpdatePassword = false;
+                        _this.remainingTimeUpdatePassword = 90;
+                        id.classList.replace('codeButtonDivTrue', 'codeButtonDivFalse');
+                        id.style.cursor = "not-allowed"
+                        _this.updatePasswordMessage = ""
+                        // 开始倒计时
+                        timer = setInterval(() => {
+                            if (_this.remainingTimeUpdatePassword > 0) {
+                                _this.remainingTimeUpdatePassword--;
+                            } else {
+                                clearInterval(timer);
+                                _this.countingDownUpdatePassword = true;
+                                id.style.cursor = "auto"
+                                id.classList.replace('codeButtonDivFalse', 'codeButtonDivTrue');
+                            }
+                        }, 1000);
+
+                    }
+                } else {
+                    this.updatePasswordMessage = "请输入正确的邮箱格式。"
+                }
+
+            },
+            /*获取验证码 注册*/
             startCountdown() {
-                console.log("12")
-                var id = document.getElementById('codeBtn');
-                // 切换class
-                if (this.countingDown) {
-                    /*发送ajax请求*/
-                    axios({
-                        method: "get",
-                        url: "register/getCode",
-                        success: function (Captcha) {
-                            console.log(Captcha)
-                        }
-                    })
-                    this.countingDown = false;
-                    this.remainingTime = 60;
-                    id.classList.replace('codeButtonDivTrue', 'codeButtonDivFalse');
-                    console.log(this.countingDown)
-                    // 开始倒计时
-                    const timer = setInterval(() => {
-                        if (this.remainingTime > 0) {
-                            this.remainingTime--;
-                        } else {
-                            clearInterval(timer);
-                            this.countingDown = true;
-                            id.classList.replace('codeButtonDivFalse', 'codeButtonDivTrue');
-                        }
-                    }, 1000);
+                const reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+                let _this = this
+                let timer = null;
+                const id = document.getElementById('codeBtn');
+                if (reg.test(this.loginImfor.useremail)) {
+                    if (this.countingDown) {
+                        /*发送ajax请求*/
+                        axios({
+                            method: "get",
+                            url: "register/getCode?email=" + this.loginImfor.useremail,
+                        }).then(function (data) {
+                            sessionStorage.setItem("emailCode", data.data)
+                            setTimeout(() => {
+                                sessionStorage.removeItem("emailCode")
+                            }, 120000);
+                        });
+                        _this.countingDown = false;
+                        _this.remainingTime = 90;
+                        id.classList.replace('codeButtonDivTrue', 'codeButtonDivFalse');
+                        id.style.cursor = "not-allowed"
+                        console.log(_this.countingDown);
+                        // 开始倒计时
+                        timer = setInterval(() => {
+                            if (_this.remainingTime > 0) {
+                                _this.remainingTime--;
+                            } else {
+                                clearInterval(timer);
+                                _this.countingDown = true;
+                                id.style.cursor = "auto"
+                                id.classList.replace('codeButtonDivFalse', 'codeButtonDivTrue');
+                            }
+                        }, 1000);
+
+                    }
+                } else {
+                    this.loginMsg = "请输入正确的邮箱格式。"
                 }
             },
         },

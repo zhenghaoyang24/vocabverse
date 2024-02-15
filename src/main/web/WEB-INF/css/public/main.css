@@ -17,6 +17,7 @@
     --btnBoderColor: #cbcbcb;
 
 }
+
 body {
     min-width: 800px;
     user-select: none;
@@ -28,6 +29,7 @@ body {
     background-attachment: fixed;
     background-size: cover;
 }
+
 /*设置滚动条的长、宽为0*/
 html::-webkit-scrollbar {
     height: 100%;
@@ -35,6 +37,7 @@ html::-webkit-scrollbar {
     /*color: #00e57b;*/
     background-color: #676767;
 }
+
 html::-webkit-scrollbar-thumb {
     border-radius: 10px;
     background-color: #00e57b;
@@ -46,7 +49,7 @@ html::-webkit-scrollbar-thumb {
     margin-left: 10%;
 }
 
-.content-div{
+.content-div {
     width: auto;
     /*height:500px;*/
     padding: 10px;
@@ -56,7 +59,7 @@ html::-webkit-scrollbar-thumb {
 
 }
 
-.public_notification_div{
+.public_notification_div {
     user-select: none;
     transition: all 0.3s;
     /*display: none;*/
@@ -71,23 +74,27 @@ html::-webkit-scrollbar-thumb {
     right: -300px;
     top: 60px;
 }
-.public_notification_content{
+
+.public_notification_content {
     padding-top: 10px;
     font-size: 15px;
     color: whitesmoke;
     font-family: "Microsoft YaHei UI", serif;
 }
-.notification_item_tittle{
+
+.notification_item_tittle {
     height: 20px;
     display: flex;
 }
-.notification_item_tittle>img{
+
+.notification_item_tittle > img {
     /*vertical-align: middle;*/
     /*text-align: center;*/
     width: 20px;
     height: 20px;
 }
-.notification_item_tittle>span{
+
+.notification_item_tittle > span {
     font-weight: 800;
     font-family: "Microsoft YaHei UI", serif;
     padding-left: 10px;
@@ -99,51 +106,63 @@ html::-webkit-scrollbar-thumb {
 
 
 /*弹窗*/
-.MessageBoxDiv{
+.MessageBoxDiv {
     user-select: none;
     /*margin-top: ;*/
-    justify-content:center;
     display: none;
+    justify-content: center;
+
     position: absolute;
     width: 100%;
     height: 100%;
+    /*min-height: 500px;*/
     z-index: 99999;
     background-color: rgba(0, 0, 0, 0.62);
 }
-.MessageBox{
+
+.MessageBox {
     border: 2px rgba(255, 0, 0, 0) solid;
     box-shadow: 0 0 4px 1px #626262;
     margin-top: -200px;
     border-radius: 5px;
     background-color: #2d2d2d;
     width: 290px;
-    height: 120px;
-    padding-top:  20px;
-    padding-right:  20px;
-    padding-left:  20px;
+
+
+    /*height: 120px;*/
+    display: inline-flex;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 150px;
+    padding: 20px;
     transition: all 0.2s;
 }
-.MessageBoxContent{
+
+.MessageBoxContent {
     /*height: 100%;*/
     color: whitesmoke;
 }
-.MessageBoxController{
+
+.MessageBoxController {
     /*position: relative;*/
     /*width: auto;*/
     display: flex;
     justify-content: space-between;
-    margin-top: 60px;
+    margin-top: 50px;
 }
-.MessageBoxController span:nth-child(1){
+
+.MessageBoxController span:nth-child(1) {
     border: 1px red solid;
     color: red;
 
 }
-.MessageBoxController span:nth-child(2){
-   border:1px solid #00e57b;
+
+.MessageBoxController span:nth-child(2) {
+    border: 1px solid #00e57b;
     color: #00e57b;
 }
-.MessageBoxController span{
+
+.MessageBoxController span {
     font-weight: 600;
     cursor: pointer;
     color: whitesmoke;

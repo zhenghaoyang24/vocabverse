@@ -2,6 +2,7 @@ package com.zheng.interceptor;
 
 import com.zheng.pojo.User;
 import com.zheng.service.UserService;
+import com.zheng.utils.JudgeUserAgentUtil;
 import com.zheng.utils.UserSessionCookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -26,42 +27,34 @@ public class MyInterceptor implements HandlerInterceptor {
     //在目标方法执行之前
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        System.out.println("preHandle...");
         String session_userid = UserSessionCookieUtil.getUserIDSession(request);  //获取session
-//        Object session_userid =request.getSession().getAttribute("userid");
-        System.out.println("preHandle->userid:"+session_userid);
-        if (session_userid!=null) {
-            //session不为空，则放行，
-            System.out.println("Released");
-            return true;
-        }else {   //session不存在则判断cookie是否存在
-            User userByNameAndEmail = UserSessionCookieUtil.getUserByCookie(request);
-//            String useremail = null,userpassword = null;
-//            Cookie[] cookies = request.getCookies();
-//            User userByNameAndEmail;
-//            for (int i = 0; i < cookies.length; i++) {
-//                if (Objects.equals(cookies[i].getName(), "useremail"))
-//                    useremail= cookies[i].getValue();
-//                if (Objects.equals(cookies[i].getName(), "userpassword"))
-//                    userpassword= cookies[i].getValue();
-//            }
-////            System.out.println("preHandle->useremail:"+useremail);
-////            System.out.println("preHandle->userpassword:"+userpassword);
-//            userByNameAndEmail = userService.findUserByNameAndEmail(useremail, userpassword);
-//            System.out.println("userByNameAndEmail="+userByNameAndEmail);
-            if (userByNameAndEmail==null){   //cookie不存在，则拦截，并重定向到登录页面
-                response.sendRedirect("loginPage");
-                System.out.println("Intercepted");
-                return false;
-            }
-            else {
-                UserSessionCookieUtil.setUserIDSession(String.valueOf(userByNameAndEmail.getUserid()), request);
-//                request.getSession().setAttribute("userid", userByNameAndEmail.getUserid());
-//                System.out.println("request.getAttribute.userid="+request.getSession().getAttribute("userid"));
-                System.out.println("Released");    //cookie存在，放行
+        boolean userAgnet = JudgeUserAgentUtil.getUserAgnet(request);
+        System.out.println(userAgnet);
+        System.out.println("preHandle->session userid:"+session_userid);
+        if (JudgeUserAgentUtil.getUserAgnet(request)){
+            if (session_userid!=null) {
+                //session不为空，则放行，
+                System.out.println("Released 1");
                 return true;
+            }else {   //session不存在则判断cookie是否存在
+                User userByNameAndEmail = UserSessionCookieUtil.getUserByCookie(request);
+//                System.out.println(userByNameAndEmail);
+                if (userByNameAndEmail==null){   //cookie不存在，则拦截，并重定向到登录页面
+                    response.sendRedirect("registerPage");
+                    System.out.println("Intercepted");
+                    return false;
+                }
+                else {
+                    UserSessionCookieUtil.setUserIDSession(String.valueOf(userByNameAndEmail.getUserid()), request);
+                    System.out.println("Released 2");    //cookie存在，放行
+                    return true;
+                }
             }
+        }else{
+            response.sendRedirect("warnPage");
+            return false;
         }
+
     }
 
     //在目标执行完后，视图返回对象之前执行,如没有return异常，不会执行postHandle

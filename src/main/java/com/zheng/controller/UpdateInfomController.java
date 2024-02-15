@@ -6,6 +6,7 @@ import com.zheng.service.*;
 import com.zheng.utils.GetNowDataUtil;
 import com.zheng.utils.UserSessionCookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.objenesis.SpringObjenesis;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,6 +30,8 @@ public class UpdateInfomController {
     private DailyService dailyService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private StudyWordService studyWordService;
 
 
     @RequestMapping(value = "/creatDaily", method = RequestMethod.POST)
@@ -53,6 +56,14 @@ public class UpdateInfomController {
         int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
         String time = GetNowDataUtil.getNowData();
         dailyService.addSearchedWordCount(userid, time);
+    }
+
+    @RequestMapping(value = "/setStudyWordState", method = RequestMethod.POST)
+    @ResponseBody
+    public boolean setStudyWordState(int state,int wordid,HttpServletRequest request) {
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+        boolean b = studyWordService.setStudyWordState(state, userid, wordid);
+        return b;
     }
 
     @RequestMapping(value = "/deleteSearchWordHistory", method = RequestMethod.POST)
@@ -221,12 +232,16 @@ public class UpdateInfomController {
     }
 
 
+    /*修改用户基本信息*/
     @RequestMapping(value = "/updateUserData", method = RequestMethod.POST)
     @ResponseBody
     public boolean updateUserData(String newValue, String category,HttpServletRequest request) {
         int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
         return userService.updateUserDataService(newValue, category, userid);
     }
+
+    /*修改密码*/
+
 
 
 

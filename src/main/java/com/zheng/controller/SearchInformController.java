@@ -30,6 +30,29 @@ public class SearchInformController {
     private UserBookService userBookService;
     @Autowired
     private DailyService dailyService;
+    @Autowired
+    private StudyWordService studyWordService;
+
+
+
+    @RequestMapping(value = "/getStudyWordRememberHistory", method = RequestMethod.GET)
+    @ResponseBody
+    List<StudyWordRemenberHistory> getStudyWordRememberHistory(int wordid, HttpServletRequest request) {
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+        List<StudyWordRemenberHistory> history = studyWordService.getStudyWordRememberHistory(wordid, userid);
+        return history;
+    }
+
+    @RequestMapping(value = "/getStudyWordInformation", method = RequestMethod.GET)
+    @ResponseBody
+    StudyWord getStudyWordInformation(int wordid, HttpServletRequest request) {
+        System.out.println(wordid);
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+        System.out.println(userid);
+        StudyWord word = studyWordService.getStudyWordInformation(wordid, userid);
+        System.out.println(word);
+        return word;
+    }
 
 
     @RequestMapping(value = "/getWordsSearchTimesRank", method = RequestMethod.GET)
@@ -101,10 +124,7 @@ public class SearchInformController {
     @RequestMapping(value = "/searchWordById", method = RequestMethod.GET)
     @ResponseBody
     public Word searchWordById(int wordid) {
-        System.out.println("wordid:" + wordid);
-        Word word = wordService.findWordById(wordid);
-        System.out.println(word);
-        return word;
+        return wordService.findWordById(wordid);
     }
 
     /**
@@ -181,7 +201,6 @@ public class SearchInformController {
         User user = userService.findUserById(userid);
         return user;
     }
-
 
 
 }
