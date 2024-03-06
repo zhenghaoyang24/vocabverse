@@ -61,6 +61,7 @@ public class WordServiceImpl implements WordService {
 
     /**
      * 添加单词历史
+     *
      * @param history
      * @return
      */
@@ -69,10 +70,10 @@ public class WordServiceImpl implements WordService {
         SqlSession sqlSession = sqlSessionFactory.openSession(true);
         VocabularyMapper mapper = sqlSession.getMapper(VocabularyMapper.class);
         SearchWordHistory searchWordHistory = mapper.judgSearchWordHistory(history.getWordid(), history.getUserid());
-        if (searchWordHistory!=null){   //判断该用户是否已经有单词历史
+        if (searchWordHistory != null) {   //判断该用户是否已经有单词历史
             sqlSession.close();
             return false;
-        }else{
+        } else {
             boolean b = mapper.addSearchedWordHistory(history);
             sqlSession.close();
             return b;
@@ -81,6 +82,7 @@ public class WordServiceImpl implements WordService {
 
     /**
      * 所有单词历史
+     *
      * @param userid
      * @return
      */
@@ -95,6 +97,7 @@ public class WordServiceImpl implements WordService {
 
     /**
      * 删除一个单词历史
+     *
      * @param wordid
      * @param userid
      * @return
@@ -110,6 +113,7 @@ public class WordServiceImpl implements WordService {
 
     /**
      * 删除所有单词历史
+     *
      * @param userid
      * @return
      */
@@ -138,6 +142,23 @@ public class WordServiceImpl implements WordService {
         List<Word> timesRank = mapper.getWordsStudyTimesRank();
         sqlSession.close();
         return timesRank;
+    }
+
+    @Override
+    public boolean updateWordStudyTime(int wordid, String type) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        VocabularyMapper mapper = sqlSession.getMapper(VocabularyMapper.class);
+        if (type.equals("add")) {
+            mapper.addWordStudtTime(wordid);
+            return true;
+        } else if (type.equals("sub")) {
+            mapper.subWordStudtTime(wordid);
+            return true;
+
+        } else {
+            return false;
+        }
+
     }
 
 

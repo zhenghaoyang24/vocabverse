@@ -116,6 +116,7 @@
 }
 
 .wordspelling > span {
+    user-select: text;
     color: white;
     font-family: Arial, serif;
     font-weight: 800;

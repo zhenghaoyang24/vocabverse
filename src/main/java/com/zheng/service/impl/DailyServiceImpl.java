@@ -41,4 +41,24 @@ public class DailyServiceImpl implements DailyService {
         sqlSession.close();
         return b;
     }
+
+    @Override
+    public boolean setShouldStudy(int shouldstudy, int userid, String time) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        DailyMapper mapper = sqlSession.getMapper(DailyMapper.class);
+        boolean b = mapper.setShouldStudy(shouldstudy,userid, time);
+        sqlSession.close();
+        return b;
+    }
+
+
+    /*设置学习次数 单词数 时间  反馈时*/
+    @Override
+    public boolean updateDailyFeedbackDate(Daily daily) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        DailyMapper mapper = sqlSession.getMapper(DailyMapper.class);
+        boolean b = mapper.updateDailyFeedbackDate(daily);
+        sqlSession.close();
+        return b;
+    }
 }

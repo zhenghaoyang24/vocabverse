@@ -8,6 +8,10 @@ public interface ExampleService {
 
     List<Example> findExampleByWordId(int wordid);
 
+    Example findExampleByExapid(int exapid);
+
+    Example findMostHeatExample(int wordid);
+
     boolean addHeat(int heat,int exapid);
 
 
@@ -16,4 +20,6 @@ public interface ExampleService {
     boolean deleteExample(int exapid);
 
     boolean editExample(Example example);
+
+
 }

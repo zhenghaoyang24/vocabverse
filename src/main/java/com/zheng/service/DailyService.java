@@ -9,4 +9,8 @@ public interface DailyService {
 
 
     boolean addSearchedWordCount(int userid, String time);
+
+    boolean setShouldStudy(int shouldstudy, int userid, String time);
+
+    boolean updateDailyFeedbackDate(Daily daily);
 }

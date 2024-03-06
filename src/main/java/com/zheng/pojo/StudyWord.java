@@ -4,6 +4,10 @@ public class StudyWord {
 
     int userid;
     int wordid;
+
+    Word word;
+
+
     int exapid;
 
     Example example;
@@ -23,6 +27,14 @@ public class StudyWord {
     String laststudydate;
     String nextstudydate;
     int state;
+
+    public Word getWord() {
+        return word;
+    }
+
+    public void setWord(Word word) {
+        this.word = word;
+    }
 
     public Example getExample() {
         return example;
@@ -181,6 +193,7 @@ public class StudyWord {
         return "StudyWord{" +
                 "userid=" + userid +
                 ", wordid=" + wordid +
+                ", word=" + word +
                 ", exapid=" + exapid +
                 ", example=" + example +
                 ", q_0=" + q_0 +

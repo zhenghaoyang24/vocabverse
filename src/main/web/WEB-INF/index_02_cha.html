@@ -53,8 +53,9 @@
     <div class="public_notification_content">{{no_content}}</div>
 </div>
 <!--弹窗-->
-<div id="MessageBoxContent" class="MessageBoxDiv" @click="tipEffection">
-    <div id="messageBox" class="MessageBox" :class="{'MessageBoxBorderFrames':borderFramesValue}" @animationend="tipEffectionEnd">
+<div @touchmove.prevent="false" id="MessageBoxContent" class="MessageBoxDiv" @click="tipEffection">
+    <div id="messageBox" class="MessageBox" :class="{'MessageBoxBorderFrames':borderFramesValue}"
+         @animationend="tipEffectionEnd">
         <div class="MessageBoxContent">{{messageBoxQuestion}}</div>
         <div class="MessageBoxController">
             <span @click.stop="messageBoxConfirmBtn(true)">确认</span>
@@ -113,7 +114,7 @@
                        type="text"
                        v-on:input="searchWordInput"
                        name="inputText" v-model="inputText" required>
-                <div class="search_history_div" v-show="this.wordList.length===0">
+                <div class="search_history_div" v-show="this.wordList.length===0&&inputText.length===0">
                     <div class="search_history_div_title">
                         <span>搜索历史</span>
                         <span @click="deleteAllSearchWordHistoryBtn"></span>
@@ -142,6 +143,9 @@
                             </div>
                         </li>
                     </ul>
+                </div>
+                <div class="searchQuickDiv" style="color: #d2d2d2;padding-top: 20px;padding-bottom: 20px" v-show="this.wordList.length===0&&inputText.length!==0">
+                    没有搜索到任何单词，请检查你的拼写是否正确
                 </div>
             </div>
 
@@ -229,7 +233,7 @@
             },
             deleteAllSearchWordHistoryBtn() {
                 let _this = this
-                MessageBoxContent.openMessageBox("你确定要删除所有搜索历史吗？")
+                MessageBoxVue.openMessageBox("你确定要删除所有搜索历史吗？")
                 let r = new Promise((resolve) => {
                     let timer = setInterval(() => {   //定时器
                         let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
@@ -256,7 +260,7 @@
             },
             deleteTheWordHistory(wordid) {
                 let _this = this
-                MessageBoxContent.openMessageBox("你确定要删除这个搜索历史吗？")
+                MessageBoxVue.openMessageBox("你确定要删除这个搜索历史吗？")
                 let r = new Promise((resolve) => {
                     let timer = setInterval(() => {   //定时器
                         let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
@@ -295,28 +299,14 @@
                 })
             },
             async fetchDaily() {
-                await this.getDailyAxios();
-                if (this.daily === "") {
-                    await this.creatDailyAxios();
-                } else {
-                    this.numberAddDirective()
-                }
-
-            },
-            creatDailyAxios() {
-                axios({
-                    method: "post",
-                    url: "update/creatDaily"
-                })
-            },
-            async getDailyAxios() {
                 let _this = this
                 await axios({
                     method: "get",
-                    url: "search/dailyExist"
+                    url: "search/getDaily"
                 }).then(function (data) {
                     _this.daily = data.data
                 })
+                this.numberAddDirective()
 
             },
             /*增加用户搜索过的单词数*/
@@ -329,6 +319,7 @@
             closeSearchQuickDiv() {
                 this.wordList = []
                 this.inputText = ''
+                console.log(this.wordList.length)
             },
             fetchUserId() {
                 const _this = this;
@@ -411,11 +402,11 @@
     })
 
     /*弹窗*/
-    const MessageBoxContent = new Vue({
+    const MessageBoxVue = new Vue({
         el: "#MessageBoxContent",
         data: {
             messageBoxQuestion: "",
-            borderFramesValue:false
+            borderFramesValue: false
         },
         methods: {
             /*public确认还是取消按钮并关闭弹窗*/
@@ -423,24 +414,33 @@
                 // console.log("v="+v)
                 window.sessionStorage.setItem("messageBoxConfirmValue", v);
                 //关闭弹窗
-                let messageBox = document.getElementById("messageBox");
+                // let messageBox = document.getElementById("messageBox");
                 let MessageBoxContent = document.getElementById("MessageBoxContent");
                 MessageBoxContent.style.display = "none"
-                messageBox.style.marginTop = "-200px";
+                // messageBox.style.marginTop = "-200px";
+                let m = function (e) {
+                    e.preventDefault();
+                };
+                document.body.style.overflow = '';
+                document.addEventListener('touchmove', m, {passive: true});//禁止页面滑动
                 // console.log(window.sessionStorage.getItem("messageBoxConfirmValue")==="true")
             },
             /*打开弹窗 其他vue实例使用*/
             openMessageBox(content) {
+                let m = function (e) {
+                    e.preventDefault();
+                };
+                document.body.style.overflow = 'hidden';
+                document.addEventListener('touchmove', m, {passive: false});//禁止页面滑动
                 sessionStorage.setItem("messageBoxConfirmValue", "null");
                 this.messageBoxQuestion = content
                 // this.functionName = functionName
-                let messageBox = document.getElementById("messageBox");
+                // let messageBox = document.getElementById("messageBox");
                 let MessageBoxContent = document.getElementById("MessageBoxContent");
                 MessageBoxContent.style.display = "flex"
-                messageBox.style.marginTop = "20px";
+                // messageBox.style.marginTop = "20px";
             },
             tipEffection() {
-                console.log("123")
                 this.borderFramesValue = true
             },
             tipEffectionEnd() {

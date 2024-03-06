@@ -24,6 +24,24 @@ public class ExampleServiceImpl implements ExampleService {
     }
 
     @Override
+    public Example findExampleByExapid(int exapid) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        ExampleMapper mapper = sqlSession.getMapper(ExampleMapper.class);
+        Example example = mapper.findExampleByExapid(exapid);
+        sqlSession.close();
+        return example;
+    }
+
+    @Override
+    public Example findMostHeatExample(int wordid) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        ExampleMapper mapper = sqlSession.getMapper(ExampleMapper.class);
+        Example example = mapper.findMostHeatExample(wordid);
+        sqlSession.close();
+        return example;
+    }
+
+    @Override
     public boolean addHeat(int heat, int exapid) {
         SqlSession sqlSession = sqlSessionFactory.openSession(true);
         ExampleMapper mapper = sqlSession.getMapper(ExampleMapper.class);

@@ -14,7 +14,7 @@ public interface VocabularyMapper {
     List<Word> findByLetterEn(@Param("letter") String letter);
 
     /*根据中文搜索单词*/
-    @Select("SELECT * FROM tb_vocabulary WHERE paraphrase LIKE CONCAT('%',#{letter},'%') LIMIT 50")
+    @Select("SELECT * FROM tb_vocabulary WHERE paraphrase LIKE CONCAT('%',#{letter},'%') ORDER BY frequency  DESC  LIMIT 50")
     List<Word> findByLetterCn(@Param("letter") String letter);
 
     /*根据id搜索单词*/
@@ -30,10 +30,13 @@ public interface VocabularyMapper {
     */
     @Insert(value = "insert into tb_voc_history(userid,wordid,spelling) values (#{userid},#{wordid},#{spelling});")
     boolean addSearchedWordHistory(SearchWordHistory history);
+
     @Select(value = ("select * from tb_voc_history where wordid=#{wordid} and userid=#{userid}"))
     SearchWordHistory judgSearchWordHistory(@Param("wordid") int wordid, @Param("userid") int userid);
+
     @Select("select * from tb_voc_history where userid = #{userid}")
     List<SearchWordHistory> getAllSearchWordHistory(int userid);
+
     @Update("delete from tb_voc_history where wordid=#{wordid} and userid=#{userid}")
     boolean deleteSearchWordHistory(@Param("wordid") int wordid, @Param("userid") int userid);
 
@@ -45,6 +48,12 @@ public interface VocabularyMapper {
 
     @Select("SELECT * FROM tb_vocabulary order by studytimes desc limit 15")
     List<Word> getWordsStudyTimesRank();
+
+    @Update("update tb_vocabulary set studytimes =studytimes +1 where wordid = #{wordid}")
+    boolean addWordStudtTime(@Param("wordid") int wordid);
+
+    @Update("update tb_vocabulary set studytimes =studytimes -1 where wordid = #{wordid}")
+    boolean subWordStudtTime(@Param("wordid") int wordid);
 
 
 }

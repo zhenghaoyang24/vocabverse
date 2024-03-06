@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -187,7 +186,7 @@ public class UserLoginController {
             return "emailexit";
         } else {  //注册成功，
             System.out.println("signup success");
-            String nowData = GetNowDataUtil.getNowData();
+            String nowData = GetDateUtil.getNowData();
             user.setRegtime(nowData);
             user.setLevel(0);
             user.setGender(2);  //2为外星人

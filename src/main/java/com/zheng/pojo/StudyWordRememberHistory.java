@@ -1,6 +1,6 @@
 package com.zheng.pojo;
 
-public class StudyWordRemenberHistory {
+public class StudyWordRememberHistory {
     int userid;
     int wordid;
     int opt;
@@ -40,7 +40,7 @@ public class StudyWordRemenberHistory {
 
     @Override
     public String toString() {
-        return "StudyWordRemenberHistory{" +
+        return "StudyWordRememberHistory{" +
                 "userid=" + userid +
                 ", wordid=" + wordid +
                 ", opt=" + opt +

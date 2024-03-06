@@ -8,6 +8,26 @@ public class Daily {
     int studyword;
     int studytime;
 
+    int studyduration;
+
+    int shouldstudy;
+
+    public int getShouldstudy() {
+        return shouldstudy;
+    }
+
+    public void setShouldstudy(int shouldstudy) {
+        this.shouldstudy = shouldstudy;
+    }
+
+    public int getStudyduration() {
+        return studyduration;
+    }
+
+    public void setStudyduration(int studyduration) {
+        this.studyduration = studyduration;
+    }
+
     public int getUserid() {
         return userid;
     }
@@ -65,6 +85,8 @@ public class Daily {
                 ", searchedword=" + searchedword +
                 ", studyword=" + studyword +
                 ", studytime=" + studytime +
+                ", studyduration=" + studyduration +
+                ", shouldstudy=" + shouldstudy +
                 '}';
     }
 }

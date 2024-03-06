@@ -2,7 +2,7 @@ package com.zheng.utils;
 
 import java.util.Calendar;
 
-public class GetNowDataUtil {
+public class GetDateUtil {
 
     private static Calendar cal;
 
@@ -20,6 +20,16 @@ public class GetNowDataUtil {
         return y+"-"+m+"-"+d;
 
     }
+
+    public static String getNextDate(int day){
+        cal=Calendar.getInstance();
+        cal.add(Calendar.DATE, day);
+        int y=cal.get(Calendar.YEAR);
+        int m=cal.get(Calendar.MONTH)+1;
+        int d=cal.get(Calendar.DATE);;
+        return y+"-"+m+"-"+d;
+    }
+
 
 
 

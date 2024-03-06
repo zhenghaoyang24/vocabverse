@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Werse词境 学习</title>
+    <script src="js/echarts.min.js"></script>
     <script src="js/jquery-3.7.0.min.js"></script>
     <script src="js/vue.js"></script>
     <script src="js/axios-0.18.0.js"></script>
@@ -11,6 +12,16 @@
     <link rel="stylesheet" href="css/public/main.css">
     <link rel="stylesheet" href="css/top-nav.css">
     <link rel="stylesheet" href="css/index_01.css">
+    <style>
+        /*弹出框动效*/
+        .MessageBoxBorderFrames {
+            animation: MessageBoxBorderFrames 0.3s linear;
+        }
+        .left_sort_span_focus {
+            background-color: var(--greenColor00e57b);
+            color: #1a1a1a;
+        }
+    </style>
 </head>
 <body>
 <!-- 顶部导航栏，三个元素 -->
@@ -65,17 +76,227 @@
     </div>
     <div class="public_notification_content">{{no_content}}</div>
 </div>
+<!--弹窗-->
+<div @touchmove.prevent="false" id="MessageBoxContent" class="MessageBoxDiv" @click="tipEffection">
+    <div id="messageBox" class="MessageBox" :class="{'MessageBoxBorderFrames':borderFramesValue}"
+         @animationend="tipEffectionEnd">
+        <div class="MessageBoxContent">{{messageBoxQuestion}}</div>
+        <div class="MessageBoxController">
+            <span @click.stop="messageBoxConfirmBtn(true)">确认</span>
+            <span @click.stop="messageBoxConfirmBtn(false)">取消</span>
+        </div>
+    </div>
+</div>
 <!--内容-->
 <div class="content-body">
     <div class="content-div" id="studyApp">
-        <div class="study_rate_div">
-            <span>1</span>
-            <span>3</span>
+        <!--复习-->
+        <div v-if="studyingOrNot">
+            <div class="study_rate_div">
+                <span :style="{'width':tittleGreenWidth+'%'}">{{daily.studyword}}</span>
+                <span :style="{'width':100-tittleGreenWidth+'%'}">{{daily.shouldstudy - daily.studyword}}</span>
+            </div>
+            <div class="study_control_div">
+                <div class="study_today_progress_div">
+                    <span>{{daily.studyword}}/{{daily.shouldstudy}}</span>
+                    <span>复习次数:{{daily.studytime}}</span>
+                </div>
+                <div class="study_today_control_div">
+                    <span @click="alreadyKnownBtn"></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <!--复习与释义-->
+            <div v-if="thinkingOrNot" @mousedown.left.self="nextWordBtn" @mousemove="nextWordCancelBtn"
+                 @mouseup.left.self="nextWordCancelBtn" class="study_content_div">
+                <div class="study_word_inform">
+                    <div class="study_word_audio_div">
+                        <h1>{{studyWord.word.spelling}}</h1>
+                        <div class="study_audio_div">
+                            <div class="study_audio_UK_USA_div" style="padding-right: 10px" id="UK_audio_btn"
+                                 @click.stop="playAudio($event)">英[{{studyWord.word.ukphonetic}}]<span
+                                    class="study_audio_icon"></span>
+                            </div>
+                            <audio id="UK_audio" preload="metadata" :src="audio_type1"></audio>
+                            <div class="study_audio_UK_USA_div" id="USA_audio_btn" @click.stop="playAudio($event)">
+                                美[{{studyWord.word.usphonetic}}]<span class="study_audio_icon"></span></div>
+                            <audio id="USA_audio" preload="metadata" :src="audio_type2"></audio>
+                        </div>
+                    </div>
+                    <div class="study_example_div">
+                        <span v-html="highLightWord(studyWord.example.en)">{{studyWord.example.en}}</span>
+                        <span class="example_audio_btn" @click.stop="playExampleAudio()"></span>
+                        <audio @ended="exampleEnded" id="example_audio" preload="metadata" :src="audio_example"></audio>
+                    </div>
+                </div>
+                <div class="study_bottom_div">
+                    <div style="width: 80px">
+
+                    </div>
+                    <div class="study_tip_div">
+                        <span class="tip_text_span"><span class="tip_icon"></span>：稍想片刻后，长按<span
+                                class="shubiao_left_icon"></span> (鼠标左键)上方空白处查看释义。</span>
+                    </div>
+                    <div class="next_word_div">
+                        查看释义
+                        <div class="nextWordFrames"></div>
+                    </div>
+                </div>
+            </div>
+            <div v-else class="study_paraphrase_content">
+                <div class="study_paraphrase_content_left">
+                    <div class="study_paraphrase_content_left_spelling">
+                        <h1>{{studyWord.word.spelling}}</h1>
+                        <div class="spelling_detail_div">、
+                            <span class="spelling_detail_icon" @click="theWordDetail(studyWord.word.wordid)"></span>
+                            <span class="spelling_detail_text">查看单词详情</span>
+                        </div>
+                    </div>
+                    <div class="study_audio_div">
+                        <div class="study_audio_UK_USA_div" style="padding-right: 10px" id="UK_audio_btn_paraphrase"
+                             @click.stop="playAudio($event)">英[{{studyWord.word.ukphonetic}}]<span
+                                class="study_audio_icon"></span>
+                        </div>
+                        <audio id="UK_audio_paraphrase" preload="metadata" :src="audio_type1"></audio>
+                        <div class="study_audio_UK_USA_div" id="USA_audio_btn_paraphrase"
+                             @click.stop="playAudio($event)">
+                            美[{{studyWord.word.usphonetic}}]<span class="study_audio_icon"></span></div>
+                        <audio id="USA_audio_paraphrase" preload="metadata" :src="audio_type2"></audio>
+                    </div>
+                    <div class="wordParaphraseDiv">
+                        <h3 style="color: var(--greenColor00e57b)">释义</h3>
+                        <div style="user-select: text;">{{studyWord.word.paraphrase}}</div>
+                    </div>
+                    <div style="padding-top: 30px">
+                        <div class="study_example_title_div">
+                            <h3>提示例句</h3>
+                            <span></span>
+                        </div>
+                        <div class="study_example_paraphrase_div">
+                            <div style="align-items: center">
+                                <span style="font-size: 1.1em"
+                                      v-html="highLightWord(this.studyWord.example.en)">{{studyWord.example.en}}</span>
+                                <span class="example_audio_btn example_audio_paraphrase_btn"
+                                      @click.stop="playExampleAudioParaphrase()"></span>
+                                <audio @ended="exampleEnded" id="example_audio_paraphrase" preload="metadata"
+                                       :src="audio_example"></audio>
+                            </div>
+                            <div style="font-size: 1em">{{studyWord.example.cn}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="study_paraphrase_content_right">
+                    <div class="study_information">
+                        <div class="today_information_div">
+                            <div class="today_information_item">
+                                <div>{{studyWord.day_studycount}}次</div>
+                                <div><span class="today_information_item_day_studycount"></span>今天复习</div>
+                            </div>
+                            <div class="today_information_item">
+                                <div v-html="timeCount(oneWordThinkTime)">{{oneWordThinkTime}}</div>
+                                <div><span class="today_information_item_day_oneWordThinkTime"></span>思考时间</div>
+                            </div>
+                        </div>
+                        <div id="stackChart" style="width: 100%;height: 150px;padding-top: 20px">
+
+                        </div>
+                    </div>
+                    <div class="feedBack_control_div">
+                        <div v-show="qualityState!==-1" style="padding-bottom: 10px">
+                            <div v-show="qualityState===3" class="feedBack_control_introduce_div">
+                                <img src="image/public_icon/emoji/green.png">
+                                <div class="feedBack_control_introduce_text_div">
+                                    看到单词立马能想起意思(选择后今天不再复习)
+                                </div>
+                            </div>
+                            <div v-show="qualityState===2" class="feedBack_control_introduce_div">
+                                <img src="image/public_icon/emoji/blue.png">
+                                <div class="feedBack_control_introduce_text_div">
+                                    片刻思考后能想起意思
+                                </div>
+                            </div>
+                            <div v-show="qualityState===1" class="feedBack_control_introduce_div">
+                                <img src="image/public_icon/emoji/orange.png">
+                                <div class="feedBack_control_introduce_text_div">
+                                    对单词有模糊印象，但不确定具体含义
+                                </div>
+                            </div>
+                            <div v-show="qualityState===0" class="feedBack_control_introduce_div">
+                                <img src="image/public_icon/emoji/red.png">
+                                <div class="feedBack_control_introduce_text_div">
+                                    不知道这个单词，没有任何印象
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feedBack_control_btn_div">
+                            <span id="quality_3" @mousedown="qualityBtn(3)" @dblclick="nextWord(3)">了如指掌</span>
+                            <span id="quality_2" @mousedown="qualityBtn(2)" @dblclick="nextWord(2)">恍然大悟</span>
+                            <span id="quality_1" @mousedown="qualityBtn(1)" @dblclick="nextWord(1)">模模糊糊</span>
+                            <span id="quality_0" @mousedown="qualityBtn(0)" @dblclick="nextWord(0)">茫无所知</span>
+                        </div>
+                        <div class="feedBack_control_tip">
+                            <span></span>&nbsp;
+                            单击选中选项，双击学习下一个单词。
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+
         </div>
-        <div class="study_content_div">
+        <!--完成页面-->
+        <div v-else style="display: flex">
 
+            <div class="studying_not_left_div">
+                <div class="studying_not_left_title_div">
+                    <div>今日学习单词</div>
+                    <div class="studying_not_left_control_div">
+                        <span id="left_sort_1" @click="leftSortBtn(1)">全部</span>
+                        <span id="left_sort_2" @click="leftSortBtn(2)">模糊</span>
+                        <span id="left_sort_3" @click="leftSortBtn(3)">顽固</span>
+                    </div>
+                </div>
+                <div class="studying_not_left_item_div">
+                    <div v-show="studiedWordSortState===1" v-for="(item,index) in todayStudiedWords" class="todayStudiedWords_item"
+                         @click="theWordDetail(item.word.wordid)">
+                        <span>{{item.word.spelling}}</span>
+                        <span>详情</span>
+                    </div>
+                    <div v-show="studiedWordSortState===2&&item.day_q_1!==0" v-for="(item,index) in todayStudiedWords" class="todayStudiedWords_item"
+                         @click="theWordDetail(item.word.wordid)">
+                        <span>{{item.word.spelling}}</span>
+                        <span>详情</span>
+                    </div>
+                    <div v-show="studiedWordSortState===3&&item.day_q_0!==0" v-for="(item,index) in todayStudiedWords" class="todayStudiedWords_item"
+                         @click="theWordDetail(item.word.wordid)">
+                        <span>{{item.word.spelling}}</span>
+                        <span>详情</span>
+                    </div>
+                </div>
+            </div>
 
-
+            <div class="studying_not_right_div">
+                <h1 style="color: whitesmoke;margin: 0;padding-bottom: 20px">{{getNowDateFilter()}}</h1>
+                <div class="studying_not_right_today_information_div">
+                    <div v-if="!studyingOrNot" class="today_information_item">
+                        <div>{{daily.studyword}}个</div>
+                        <div><span class="today_information_item_day_studywordcount"></span>学习单词</div>
+                    </div>
+                    <div class="today_information_item">
+                        <div>{{daily.studytime}}次</div>
+                        <div><span class="today_information_item_day_studycount"></span>复习次数</div>
+                    </div>
+                    <div class="today_information_item">
+                        <div v-html="timeCount(daily.studyduration)">{{daily.studyduration}}</div>
+                        <div><span class="today_information_item_day_oneWordThinkTime"></span>学习时间</div>
+                    </div>
+                </div>
+                <div id="stackStudiedChart" style="width: auto;height: 150px;padding-top: 20px"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -84,10 +305,607 @@
     const studyApp = new Vue({
         el: '#studyApp',
         data: {
-            studyFinished: false,   //是否还有单词未学习，显示记单词还是已经打卡页面
+            studyingOrNot: false,   //是否还有单词未学习，显示记单词还是已经打卡页面
+            thinkingOrNot: false,  //思考 释义
+            qualityState: -1,  //选择
+            daily: [],
+            audio_type1: '',  //英英
+            audio_type2: '',   //美英
+            audio_example: '',  //例句音源
+            tittleGreenWidth: 0,
+            lastStudyWord: [],  //复习的上一个单词
+            studyWord: {},
+            todayStudiedWords: [],  //今天学习的单词
+            downTime: 0,
+            downState: false,  //false为抬起状态 true为按下
+            totalStudyTime: 0,  //总学习时间
+            totalStudyTimer: null,  //总学习时间计时器
+            oneWordThinkTime: 0, //单个思考时间
+            oneWordThinkTimer: null,  //单个思考时间计时器
+            studiedWordSortState: 1,   //排序属性
+
         },
-        methods: {}
+        watch: {
+            // studiedWordSortState(newValue, oldValue) {
+            //     let id_new = document.getElementById("left_sort_" + newValue);
+            //     let id_old = document.getElementById("left_sort_" + oldValue);
+            //     console.log(id_new)
+            //     id_old.classList.remove("left_sort_span_focus");
+            //     id_new.classList.add("left_sort_span_focus");
+            // },
+            qualityState(newValue, oldValue) {
+                const id_new = document.getElementById("quality_" + newValue)
+                if (oldValue === -1) {
+                    this.qualityState = newValue
+                    id_new.style.borderColor = '#ffffff'
+                } else {
+                    this.qualityState = newValue
+                    const id_old = document.getElementById("quality_" + oldValue)
+                    id_new.style.borderColor = '#ffffff'
+                    id_old.style.borderColor = '#1a1a1a'
+                }
+            },
+            thinkingOrNot(newValue, oldValue) {
+                let _this = this
+                //画图
+                if (!newValue && oldValue) {
+                    setTimeout(() => {
+                        _this.stackChart()
+                    }, 50)
+                }
+                //单个学习时间
+                if (newValue) {
+                    _this.oneWordThinkTimer = setInterval(() => {   //定时器
+                        _this.oneWordThinkTime++
+                    }, 100);
+                } else {
+                    clearInterval(_this.oneWordThinkTimer)
+                }
+            },
+        },
+        created() {
+            this.fetchStudyWord()
+        },
+        methods: {
+            leftSortBtn(v){
+                let id_1 = window.document.getElementById("left_sort_1");
+                let id_2 = document.getElementById("left_sort_2");
+                let id_3 = document.getElementById("left_sort_3");
+                if (v===1){
+                    id_1.style.backgroundColor = "#00e57b"
+                    id_1.style.color = "#000000"
+                    id_2.style.backgroundColor = "#424242"
+                    id_3.style.backgroundColor = "#424242"
+                    id_2.style.color = "#efefef"
+                    id_3.style.color = "#efefef"
+                }
+                if (v===2){
+
+                    id_2.style.backgroundColor = "#ff9000"
+                    id_2.style.color = "#000000"
+                    id_1.style.backgroundColor = "#424242"
+                    id_3.style.backgroundColor = "#424242"
+                    id_1.style.color = "#efefef"
+                    id_3.style.color = "#efefef"
+                }
+                if (v===3){
+                    id_3.style.backgroundColor = "#ff0000"
+                    id_3.style.color = "#000000"
+                    id_1.style.backgroundColor = "#424242"
+                    id_2.style.backgroundColor = "#424242"
+                    id_1.style.color = "#efefef"
+                    id_2.style.color = "#efefef"
+                }
+                this.studiedWordSortState = v
+            },
+            /*获取今日学习过的单词*/
+            async getTadyStudiedWord() {
+                let _this = this
+                await axios({
+                    method: 'get',
+                    // url: 'update/feedbackStudyWord?quality=' + v
+                    url: 'search/getTodayStudiedWords'
+                }).then(function (data) {
+                    _this.todayStudiedWords = data.data
+                });
+            },
+            //fetchword时，不为空v=true ，nextWord v=false
+            totalStudyTimerFresh(v) {
+                let _this = this
+                if (v) { //计时器启动
+                    _this.totalStudyTime = 0
+                    _this.totalStudyTimer = setInterval(() => {   //定时器
+                        _this.totalStudyTime++
+                    }, 100);
+                } else {
+                    clearInterval(_this.totalStudyTimer)
+                }
+
+            },
+            nextWord(v) {
+                let _this = this
+                this.totalStudyTimerFresh(false)  //计时结束
+                axios({
+                    method: 'post',
+                    // url: 'update/feedbackStudyWord?quality=' + v
+                    url: 'update/feedbackStudyWord?wordid=' + _this.studyWord.wordid + '&quality=' + v + '&dayStudyCount=' + _this.studyWord.day_studycount + '&difficulty=' + _this.studyWord.word.difficulty + "&totalStudyTime=" + _this.totalStudyTime
+                }).then(function (data) {
+                    if (data.data) {
+                        _this.fetchStudyWord()
+                    } else {
+                        NotificationVue.showPublicNotification("error", "抱歉系统发生了未知错误，请稍后再试。")
+                    }
+                });
+
+
+                //获取下一个单词
+            },
+            qualityBtn(v) {
+                this.qualityState = v
+            },
+            nextWordBtn() {
+                let _this = this
+                let nextWordFrames = document.getElementsByClassName("nextWordFrames")[0];
+                let next_word_div = document.getElementsByClassName("next_word_div")[0];
+                if (this.downState === false) {
+                    this.downState = true
+                    next_word_div.style.color = "#ffffff"
+                    nextWordFrames.style.backgroundColor = "#00e57b"
+                    nextWordFrames.style.animation = "nextWordFrames 0.5s linear"
+                    next_word_div.style.border = "1px #00e57b solid"
+                    let timer = setInterval(() => {   //定时器
+                        if (_this.downState === false) {
+                            clearInterval(timer)
+                            _this.nextWordCancelBtn()
+                        } else {
+                            _this.downTime++
+                            if (_this.downTime >= 50) {
+                                _this.nextWordCancelBtn()
+                                clearInterval(timer)
+                                _this.thinkingOrNot = false  //释义
+
+                            }
+                        }
+                    }, 10)
+                }
+
+            },
+            stackChart() {
+                let _this = this
+                const myChart = echarts.init(document.getElementById('stackChart'));
+                window.addEventListener('resize', function () {
+                    myChart.resize();
+                });
+                const option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            // Use axis to trigger tooltip
+                            type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+                        },
+                    },
+                    legend: {
+                        textStyle: {
+                            color: '#ffffff',  //更改坐标轴文字颜色
+                            fontSize: 12      //更改坐标轴文字大小
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '3%',
+                        bottom: '0%',
+                        top: '25%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'value',
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#ffffff',  //更改坐标轴文字颜色
+                                fontSize: 12      //更改坐标轴文字大小
+                            }
+                        }
+                    },
+                    yAxis: {
+                        type: 'category',
+                        data: ['今天'],
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#ffffff',  //更改坐标轴文字颜色
+                                fontSize: 12      //更改坐标轴文字大小
+                            }
+                        }
+                    },
+                    series: [
+                        {
+                            itemStyle: {
+                                color: '#00e57b',
+                            },
+                            name: '了如指掌',
+                            type: 'bar',
+                            stack: 'total',
+                            label: {
+                                show: true
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            data: [0]
+                        },
+                        {
+                            itemStyle: {
+                                color: '#50a7ff',
+                            },
+                            name: '恍然大悟',
+                            type: 'bar',
+                            stack: 'total',
+                            label: {
+                                show: true
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            data: [_this.studyWord.day_q_2]
+                        },
+                        {
+                            name: '模模糊糊',
+                            type: 'bar',
+                            stack: 'total',
+                            label: {
+                                show: true
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            data: [_this.studyWord.day_q_1],
+                            itemStyle: {
+                                color: '#ff9000',
+                            }
+                        },
+                        {
+                            name: '茫无所知',
+                            type: 'bar',
+                            stack: 'total',
+                            label: {
+                                show: true
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            data: [_this.studyWord.day_q_0],
+                            itemStyle: {
+                                color: '#ff0000',
+                            }
+                        }
+                    ]
+                };
+                option && myChart.setOption(option);
+            },
+            stackStudiedChart(v) {
+                let q_3 = v.length
+                let q_2 = 0
+                let q_1 = 0
+                let q_0 = 0
+                for (let i = 0; i < v.length; i++) {
+                    q_2 = q_2 + v[i].day_q_2
+                    q_1 = q_1 + v[i].day_q_1
+                    q_0 = q_0 + v[i].day_q_0
+                }
+                let _this = this
+                const myChart = echarts.init(document.getElementById('stackStudiedChart'));
+                window.addEventListener('resize', function () {
+                    myChart.resize();
+                });
+                const option = {
+                    title: {
+                        text: '今日学习反馈记录',
+                        textStyle: {
+                            color: '#ffffff',  //更改坐标轴文字颜色
+                            fontSize: 17      //更改坐标轴文字大小
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            // Use axis to trigger tooltip
+                            type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+                        },
+                    },
+                    legend: {
+                        textStyle: {
+                            color: '#ffffff',  //更改坐标轴文字颜色
+                            fontSize: 12      //更改坐标轴文字大小
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '3%',
+                        bottom: '0%',
+                        top: '25%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'value',
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#ffffff',  //更改坐标轴文字颜色
+                                fontSize: 12      //更改坐标轴文字大小
+                            }
+                        }
+                    },
+                    yAxis: {
+                        type: 'category',
+                        data: ['次数'],
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#ffffff',  //更改坐标轴文字颜色
+                                fontSize: 12      //更改坐标轴文字大小
+                            }
+                        }
+                    },
+                    series: [
+                        {
+                            itemStyle: {
+                                color: '#00e57b',
+                            },
+                            name: '了如指掌',
+                            type: 'bar',
+                            stack: 'total',
+                            label: {
+                                show: true
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            data: [q_3]
+                        },
+                        {
+                            itemStyle: {
+                                color: '#50a7ff',
+                            },
+                            name: '恍然大悟',
+                            type: 'bar',
+                            stack: 'total',
+                            label: {
+                                show: true
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            data: [q_2]
+                        },
+                        {
+                            name: '模模糊糊',
+                            type: 'bar',
+                            stack: 'total',
+                            label: {
+                                show: true
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            data: [q_1],
+                            itemStyle: {
+                                color: '#ff9000',
+                            }
+                        },
+                        {
+                            name: '茫无所知',
+                            type: 'bar',
+                            stack: 'total',
+                            label: {
+                                show: true
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            data: [q_0],
+                            itemStyle: {
+                                color: '#ff0000',
+                            }
+                        }
+                    ]
+                };
+                option && myChart.setOption(option);
+
+            },
+            nextWordCancelBtn() {
+                this.downTime = 0
+                this.downState = false
+                let nextWordFrames = document.getElementsByClassName("nextWordFrames")[0];
+                let next_word_div = document.getElementsByClassName("next_word_div")[0];
+                next_word_div.style.color = "#1a1a1a"
+                nextWordFrames.style.backgroundColor = "#1a1a1a"
+                nextWordFrames.style.animation = "none"
+                next_word_div.style.border = "1px #1a1a1a solid"
+            },
+            exampleEnded() {
+                let example_audio_btn = document.getElementsByClassName("example_audio_btn")[0];
+                example_audio_btn.style.backgroundImage = "url('image/index-01/pause_audio.png')"
+            },
+            playExampleAudio() {
+                let example_audio_btn = document.getElementsByClassName("example_audio_btn")[0];
+                let example_audio = document.getElementById("example_audio");
+                if (example_audio.paused) {
+                    example_audio.currentTime = 0
+                    example_audio.play()
+                    example_audio_btn.style.backgroundImage = "url('image/index-01/play_audio.png')"
+                } else {
+                    example_audio.pause()
+                    example_audio_btn.style.backgroundImage = "url('image/index-01/pause_audio.png')"
+                }
+
+            },
+            playExampleAudioParaphrase() {
+                let example_audio_btn = document.getElementsByClassName("example_audio_btn")[0];
+                let example_audio_paraphrase = document.getElementById("example_audio_paraphrase");
+                if (example_audio_paraphrase.paused) {
+                    example_audio_paraphrase.currentTime = 0
+                    example_audio_paraphrase.play()
+                    example_audio_btn.style.backgroundImage = "url('image/index-01/play_audio.png')"
+                } else {
+                    example_audio_paraphrase.pause()
+                    example_audio_btn.style.backgroundImage = "url('image/index-01/pause_audio.png')"
+                }
+
+            },
+            playAudio(a) {
+                var id = a.currentTarget.id;
+                if (id === "UK_audio_btn") {
+                    // USA_audio.pause()
+                    const UK_audio = document.getElementById("UK_audio");
+                    UK_audio.play()
+                }
+                if (id === "USA_audio_btn") {
+                    const USA_audio = document.getElementById("USA_audio");
+                    // UK_audio.pause()
+                    USA_audio.play()
+                }
+                if (id === "UK_audio_btn_paraphrase") {
+                    const UK_audio_paraphrase = document.getElementById("UK_audio_paraphrase");
+                    // UK_audio.pause()
+                    UK_audio_paraphrase.play()
+                }
+                if (id === "USA_audio_btn_paraphrase") {
+                    const USA_audio_paraphrase = document.getElementById("USA_audio_paraphrase");
+                    // UK_audio.pause()
+                    USA_audio_paraphrase.play()
+                }
+
+
+            },
+            highLightWord(text) {
+                if (text.includes(this.studyWord.word.spelling)) {
+                    text = text.replace(
+                        this.studyWord.word.spelling,
+                        // 这里是替换成html格式的数据，最好再加一个样式权重，保险一点
+                        '<span style="color:#00e57b!important;">' + this.studyWord.word.spelling + '</span>'
+                    )
+                    return text
+                } else {
+                    return text
+                }
+            },
+            alreadyKnownBtn() {
+                MessageBoxVue.openMessageBox("标记熟知后，该词将不会安排再次复习，并马上进入下一个单词的学习。");
+                let r = new Promise((resolve) => {
+                    let timer = setInterval(() => {   //定时器
+                        let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
+                        if (messageBoxConfirmValue !== "null") {
+                            clearInterval(timer)
+                            resolve(messageBoxConfirmValue)
+                        }
+                    }, 100)
+                })
+                r.then((res) => {
+                    if (res === "true") {
+                        this.setStudyWordState(1)
+                    }
+                })
+            },
+            /*设置熟知*/
+            setStudyWordState(v) {
+                let _this = this
+                axios({
+                    method: 'post',
+                    url: 'update/setStudyWordState?state=' + v + '&wordid=' + _this.studyWord.wordid
+                }).then(function (data) {
+                    if (data.data === true) {
+                        _this.fetchStudyWord()  //获取下一个单词
+                        NotificationVue.showPublicNotification("success", "已将该单词标记为熟知单词。");
+                    } else {
+                        NotificationVue.showPublicNotification("error", "发生未知错误。");
+                    }
+                })
+            },
+            async fetchStudyWord() {
+                let _this = this
+                await axios({
+                    method: "get",
+                    url: "search/getTodayStudyWord"
+                }).then(function (data) {
+                    _this.studyWord = data.data
+                })
+                if (this.studyWord.length !== 0) {
+                    this.oneWordThinkTime = 0
+                    if (this.studyWord.laststudydate !== this.getNowDate()) {  //今天第一次记这个单词单词
+                        this.studyWord.day_q_0 = 0
+                        this.studyWord.day_q_1 = 0
+                        this.studyWord.day_q_2 = 0
+                        this.studyWord.day_studycount = 0
+                    }
+                    await this.fetchDaily()  //获取学习进度
+                    this.audio_type1 = "http://dict.youdao.com/dictvoice?type=1&audio=" + this.studyWord.word.spelling;
+                    this.audio_type2 = "http://dict.youdao.com/dictvoice?type=2&audio=" + this.studyWord.word.spelling;
+                    this.audio_example = "http://dict.youdao.com/dictvoice?type=2&audio=" + this.studyWord.example.en;
+                    this.studyingOrNot = true  //还有单词为学，显示学习页面
+                    this.thinkingOrNot = true   //思考页面
+                    this.totalStudyTimerFresh(true)  //计时启动
+                } else {
+                    this.studyingOrNot = false   //没有单词可学
+                    this.thinkingOrNot = false
+                    await this.fetchDaily()  //获取学习进度
+                    await this.getTadyStudiedWord()  //获取今日学习的单词
+                    this.stackStudiedChart(this.todayStudiedWords)
+                }
+
+
+            },
+            async fetchDaily() {
+                let _this = this
+                await axios({
+                    method: "get",
+                    url: "search/getDaily"
+                }).then(function (data) {
+                    _this.daily = data.data
+                })
+                let temp = this.daily.studyword / this.daily.shouldstudy * 100
+                if (temp <= 2 && temp > 0)
+                    this.tittleGreenWidth = 2
+                else if (temp >= 98 && temp < 100)
+                    this.tittleGreenWidth = 98
+                else {
+                    this.tittleGreenWidth = temp
+                }
+
+            },
+            getNowDate() {
+                let date = new Date()
+                return (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()).toString()
+            },
+            /*打卡完成时使用*/
+            getNowDateFilter() {
+                let date = new Date()
+                return (date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日').toString()
+            },
+            timeCount(time) {
+                if (time > 600) {
+                    return Math.floor(time / 600) + '分' + Math.floor((time % 600) / 10) + '秒'
+                } else {
+                    return Math.ceil(time / 10) + '秒'
+                }
+            },
+            /*跳转到单词详情*/
+            theWordDetail(wordid) {
+                sessionStorage.setItem("wordid", wordid);
+                sessionStorage.setItem("backFromWordDetailPageValue", "index_01");
+                axios({
+                    method: 'post',
+                    url: 'update/addSearchTimes?wordid=' + wordid,
+                }).then(function (data) {
+                    window.location.assign('wordDetailPage?wordid=' + wordid);
+                })
+            },
+
+        },
+
     })
+
+
     const NotificationVue = new Vue({
         el: "#notification",
         data: {
@@ -130,6 +948,52 @@
                 }, 3000)
             }
         },
+    })
+    /*弹窗*/
+    const MessageBoxVue = new Vue({
+        el: "#MessageBoxContent",
+        data: {
+            messageBoxQuestion: "",
+            borderFramesValue: false
+        },
+        methods: {
+            /*public确认还是取消按钮并关闭弹窗*/
+            messageBoxConfirmBtn(v) {
+                window.sessionStorage.setItem("messageBoxConfirmValue", v);
+                //关闭弹窗
+                // let messageBox = document.getElementById("messageBox");
+                let MessageBoxContent = document.getElementById("MessageBoxContent");
+                MessageBoxContent.style.display = "none"
+                // messageBox.style.marginTop = "-200px";
+                let m = function (e) {
+                    e.preventDefault();
+                };
+                document.body.style.overflow = '';
+                document.addEventListener('touchmove', m, {passive: true});//禁止页面滑动
+            },
+            /*打开弹窗 其他vue实例使用*/
+            openMessageBox(content) {
+                let m = function (e) {
+                    e.preventDefault();
+                };
+                document.body.style.overflow = 'hidden';
+                document.addEventListener('touchmove', m, {passive: false});//禁止页面滑动
+                sessionStorage.setItem("messageBoxConfirmValue", "null");
+                this.messageBoxQuestion = content
+                // this.functionName = functionName
+                // let messageBox = document.getElementById("messageBox");
+                let MessageBoxContent = document.getElementById("MessageBoxContent");
+                MessageBoxContent.style.display = "flex"
+                // messageBox.style.marginTop = "20px";
+            },
+            tipEffection() {
+                this.borderFramesValue = true
+            },
+            tipEffectionEnd() {
+                this.borderFramesValue = false
+            },
+
+        }
     })
 </script>
 

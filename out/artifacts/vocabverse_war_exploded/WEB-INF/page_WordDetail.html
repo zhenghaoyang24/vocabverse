@@ -6,7 +6,6 @@
     <script src="js/echarts.min.js"></script>
     <script src="js/jquery-3.7.0.min.js"></script>
     <script src="js/vue.js"></script>
-    <script src="js/element-ui@2.15.14-index.js"></script>
     <script src="js/axios-0.18.0.js"></script>
     <link rel="icon" href="image/logo-white.png">
     <!-- 引入样式 -->
@@ -250,7 +249,6 @@
     </div>
     <div class="content-body">
         <div class="content-div">
-
             <div class="wordDetailDivCon">
                 <div class="backBtn" @click="backBtn()">返回</div>
                 <div class="topControlDiv">
@@ -327,12 +325,12 @@
                                     <span @click="controlExampleBtn()"></span>
                                 </div>
                                 <div v-for="(item,index) in exampleList.slice(0, 7)" class="exampleItemDiv">
-                                    <div>{{item.en}}</div>
+                                    <div v-html="highLightWord(item.en)">{{item.en}}</div>
                                     <div>{{item.cn}}</div>
                                 </div>
                             </div>
                         </div>
-                        <div style="width: 500px;padding-left: 20px">
+                        <div style="width: 550px;padding-left: 20px">
                             <div class="word_detail_statistic">
                                 <span></span>
                                 <h3>我的学习情况</h3>
@@ -352,27 +350,31 @@
                                         <div style="display: flex" v-else-if="this.studyWord.state===1">
                                             <span style="background-color: #00e57b;">熟知单词</span>
                                         </div>
-                                        <span style="background-color: #50a7ff;">共复习{{studyWord.studycount}}次</span>
+                                        <span style="background-color: #50a7ff;">共学习{{studyWord.studycount}}天</span>
                                         <span style="background-color: #50a7ff;">{{studyWord.adddate}}加入计划</span>
                                         <span v-if="studyWord.laststudydate!==null" style="background-color: #50a7ff;">上次复习{{studyWord.laststudydate}}</span>
                                     </div>
                                 </div>
                                 <!--                            <div style="color: #c5c5c5;padding-left: 20px;font-size: 15px">该单词未在学习计划</div>-->
-                                <div id="word_detail_statistic_tiaoxing" style=";width: 95%;height: 400px;padding: 10px 0 10px 0;"></div>
+                                <div id="word_detail_statistic_tiaoxing"
+                                     style="width: 98%;height: 400px;padding: 10px 0 10px 0;"></div>
                                 <div style="width: auto;margin-top: -30px;border-top: 1px #4f4f4f solid;padding-top: 10px">
                                     <h4 style="padding: 0;margin: 0;color: whitesmoke">记忆历史</h4>
                                     <div v-if="studyWordRememberHistory.length!==0">
-                                        <h4 style="padding: 0;margin: 0;color: #adadad">{{studyWordRememberHistory[0].selectdate}}至{{studyWordRememberHistory[studyWordRememberHistory.length-1].selectdate}}</h4>
+                                        <h4 style="padding: 0;margin: 0;color: #adadad">
+                                            {{studyWordRememberHistory[0].selectdate}}至{{studyWordRememberHistory[studyWordRememberHistory.length - 1].selectdate}}|记忆{{studyWordRememberHistory.length}}次</h4>
                                         <div class="study_word_history">
                                             <div v-for="(item,index) in studyWordRememberHistory" style="display: flex">
-                                                <span v-if="item.opt===0"  style="background-color: #ff0000">忘记</span>
-                                                <span v-if="item.opt===1"  style="background-color: #50a7ff">能想起</span>
-                                                <span v-if="item.opt===2"  style="background-color: #ff9000">模糊</span>
-                                                <span v-if="item.opt===3"  style="background-color: #00e57b">认识</span>
+                                                <span v-if="item.opt===0" style="background-color: #ff0000">茫无所知</span>
+                                                <span v-if="item.opt===1"
+                                                      style="background-color: #ff9000">模模糊糊</span>
+                                                <span v-if="item.opt===2" style="background-color: #50a7ff">恍然大悟</span>
+                                                <span v-if="item.opt===3" style="background-color: #00e57b">了如指掌</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div style="padding-top: 5px;color: #b7b7b7" v-else>数据太少，复习几天再来看看吧。</div>
+                                    <div style="padding-top: 5px;color: #b7b7b7" v-else>数据太少，复习几天再来看看吧。
+                                    </div>
 
                                 </div>
                             </div>
@@ -441,6 +443,18 @@
 
         },
         methods: {
+            highLightWord(text) {
+                if (text.includes(this.word.spelling)) {
+                    text = text.replace(
+                        this.word.spelling,
+                        // 这里是替换成html格式的数据，最好再加一个样式权重，保险一点
+                        '<span style="color:#00e57b!important;">' + this.word.spelling + '</span>'
+                    )
+                    return text
+                } else {
+                    return text
+                }
+            },
             async fetchStudyWordRememberHistory() {
                 let _this = this
                 await axios({
@@ -474,9 +488,12 @@
                 }).then(function (data) {
                     if (data.data === true) {
                         _this.fetchMyStudyInfor()
-                        NotificationVue.showPublicNotification("success", "已将该单词标记为熟知单词。");
+                        if (v===1)
+                            NotificationVue.showPublicNotification("success", "已将该单词标记为熟知单词。");
+                        if (v===0)
+                            NotificationVue.showPublicNotification("success", "已将该单词从熟知单词删除。");
                     } else {
-                        NotificationVue.showPublicNotification("error", "发生位置错误。");
+                        NotificationVue.showPublicNotification("error", "发生未知错误。");
                     }
                 })
             },
@@ -499,7 +516,6 @@
                 r.then((res) => {
                     if (res === "true") {
                         this.setStudyWordState(v)
-
                     }
                 })
 
@@ -508,17 +524,54 @@
             /*学习计划按钮*/
             studyWordPlanningBtn(v) {
                 if (v === 0) { //加入计划
-
-
+                    this.addStudyWord()
                 } else { //移除计划
-                    MessageBoxVue.openMessageBox("移除学习规划将删除你学习该单词的所有学习数据，且此操作不可逆，请慎重考虑。");
+                    MessageBoxVue.openMessageBox("移除学习规划将删除你学习该单词的所有学习数据，且此操作不可逆，请慎重考虑!");
+                    let r = new Promise((resolve) => {
+                        let timer = setInterval(() => {   //定时器
+                            let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
+                            if (messageBoxConfirmValue !== "null") {
+                                clearInterval(timer)
+                                resolve(messageBoxConfirmValue)
+                            }
+                        }, 100)
+                    })
+                    r.then(async (res) => {
+                        if (res === "true") {  //删除
+                            this.deleteStudyWord()
+                        }
+                    })
+
                 }
-
-
             },
-            /*加入学习计划*/
-            addStudyWord(v) {
-                axios({})
+            /*加入学习计划axios*/
+            addStudyWord() {
+                let _this = this
+                axios({
+                    method: 'post',
+                    url: 'update/addStudyWord?wordid=' + _this.wordid,
+                }).then(function (data) {
+                    if (data.data === true) {
+                        NotificationVue.showPublicNotification("success", "添加成功。")
+                        _this.fetchMyStudyInfor()
+                    } else {
+                        NotificationVue.showPublicNotification("error", "发生未知错误，添加失败。")
+                    }
+                })
+            },
+            deleteStudyWord() {
+                let _this = this
+                axios({
+                    method: 'post',
+                    url: 'update/deleteTheStudyWord?wordid=' + _this.wordid,
+                }).then(function (data) {
+                    if (data.data === true) {
+                        NotificationVue.showPublicNotification("success", "移除成功。")
+                        _this.fetchMyStudyInfor()
+                    } else {
+                        NotificationVue.showPublicNotification("error", "发生未知错误，添加失败。")
+                    }
+                })
             },
             /*图表*/
             renderChart() {
@@ -536,12 +589,12 @@
                         }
                     },
                     xAxis: {
-                        data: ['忘记', '能想起', '模糊', '认识'],
+                        data: ['茫无所知', '模模糊糊', '恍然大悟', '了如指掌'],
                         axisLabel: {
                             show: true,
                             textStyle: {
                                 color: '#ffffff',  //更改坐标轴文字颜色
-                                fontSize: 13      //更改坐标轴文字大小
+                                fontSize: 12      //更改坐标轴文字大小
                             }
                         }
                     },
@@ -570,14 +623,15 @@
                                     value: _this.studyWord.q_1,
                                     // 设置单个柱子的样式
                                     itemStyle: {
-                                        color: '#50a7ff',
+                                        color: '#ff9000',
                                     }
                                 },
                                 {
                                     value: _this.studyWord.q_2,
                                     // 设置单个柱子的样式
+
                                     itemStyle: {
-                                        color: '#ff9000',
+                                        color: '#50a7ff',
                                     }
                                 },
                                 {
@@ -601,7 +655,6 @@
                 await axios({
                     method: 'post',
                     url: 'update/addSearchTimes?wordid=' + wordid,
-                }).then((data) => {
                 })
                 window.location.assign('wordDetailPage?wordid=' + wordid);
             },
@@ -955,7 +1008,7 @@
                     _this.word = data.data
                     _this.audio_type1 = "http://dict.youdao.com/dictvoice?type=1&audio=" + _this.word.spelling;
                     _this.audio_type2 = "http://dict.youdao.com/dictvoice?type=2&audio=" + _this.word.spelling;
-                    _this.bingHref = "https://www.bing.com/dict/search?q=speak&qs=n&form=Z9LH5&sp=-1&lq=0&pq=" + _this.word.spelling;
+                    _this.bingHref = "https://www.bing.com/dict/search?q=" + _this.word.spelling;
                     _this.youdaoHref = "https://dict.youdao.com/result?word=" + _this.word.spelling + "&lang=en";
                     _this.jinshanHref = "https://www.iciba.com/word?w=" + _this.word.spelling;
                     _this.baiduHref = "https://fanyi.baidu.com/#en/zh/" + _this.word.spelling;
@@ -991,8 +1044,11 @@
                 let item = sessionStorage.getItem("backFromWordDetailPageValue");
                 if (item === "index_02_cha")
                     window.location.assign('searchWordPage')
-                if (item === "page_WordDetail")
+                else{
+                    sessionStorage.removeItem("backFromWordDetailPageValue")
                     window.history.back();
+                }
+
             },
             numFilter(value) {
                 if (value !== 0)
@@ -1016,7 +1072,7 @@
                     this.control_example_div_state = false //关闭例句div
                 }
             },
-            /*事件转换*/
+            /*时间转换*/
             getTimeDate(date) {
                 return new Date(date).getTime();
             },
@@ -1098,10 +1154,10 @@
                 // console.log("v="+v)
                 window.sessionStorage.setItem("messageBoxConfirmValue", v);
                 //关闭弹窗
-                let messageBox = document.getElementById("messageBox");
+                // let messageBox = document.getElementById("messageBox");
                 let MessageBoxContent = document.getElementById("MessageBoxContent");
                 MessageBoxContent.style.display = "none"
-                messageBox.style.marginTop = "-200px";
+                // messageBox.style.marginTop = "-200px";
                 let m = function (e) {
                     e.preventDefault();
                 };
@@ -1119,10 +1175,10 @@
                 sessionStorage.setItem("messageBoxConfirmValue", "null");
                 this.messageBoxQuestion = content
                 // this.functionName = functionName
-                let messageBox = document.getElementById("messageBox");
+                // let messageBox = document.getElementById("messageBox");
                 let MessageBoxContent = document.getElementById("MessageBoxContent");
                 MessageBoxContent.style.display = "flex"
-                messageBox.style.marginTop = "20px";
+                // messageBox.style.marginTop = "20px";
             },
             tipEffection() {
                 this.borderFramesValue = true

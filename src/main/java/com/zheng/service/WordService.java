@@ -28,4 +28,7 @@ public interface WordService {
     List<Word> getWordsSearchTimesRank();
     List<Word> getWordsStudyTimesRank();
 
+    /*更改学习人数*/
+    boolean updateWordStudyTime(int wordid, String type);
+
 }

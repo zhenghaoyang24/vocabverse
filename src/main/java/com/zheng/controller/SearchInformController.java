@@ -2,17 +2,15 @@ package com.zheng.controller;
 
 import com.zheng.pojo.*;
 import com.zheng.service.*;
-import com.zheng.utils.GetNowDataUtil;
+import com.zheng.utils.GetDateUtil;
 import com.zheng.utils.UserSessionCookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Controller
@@ -35,22 +33,51 @@ public class SearchInformController {
 
 
 
+    @RequestMapping(value = "/getTodayStudiedWords", method = RequestMethod.GET)
+    @ResponseBody
+    List<StudyWord> getTodayStudiedWords(HttpServletRequest request) {
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+        String date = GetDateUtil.getNowData();
+        List<StudyWord> todayStudiedWords = studyWordService.getTodayStudiedWords(userid, date);
+        return todayStudiedWords;
+    }
+
+    @RequestMapping(value = "/getTodayStudyWord", method = RequestMethod.GET)
+    @ResponseBody
+    StudyWord getTodayStudyWords(HttpServletRequest request) {
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+        String nowData = GetDateUtil.getNowData();
+        StudyWord studyWord = studyWordService.getTodayStudyWord(userid, nowData);
+        if (studyWord==null){
+            return null;
+        }else{
+            Example example = exampleService.findExampleByExapid(studyWord.getExapid());
+            if (example == null) {
+                example = exampleService.findMostHeatExample(studyWord.getWordid());
+                studyWordService.updateStudyWordExample(userid, studyWord.getWordid(), example.getExapid());
+                studyWord = studyWordService.getTodayStudyWord(userid, nowData);
+            }
+            return studyWord;
+        }
+
+
+
+    }
+
+
     @RequestMapping(value = "/getStudyWordRememberHistory", method = RequestMethod.GET)
     @ResponseBody
-    List<StudyWordRemenberHistory> getStudyWordRememberHistory(int wordid, HttpServletRequest request) {
+    List<StudyWordRememberHistory> getStudyWordRememberHistory(int wordid, HttpServletRequest request) {
         int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
-        List<StudyWordRemenberHistory> history = studyWordService.getStudyWordRememberHistory(wordid, userid);
+        List<StudyWordRememberHistory> history = studyWordService.getStudyWordRememberHistory(wordid, userid);
         return history;
     }
 
     @RequestMapping(value = "/getStudyWordInformation", method = RequestMethod.GET)
     @ResponseBody
     StudyWord getStudyWordInformation(int wordid, HttpServletRequest request) {
-        System.out.println(wordid);
         int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
-        System.out.println(userid);
         StudyWord word = studyWordService.getStudyWordInformation(wordid, userid);
-        System.out.println(word);
         return word;
     }
 
@@ -74,17 +101,23 @@ public class SearchInformController {
         return wordService.getAllSearchWordHistory(userid);
     }
 
-
-    @RequestMapping(value = "/dailyExist", method = RequestMethod.GET)
+    @RequestMapping(value = "/getDaily", method = RequestMethod.GET)
     @ResponseBody
-    public Daily dailyExist(HttpServletRequest request) {
+    public Daily getDaily(HttpServletRequest request) {
         int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
-        String time = GetNowDataUtil.getNowData();
-        Daily daily = dailyService.getDaily(userid, time);
-        if (daily == null)
-            return null;
-        else
+        String time = GetDateUtil.getNowData();
+        Daily d = dailyService.getDaily(userid, time);
+        if (d == null){
+            Daily daily = new Daily();
+//            Daily daily1 = new Daily();
+            daily.setUserid(userid);
+            daily.setTime(time);
+            daily.setShouldstudy(studyWordService.getTodayStudyWordsCount(userid, time));
+            dailyService.creatDaily(daily);
             return daily;
+        }
+        else
+            return d;
     }
 
 
@@ -136,7 +169,6 @@ public class SearchInformController {
     @RequestMapping(value = "/findExamplesByWordId", method = RequestMethod.GET)
     @ResponseBody
     public List<Example> findExamplesByWordId(int wordid) {
-//        System.out.println(exampleService.findExampleByWordId(wordid));
         return exampleService.findExampleByWordId(wordid);
     }
 

@@ -19,7 +19,7 @@
 }
 
 body {
-    min-width: 800px;
+    min-width: 1000px;
     user-select: none;
     background-color: var(--blackBackgroung);
     margin: 0;
@@ -28,8 +28,8 @@ body {
     background-position: right;
     background-attachment: fixed;
     background-size: cover;
-}
 
+}
 /*设置滚动条的长、宽为0*/
 html::-webkit-scrollbar {
     height: 100%;
@@ -88,8 +88,6 @@ html::-webkit-scrollbar-thumb {
 }
 
 .notification_item_tittle > img {
-    /*vertical-align: middle;*/
-    /*text-align: center;*/
     width: 20px;
     height: 20px;
 }
@@ -107,29 +105,25 @@ html::-webkit-scrollbar-thumb {
 
 /*弹窗*/
 .MessageBoxDiv {
-    user-select: none;
-    /*margin-top: ;*/
     display: none;
-    justify-content: center;
-
     position: absolute;
-    width: 100%;
-    height: 100%;
-    /*min-height: 500px;*/
+    width: 100vmax;
+    height: 100vmax;
+    user-select: none;
+    justify-content: center;
     z-index: 99999;
     background-color: rgba(0, 0, 0, 0.62);
 }
 
 .MessageBox {
+    position: sticky;
+    top: 20px;
     border: 2px rgba(255, 0, 0, 0) solid;
     box-shadow: 0 0 4px 1px #626262;
-    margin-top: -200px;
+    /*margin-top: -200px;*/
     border-radius: 5px;
     background-color: #2d2d2d;
     width: 290px;
-
-
-    /*height: 120px;*/
     display: inline-flex;
     justify-content: space-between;
     flex-direction: column;
@@ -139,13 +133,10 @@ html::-webkit-scrollbar-thumb {
 }
 
 .MessageBoxContent {
-    /*height: 100%;*/
     color: whitesmoke;
 }
 
 .MessageBoxController {
-    /*position: relative;*/
-    /*width: auto;*/
     display: flex;
     justify-content: space-between;
     margin-top: 50px;

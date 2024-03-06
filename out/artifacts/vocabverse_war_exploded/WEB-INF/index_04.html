@@ -665,7 +665,7 @@
 
             /*picker*/
             picker_years: Array.from({length: 40}, (_, index) => new Date().getFullYear() - index),   //年份
-            picker_months: Array.from({length: 12}, (_, index) => new Date().getMonth() + index + 1),   //月份
+            picker_months: Array.from({length: 12}, (_, index) => new Date().getMonth() + index-1 ),   //月份
             picker_days: null,  //天
             pointerDown: false,               //鼠标/手指是否按下
             itemHeight: 38,                   //每个picker_item高5rem=5*16=80px
