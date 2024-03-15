@@ -13,4 +13,6 @@ public interface DailyService {
     boolean setShouldStudy(int shouldstudy, int userid, String time);
 
     boolean updateDailyFeedbackDate(Daily daily);
+
+    boolean checkinDaily(int userid, String time);
 }

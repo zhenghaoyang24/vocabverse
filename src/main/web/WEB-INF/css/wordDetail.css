@@ -663,20 +663,20 @@
     border: 1px solid #00e57b;
     border-radius: 3px;
 }
-
-.all_words_div > div:hover .all_words_div_item_span {
-    color: #00e57b;
-    transition: all 0.2s;
-}
-
 .all_words_div_item_span {
     color: #eaeaea;
     font-size: 20px;
 }
-
+.all_words_div > div:hover .all_words_div_item_span {
+    color: #00e57b;
+    transition: all 0.2s;
+}
 .all_words_div > div:hover {
     color: #00e57b;
 }
+
+
+
 
 .word_item_span {
     /*margin-left: 10px;*/

@@ -24,4 +24,8 @@ public interface DailyMapper {
     boolean setShouldStudy(@Param("shouldstudy")int shouldstudy,@Param("userid")int userid,@Param("time")String time);
 
 
+    @Update("update  tb_daily set checkin = 1 where userid = #{userid} and time = #{time}")
+    boolean checkinDaily(@Param("userid")int userid,@Param("time")String time);
+
+
 }

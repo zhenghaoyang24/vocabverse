@@ -21,7 +21,6 @@ public class BookMapperTest {
     private BookMapper mapper;
 
 
-
     @Before
     public void before() throws IOException {
         //加载核心文件
@@ -35,6 +34,11 @@ public class BookMapperTest {
     public void allMyUserBooks() {
         List<UserBook> userBooks = mapper.allMyUserBooks(1000);
         System.out.println(userBooks);
+    }
+
+    @Test
+    public void addUserBookVocCount() {
+        mapper.addUserBookVocCount(14);
     }
 
     @Test
@@ -55,9 +59,10 @@ public class BookMapperTest {
         System.out.println(b);
 
     }
+
     @Test
     public void judgeTheWordInTheBook() {
-        VocBook vocBook = mapper.judgeTheWordInTheBook(31093,14);
+        VocBook vocBook = mapper.judgeTheWordInTheBook(31093, 14);
         System.out.println(vocBook);
     }
 
@@ -66,13 +71,12 @@ public class BookMapperTest {
         List<VocBook> vocBooks = mapper.theBookOfAllWords(14);
         System.out.println(vocBooks);
     }
+
     @Test
     public void deleteWordFromUserBookMapper() {
         boolean b = mapper.deleteWordFromUserBookMapper(22542, 14);
         System.out.println(b);
     }
-
-
 
 
 }

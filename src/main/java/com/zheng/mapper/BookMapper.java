@@ -32,6 +32,12 @@ public interface BookMapper {
     @Insert(value = "insert into tb_voc_userbook(wordid,bookid) value (#{wordid},#{bookid})")
     boolean addWordToUserBook(@Param("wordid") int wordid, @Param("bookid") int bookid);
 
+    @Update("update tb_user_book set voccount = voccount+1 where userbookid = #{userbookid}")
+    boolean addUserBookVocCount(@Param("userbookid")int userbookid);
+
+    @Update("update tb_user_book set voccount = voccount-1 where userbookid = #{userbookid}")
+    boolean subUserBookVocCount(@Param("userbookid")int userbookid);
+
     /*查看是否已经有这个单词*/
     @Select("SELECT * FROM tb_voc_userbook WHERE wordid  = #{wordid} and bookid = #{bookid}")
     @Results({

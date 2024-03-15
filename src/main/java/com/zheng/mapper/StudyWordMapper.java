@@ -72,6 +72,4 @@ public interface StudyWordMapper {
 
 
 
-
-
 }

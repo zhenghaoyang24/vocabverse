@@ -42,6 +42,9 @@ public class UserBookServiceImpl implements UserBookService {
         SqlSession sqlSession = sqlSessionFactory.openSession(true);
         BookMapper mapper = sqlSession.getMapper(BookMapper.class);
         boolean b = mapper.addWordToUserBook(wordid, userbookid);
+        if (b){
+            mapper.addUserBookVocCount(userbookid);
+        }
         sqlSession.close();
         return b;
     }
@@ -69,6 +72,9 @@ public class UserBookServiceImpl implements UserBookService {
         SqlSession sqlSession = sqlSessionFactory.openSession(true);
         BookMapper mapper = sqlSession.getMapper(BookMapper.class);
         boolean b = mapper.deleteWordFromUserBookMapper(wordid, bookid);
+        if (b){
+            mapper.subUserBookVocCount(bookid);
+        }
         sqlSession.close();
         return b;
     }

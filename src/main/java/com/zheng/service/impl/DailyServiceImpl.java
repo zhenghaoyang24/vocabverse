@@ -61,4 +61,13 @@ public class DailyServiceImpl implements DailyService {
         sqlSession.close();
         return b;
     }
+
+    @Override
+    public boolean checkinDaily(int userid, String time) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        DailyMapper mapper = sqlSession.getMapper(DailyMapper.class);
+        boolean b = mapper.checkinDaily(userid, time);
+        sqlSession.close();
+        return b;
+    }
 }
