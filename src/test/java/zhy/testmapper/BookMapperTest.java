@@ -1,10 +1,7 @@
 package zhy.testmapper;
 
 import com.zheng.mapper.BookMapper;
-import com.zheng.mapper.ExampleMapper;
-import com.zheng.pojo.Example;
-import com.zheng.pojo.UserBook;
-import com.zheng.pojo.VocBook;
+import com.zheng.pojo.*;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -34,6 +31,19 @@ public class BookMapperTest {
     public void allMyUserBooks() {
         List<UserBook> userBooks = mapper.allMyUserBooks(1000);
         System.out.println(userBooks);
+    }
+
+
+    @Test
+    public void getAllOfficialBook() {
+        List<OfficialBook> allOfficialBook = mapper.getAllOfficialBook();
+        System.out.println(allOfficialBook);
+    }
+
+    @Test
+    public void getAllShareUserBook() {
+        List<UserBook> books = mapper.getAllShareUserBook();
+        System.out.println(books);
     }
 
     @Test
@@ -68,7 +78,7 @@ public class BookMapperTest {
 
     @Test
     public void theBookOfAllWords() {
-        List<VocBook> vocBooks = mapper.theBookOfAllWords(14);
+        List<VocBook> vocBooks = mapper.theUserBookOfAllWords(14);
         System.out.println(vocBooks);
     }
 

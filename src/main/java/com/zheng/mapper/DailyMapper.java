@@ -6,10 +6,13 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.List;
+
 public interface DailyMapper {
 
     @Select("SELECT * FROM tb_daily WHERE userid = #{userid} and time = #{time}")
-    Daily getDailyByUseridAndTime(@Param("userid") int userid,@Param("time") String time);
+    Daily getDailyByUseridAndTime(@Param("userid") int userid, @Param("time") String time);
+
 
     @Insert(value = "insert into tb_daily(userid,time,shouldstudy) values (#{userid},#{time},#{shouldstudy});")
     boolean creatDaily(Daily daily);
@@ -21,11 +24,17 @@ public interface DailyMapper {
     boolean updateDailyFeedbackDate(Daily daily);
 
     @Update("update tb_daily set shouldstudy = #{shouldstudy} where userid = #{userid} and time = #{time}")
-    boolean setShouldStudy(@Param("shouldstudy")int shouldstudy,@Param("userid")int userid,@Param("time")String time);
+    boolean setShouldStudy(@Param("shouldstudy") int shouldstudy, @Param("userid") int userid, @Param("time") String time);
 
 
     @Update("update  tb_daily set checkin = 1 where userid = #{userid} and time = #{time}")
-    boolean checkinDaily(@Param("userid")int userid,@Param("time")String time);
+    boolean checkinDaily(@Param("userid") int userid, @Param("time") String time);
+
+
+
+    //获取daily数据
+    @Select("SELECT *  from tb_daily where userid = #{userid} ORDER BY Date(time) DESC LIMIT 15")
+    List<Daily> getDailyListByUserid(@Param("userid") int userid);
 
 
 }

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Werse词境 数据</title>
+    <script src="js/echarts.min.js"></script>
     <script src="js/jquery-3.7.0.min.js"></script>
     <script src="js/vue.js"></script>
     <script src="js/axios-0.18.0.js"></script>
@@ -51,6 +52,22 @@
         .updateBtn_active:hover {
             background-color: #1aff96;
         }
+
+        .switch_btn {
+            cursor: pointer;
+            padding: 4px;
+            font-size: 0.9em;
+            font-weight: 800;
+            border: 2px solid #00e57b;
+            border-radius: 5px;
+            width: 50%;
+            height: 100%;
+        }
+
+        .switch_btn_active {
+            background-color: #00e57b;
+            color: black;
+        }
     </style>
 </head>
 <body>
@@ -77,7 +94,7 @@
     <div class="public_notification_content">{{no_content}}</div>
 </div>
 <!--弹窗-->
-<div id="MessageBoxContent" class="MessageBoxDiv" @click="tipEffection">
+<div @touchmove.prevent="false" id="MessageBoxContent" class="MessageBoxDiv" @click="tipEffection">
     <div id="messageBox" class="MessageBox" :class="{'MessageBoxBorderFrames':borderFramesValue}"
          @animationend="tipEffectionEnd">
         <div class="MessageBoxContent">{{messageBoxQuestion}}</div>
@@ -253,193 +270,341 @@
     </div>
 </div>
 <!--内容-->
-<div class="content-body">
-    <div class="content-div">
-        <div class="data_body_content" id="userDataApp">
-            <!--左侧-->
-            <!--我的信息-->
-            <transition name="fade">
-                <div v-if="cardStateValue==='allInformation'" class="user_data_div">
-                    <!--头像 名字 性别-->
-                    <div class="user_data_content">
-                        <div style="width: 100%;display: flex">
-                            <div class="user_data_avatar">
-                                <img :src="user.avatar" alt="头像">
-                            </div>
-                            <div class="user_data_name_sex_level_uid">
-                                <h4>{{user.nickname}}</h4>
-                                <div class="user_data_sex_level_uid">
-                                    <span v-if="user.gender===0" class="user_sex_female"></span>
-                                    <span v-else-if="user.gender===1" class="user_sex_male"></span>
-                                    <span v-else class="user_sex_alien"></span>
-                                    <span class="user_level">LVL{{user.level}}</span>
-                                    <span class="user_uid">UID:{{user.userid}}</span>
+<div style="width: 100%" id="userDataApp">
+    <div v-if="control_userbook_div_state" class="control_example_div">
+        <div class="control_example_content_div">
+            <!--标题-->
+            <div class="tittle_sort_div">
+                <div class="tittle_div">
+                    <span v-show="all_add_detail_userbook==0" class="tittle_span">我的词库</span>
+                    <span v-show="all_add_detail_userbook==1" class="tittle_span">新建词库</span>
+                    <span v-show="all_add_detail_userbook==2"
+                          class="tittle_span">{{theUserBookDetail.userbookname}}</span>
+                    <span v-show="all_add_detail_userbook==3" class="tittle_span">编辑词库</span>
+                    <span @click="controlUserBookBtn" class="close_div_btn"></span>
+                </div>
+                <div class="sort_div">
+                    <!--显示例句时渲染-->
+                    <span class="backOradd" @click="addUserbookBtn"
+                          v-show="all_add_detail_userbook==0">新建词库</span>
+                    <span class="backOradd" @click="userBookBackBtn" v-show="all_add_detail_userbook!==0">返回</span>
+                    <span class="backOradd" @click="addUserBookConfirmBtn"
+                          v-show="all_add_detail_userbook==1">确认添加</span>
+                    <span class="backOradd"
+                          v-show="all_add_detail_userbook==3" @click="editUserBookConfirmBtn">确认编辑</span>
+                    <span class="backOradd deleteTheUserBookBtn_div"
+                          v-show="all_add_detail_userbook==3" @click="deleteTheUserBookConfirmBtn">删除词库</span>
+                </div>
+            </div>
+            <!--我的所有词库-->
+            <div v-if="all_add_detail_userbook==0" class="all_example_list">
+                <div v-if="alMyUserBooks.length==0"
+                     style="width: 100%;height: 100%;display:flex;justify-content: center;">
+                    <span style="margin: auto;color: whitesmoke;font-weight: 700">这里空空如也。你还没有任何词库！</span>
+                </div>
+                <div v-else v-for="(item,index) in alMyUserBooks" class="userBookItemDiv"
+                     @click="theUserBookDetailBtn(item.userbookid)">
+                    <div class="userBookNameDiv">
+                        <span class="userBookNameDiv_child1"></span>
+                        <span class="userBookNameDiv_child2">{{item.userbookname}}</span>
+                    </div>
+                    <span @click.stop="editTheUserBookBtn(item.userbookid)"
+                          class="addTheWordToCikuBtn">编辑该词库</span>
+                </div>
+            </div>
+            <!--添加云词库-->
+            <div v-if="(all_add_detail_userbook===1)||(all_add_detail_userbook===3)" class="all_example_list">
+                <div class="addUserBookDiv">
+                    <label>词库名称&nbsp;</label> <input v-model="userbookname" maxlength="20" type="text"
+                                                         placeholder="词库名称(必须向)">
+                </div>
+                <div class="addUserBookDiv_jianjie">
+                    <label>词库简介&nbsp;</label>
+                    <textarea v-model="bookdescribe" placeholder="词库简介(非必须向)" maxlength="50"></textarea>
+                </div>
+                <div class="double_switch_div">
+                    <label>词库属性&nbsp;</label>
+                    <div class="double_switch_div_btn">
+                        <span class="switch_btn switch_btn_active" id="switchBtnStatus_0"
+                              @click="switchChangeBtn(0)">私密</span>
+                        <span class="switch_btn" id="switchBtnStatus_1" @click="switchChangeBtn(1)">公开</span>
+                    </div>
+                </div>
+            </div>
+            <!--词库详情-->
+            <div v-if="all_add_detail_userbook==2" class="the_book_all_words_div">
+                <div v-show="all_add_detail_userbook==2" class="userbook_detail_tittle_div">
+                    <div>简介:{{theUserBookDetail.bookdescribe}}</div>
+                    <div>属性:{{theUserBookDetail.share == 0 ? "私密词库" : "公开词库" }}</div>
+                </div>
+                <div class="all_words_div">
+                    <div @click="theWordDetail(item.wordid)" v-for="(item,index) in theUserBookOfAllWords">
+                        <span class="all_words_div_item_span">{{item.word.spelling}}</span>
+                        <span @click.stop="deleteTheWordFormUserBookBtn(item.wordid,item.bookid)" class="word_item_span"
+                              style="width: 20px;height: 20px">&nbsp;</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="content-body">
+        <div class="content-div">
+            <div class="data_body_content">
+                <!--左侧-->
+                <!--我的信息-->
+                <transition name="fade">
+                    <div v-if="cardStateValue==='allInformation'" class="user_data_div">
+                        <!--头像 名字 性别-->
+                        <div class="user_data_content">
+                            <div style="width: 100%;display: flex">
+                                <div class="user_data_avatar">
+                                    <img :src="user.avatar" alt="头像">
+                                </div>
+                                <div class="user_data_name_sex_level_uid">
+                                    <h4>{{user.nickname}}</h4>
+                                    <div class="user_data_sex_level_uid">
+                                        <span v-if="user.gender===0" class="user_sex_female"></span>
+                                        <span v-else-if="user.gender===1" class="user_sex_male"></span>
+                                        <span v-else class="user_sex_alien"></span>
+                                        <span class="user_level">LVL{{user.level}}</span>
+                                        <span class="user_uid">UID:{{user.userid}}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="user_other_data_div">
-                            <!--签名-->
-                            <div class="user_synopsis">
-                                签名：{{user.synopsis === null ? "你还没有签名，快去写个签名吧。" : user.synopsis}}
+                            <div class="user_other_data_div">
+                                <!--签名-->
+                                <div class="user_synopsis">
+                                    签名：{{user.synopsis === null ? "你还没有签名，快去写个签名吧。" : user.synopsis}}
+                                </div>
+                                <div class="user_other_data_item">
+                                    <span>生日：</span>
+                                    <span>{{user.birthday === null ? "无" : user.birthday}}</span>
+                                </div>
+                                <div class="user_other_data_item">
+                                    <span>学校：</span>
+                                    <span>{{user.school === null ? "无" : user.school}}</span>
+                                </div>
+                                <div class="user_other_data_item">
+                                    <span>地区：</span>
+                                    <span>{{user.region === null ? "无" : user.region}}</span>
+                                </div>
+                                <div class="user_other_data_item">
+                                    <span>邮箱：</span>
+                                    <span>{{user.useremail}}</span>
+                                </div>
+                                <div class="user_other_data_item">
+                                    <span>手机：</span>
+                                    <span>{{user.phonenumber === null ? "无" : user.phonenumber}}</span>
+                                </div>
+                                <div class="user_other_data_item">
+                                    <span>注册时间：</span>
+                                    <span>{{user.regtime === null ? "无" : user.regtime}}</span>
+                                </div>
+
                             </div>
-                            <div class="user_other_data_item">
+                        </div>
+                        <!--底部控制-->
+                        <div class="user_data_control_div">
+                            <div class="user_data_update_div">
+                                <div @click="updateInformationBtn">修改信息</div>
+                                <div @click="updatePasswordBtn">修改密码</div>
+                            </div>
+                            <div class="loginOut_div" @click="loginOut">
+                                <span class="loginOuText">注销登录</span>
+                                <span class="loginOutImg"></span>
+                            </div>
+                        </div>
+
+                    </div>
+                </transition>
+                <!--修改信息-->
+                <transition name="fade">
+                    <div v-if="cardStateValue==='updateInformation'" class="user_update_data_div">
+                        <div style="display:flex;justify-content: space-between;border-bottom: 2px #626262 solid;padding-bottom: 10px">
+                            <div @click="updateBackBtn" class="update_information_div_back_btn">
+                                <span class="update_information_div_back_btn_img"></span>返回
+                            </div>
+                            <div style="color:#a8a8a8;display: flex;align-items: center"><img
+                                    style="width: 20px;height: 20px;margin: 0;padding: 0"
+                                    src="image/index_04/tip_icon.png"
+                                    alt=""> 点击单项更改
+                            </div>
+                        </div>
+                        <div class="update_user_data_item" @click="updateItemDataBtn('avatar',user.avatar)">
+                            <div style="color: #ffffff;font-weight: 600;font-size: 1em;">头像</div>
+                            <img :src="user.avatar" alt="">
+                            <span></span>
+                        </div>
+                        <div class="update_user_data_item" @click="updateItemDataBtn('synopsis',user.synopsis)">
+                            <div class="update_user_data_item_jianjie">
+                                <div>简介：</div>
+                                <div>{{user.synopsis === null ? "无" : user.synopsis}}</div>
+                            </div>
+                            <span></span>
+                        </div>
+                        <div class="update_user_data_item" @click="updateItemDataBtn('nickname',user.nickname)">
+                            <div class="update_user_data_item_left">
+                                <span>昵称：</span>
+                                <span>{{user.nickname === null ? "无" : user.nickname}}</span>
+                            </div>
+                            <span></span>
+                        </div>
+                        <div class="update_user_data_item" @click="updateItemDataBtn('gender',user.gender)">
+                            <div class="update_user_data_item_left">
+                                <span>性别：</span>
+                                <span v-if="user.gender===0">女</span>
+                                <span v-else-if="user.gender===1">男</span>
+                                <span v-else>外星人</span>
+                            </div>
+                            <span></span>
+                        </div>
+                        <div class="update_user_data_item" @click="updateItemDataBtn('birthday',user.birthday)">
+                            <div class="update_user_data_item_left">
                                 <span>生日：</span>
                                 <span>{{user.birthday === null ? "无" : user.birthday}}</span>
                             </div>
-                            <div class="user_other_data_item">
-                                <span>学校：</span>
-                                <span>{{user.school === null ? "无" : user.school}}</span>
-                            </div>
-                            <div class="user_other_data_item">
-                                <span>地区：</span>
-                                <span>{{user.region === null ? "无" : user.region}}</span>
-                            </div>
-                            <div class="user_other_data_item">
-                                <span>邮箱：</span>
-                                <span>{{user.useremail}}</span>
-                            </div>
-                            <div class="user_other_data_item">
+                            <span></span>
+                        </div>
+                        <div class="update_user_data_item" @click="updateItemDataBtn('phonenumber',user.phonenumber)">
+                            <div class="update_user_data_item_left">
                                 <span>手机：</span>
                                 <span>{{user.phonenumber === null ? "无" : user.phonenumber}}</span>
                             </div>
-                            <div class="user_other_data_item">
-                                <span>注册时间：</span>
-                                <span>{{user.regtime === null ? "无" : user.regtime}}</span>
+                            <span></span>
+                        </div>
+                        <div class="update_user_data_item" @click="updateItemDataBtn('school',user.school)">
+                            <div class="update_user_data_item_left">
+                                <span>学校：</span>
+                                <span>{{user.school === null ? "无" : user.school}}</span>
+                            </div>
+                            <span></span>
+                        </div>
+                        <div class="update_user_data_item" @click="updateItemDataBtn('region',user.region)">
+                            <div class="update_user_data_item_left">
+                                <span>地区：</span>
+                                <span>{{user.region === null ? "无" : user.region}}</span>
+                            </div>
+                            <span></span>
+                        </div>
+
+
+                    </div>
+                </transition>
+                <!--修改密码-->
+                <transition name="fade">
+                    <div v-if="cardStateValue==='updatePassword'" class="user_data_div">
+                        <!--头像 名字 性别-->
+                        <div style="width: auto">
+                            <div @click="updateBackBtn" class="update_information_div_back_btn">
+                                <span class="update_information_div_back_btn_img"></span>返回
+                            </div>
+                            <div class="update_password_input_div">
+                                <h4>旧密码</h4>
+                                <input v-model="oldPassword" onkeyup="value=value.replace(/[^\w\.\/]/ig,'')"
+                                       maxlength="16"
+                                       type="password"
+                                       placeholder="请输入旧密码">
+                                <h4 style="margin-top: 20px">新密码</h4>
+                                <input v-model="newPassword1" onkeyup="value=value.replace(/[^\w\.\/]/ig,'')"
+                                       maxlength="16"
+                                       type="password" placeholder="请设置新密码(密码长度6-16位)">
+                                <input v-model="newPassword2" onkeyup="value=value.replace(/[^\w\.\/]/ig,'')"
+                                       style="margin-top: 10px" maxlength="16" type="password"
+                                       placeholder="请再次输入新密码">
+                            </div>
+                            <div class="update_password_message_div">{{updateMessage}}</div>
+                        </div>
+                        <!--底部控制-->
+                        <div class="update_password_btn" @click="updatePasswordConfirmBtn">确认更改</div>
+                    </div>
+                </transition>
+                <!--右侧-->
+                <div class="user_study_data_div">
+                    <div style="width: 340px;min-width: 330px;height: 200px"></div>
+                    <div class="study_info_content_div">
+                        <div class="study_info_daily">
+                            <div class="study_info_daily_item">
+                                <div>{{studyDataInfoSum.checkinSum}}天</div>
+                                <div class="study_info_daily_item_name_icon"><span
+                                        class="item_name_icon_checkin"></span><span>累计签到</span></div>
+                            </div>
+                            <div class="study_info_daily_item">
+                                <div>{{studyDataInfoSum.studyWordSum}}个</div>
+                                <div class="study_info_daily_item_name_icon"><span
+                                        class="item_name_icon_studyWordCount"></span><span>学习单词</span></div>
+                            </div>
+                            <div class="study_info_daily_item">
+                                <div>{{studyDataInfoSum.studyTimesSum}}次</div>
+                                <div class="study_info_daily_item_name_icon"><span
+                                        class="item_name_icon_studycount"></span><span>复习次数</span></div>
+                            </div>
+                            <div class="study_info_daily_item">
+                                <div>{{studyDataInfoSum.studyDurationSum}}</div>
+                                <div class="study_info_daily_item_name_icon"><span
+                                        class="item_name_icon_studyduration"></span><span>学习时间</span></div>
+                            </div>
+                        </div>
+                        <div class="study_info_control_div">
+                            <h4>数据管理</h4>
+                            <div class="study_info_control_btn_div">
+                                <div class="study_info_control_btn_item study_info_control_btn_item_studyWord">
+                                    <div></div>
+                                    <div>我的单词</div>
+                                </div>
+                                <div @click="controlUserBookBtn"
+                                     class="study_info_control_btn_item study_info_control_btn_item_userBook">
+                                    <div></div>
+                                    <div>我的词库</div>
+                                </div>
                             </div>
 
                         </div>
-                    </div>
-                    <!--底部控制-->
-                    <div class="user_data_control_div">
-                        <div class="user_data_update_div">
-                            <div @click="updateInformationBtn">修改信息</div>
-                            <div @click="updatePasswordBtn">修改密码</div>
-                        </div>
-                        <div class="loginOut_div" @click="loginOut">
-                            <span class="loginOuText">注销登录</span>
-                            <span class="loginOutImg"></span>
-                        </div>
-                    </div>
+                        <div class="qualityDataChart_body_div">
+                            <h4>复习质量比例与次数</h4>
+                            <div class="qualityDataChart_div">
+                                <div id="qualityDataChartLeftId"
+                                     style="width: 310px;min-width: 300px;height: auto;"></div>
+                                <div class="qualityDoughnutChart_body">
+                                    <div class="qualityDoughnutChart_left">
+                                        <div class="qualityDoughnutChart_left_item qualityDoughnutChart_left_item_1">
+                                            <span>了如指掌</span>
+                                            <span>{{qualityDataInfo.quality_3}}</span>
+                                        </div>
+                                        <div class="qualityDoughnutChart_left_item qualityDoughnutChart_left_item_2">
+                                            <span>恍然大悟</span>
+                                            <span>{{qualityDataInfo.quality_2}}</span>
+                                        </div>
+                                        <div class="qualityDoughnutChart_left_item qualityDoughnutChart_left_item_3">
+                                            <span>模模糊糊</span>
+                                            <span>{{qualityDataInfo.quality_1}}</span>
+                                        </div>
+                                        <div class="qualityDoughnutChart_left_item qualityDoughnutChart_left_item_4">
+                                            <span>茫无所知</span>
+                                            <span>{{qualityDataInfo.quality_0}}</span>
+                                        </div>
+                                    </div>
+                                    <div id="qualityDoughnutChartId" style="width: 300px;height: 250px;"></div>
+                                </div>
 
+                            </div>
+
+                        </div>
+                        <div id="studyTimesAndDurationLineChartId" style="width: 100%;height: 300px;margin-top: 20px;border-top: 1px solid #4b4b4b;padding-top: 20px"></div>
+
+                    </div>
                 </div>
-            </transition>
-            <!--修改信息-->
-            <transition name="fade">
-                <div v-if="cardStateValue==='updateInformation'" class="user_update_data_div">
-                    <div style="display:flex;justify-content: space-between;border-bottom: 2px #626262 solid;padding-bottom: 10px">
-                        <div @click="updateBackBtn" class="update_information_div_back_btn">
-                            <span class="update_information_div_back_btn_img"></span>返回
-                        </div>
-                        <div style="color:#a8a8a8;display: flex;align-items: center"><img
-                                style="width: 20px;height: 20px;margin: 0;padding: 0" src="image/index_04/tip_icon.png"
-                                alt=""> 点击单项更改
-                        </div>
-                    </div>
-                    <div class="update_user_data_item" @click="updateItemDataBtn('avatar',user.avatar)">
-                        <div style="color: #ffffff;font-weight: 600;font-size: 1em;">头像</div>
-                        <img :src="user.avatar" alt="">
-                        <span></span>
-                    </div>
-                    <div class="update_user_data_item" @click="updateItemDataBtn('synopsis',user.synopsis)">
-                        <div class="update_user_data_item_jianjie">
-                            <div>简介：</div>
-                            <div>{{user.synopsis === null ? "无" : user.synopsis}}</div>
-                        </div>
-                        <span></span>
-                    </div>
-                    <div class="update_user_data_item" @click="updateItemDataBtn('nickname',user.nickname)">
-                        <div class="update_user_data_item_left">
-                            <span>昵称：</span>
-                            <span>{{user.nickname === null ? "无" : user.nickname}}</span>
-                        </div>
-                        <span></span>
-                    </div>
-                    <div class="update_user_data_item" @click="updateItemDataBtn('gender',user.gender)">
-                        <div class="update_user_data_item_left">
-                            <span>性别：</span>
-                            <span v-if="user.gender===0">女</span>
-                            <span v-else-if="user.gender===1">男</span>
-                            <span v-else>外星人</span>
-                        </div>
-                        <span></span>
-                    </div>
-                    <div class="update_user_data_item" @click="updateItemDataBtn('birthday',user.birthday)">
-                        <div class="update_user_data_item_left">
-                            <span>生日：</span>
-                            <span>{{user.birthday === null ? "无" : user.birthday}}</span>
-                        </div>
-                        <span></span>
-                    </div>
-                    <div class="update_user_data_item" @click="updateItemDataBtn('phonenumber',user.phonenumber)">
-                        <div class="update_user_data_item_left">
-                            <span>手机：</span>
-                            <span>{{user.phonenumber === null ? "无" : user.phonenumber}}</span>
-                        </div>
-                        <span></span>
-                    </div>
-                    <div class="update_user_data_item" @click="updateItemDataBtn('school',user.school)">
-                        <div class="update_user_data_item_left">
-                            <span>学校：</span>
-                            <span>{{user.school === null ? "无" : user.school}}</span>
-                        </div>
-                        <span></span>
-                    </div>
-                    <div class="update_user_data_item" @click="updateItemDataBtn('region',user.region)">
-                        <div class="update_user_data_item_left">
-                            <span>地区：</span>
-                            <span>{{user.region === null ? "无" : user.region}}</span>
-                        </div>
-                        <span></span>
-                    </div>
-
-
-                </div>
-            </transition>
-            <!--修改密码-->
-            <transition name="fade">
-                <div v-if="cardStateValue==='updatePassword'" class="user_data_div">
-                    <!--头像 名字 性别-->
-                    <div style="width: auto">
-                        <div @click="updateBackBtn" class="update_information_div_back_btn">
-                            <span class="update_information_div_back_btn_img"></span>返回
-                        </div>
-                        <div class="update_password_input_div">
-                            <h4>旧密码</h4>
-                            <input v-model="oldPassword" onkeyup="value=value.replace(/[^\w\.\/]/ig,'')" maxlength="16"
-                                   type="password"
-                                   placeholder="请输入旧密码">
-                            <h4 style="margin-top: 20px">新密码</h4>
-                            <input v-model="newPassword1" onkeyup="value=value.replace(/[^\w\.\/]/ig,'')" maxlength="16"
-                                   type="password" placeholder="请设置新密码(密码长度6-16位)">
-                            <input v-model="newPassword2" onkeyup="value=value.replace(/[^\w\.\/]/ig,'')"
-                                   style="margin-top: 10px" maxlength="16" type="password"
-                                   placeholder="请再次输入新密码">
-                        </div>
-                        <div class="update_password_message_div">{{updateMessage}}</div>
-                    </div>
-                    <!--底部控制-->
-                    <div class="update_password_btn" @click="updatePasswordConfirmBtn">确认更改</div>
-                </div>
-            </transition>
-            <!--右侧-->
-            <div class="user_study_data_div">
-
             </div>
-
-
         </div>
     </div>
 </div>
 
-
 <script>
-
 
     /*我的信息*/
     const userDataApp = new Vue({
         el: "#userDataApp",
         data: {
-
             user: [],
             cardStateValue: "allInformation",  //左侧显示状态  allInformation  updateInformation   updatePassword
             updateMessage: "",//提示消息
@@ -447,12 +612,548 @@
             oldPassword: "",
             newPassword1: "",
             newPassword2: "",
-            passwordUpdateState: false  //是否成功修改密码
+            passwordUpdateState: false,  //是否成功修改密码
+            dailyList: [],
+            myAllStudyWords: [],
+            studyDataInfoSum: {
+                checkinSum: 0,
+                studyDurationSum: 0,
+                studyTimesSum: 0,
+                studyWordSum: 0,
+            },
+            qualityDataInfo: {
+                quality_0: 0,
+                quality_1: 0,
+                quality_2: 0,
+                quality_3: 0,
+            },
+            /*自定义书籍*/
+            control_userbook_div_state: false,
+            all_add_detail_userbook: 0,  //0为所有书籍，1为添加书籍，2为书籍详情,3编辑书籍
+            userbookname: '',  //书名
+            bookdescribe: '',  //简介
+            theUserBookWordCount: 0,  //单词数
+            theUserBookId: null,
+            public_privacy_status: 0,  //书籍属性
+            theUserBookDetail: [],      //书籍详情
+            theUserBookOfAllWords: [],   //书籍的所有单词
+            alreadyUserBookUpdate: false,  //是否更改过自定义词典
+            alMyUserBooks: [],
         },
-        created() {
-            this.fetchUserInformationAxios()
+
+        async created() {
+            await this.fetchUserInformationAxios()  //基本信息
+            await this.getMyDailyList()  //daily
+            await this.fetchMyAllStudyWords()  //studyWord
+            await this.getStudyDataInfoSum()  //顶部数据
+            await this.getQualityDataInfo()   //复习质量比例
+            this.numberSumAddDirective()   //数字变化
+            this.timeSumAddDirective()
+            this.fetchUserId();
+            this.showChart()  //阿糊涂
         },
         methods: {
+            //画图
+            showChart() {
+                this.studyTimesAndDurationLineChart()
+                this.qualityDataChartLeft()
+                this.qualityDoughnutChartRight()
+            },
+            /*右侧数据*/
+            //复习适量比例与次数
+            getQualityDataInfo() {
+                this.qualityDataInfo.quality_0 = this.myAllStudyWords.reduce((acc, item) => acc + item.q_0, 0);
+                this.qualityDataInfo.quality_1 = this.myAllStudyWords.reduce((acc, item) => acc + item.q_1, 0);
+                this.qualityDataInfo.quality_2 = this.myAllStudyWords.reduce((acc, item) => acc + item.q_2, 0);
+                this.qualityDataInfo.quality_3 = this.myAllStudyWords.reduce((acc, item) => acc + item.q_3, 0);
+
+            },
+            //获取所有学习计划单词
+            async fetchMyAllStudyWords() {
+                let _this = this
+                await axios({
+                    url: 'search/getMyAllStudyWords',
+                    method: 'get'
+                }).then(function (data) {
+                    _this.myAllStudyWords = data.data
+                })
+            },
+            //quality图left
+            qualityDataChartLeft() {
+                let quality_0 = this.qualityDataInfo.quality_0
+                let quality_1 = this.qualityDataInfo.quality_1
+                let quality_2 = this.qualityDataInfo.quality_2
+                let quality_3 = this.qualityDataInfo.quality_3
+                let quality_total = quality_0 + quality_1 + quality_2 + quality_3
+                const myChart = echarts.init(document.getElementById('qualityDataChartLeftId'));
+                const gaugeData = [
+                    {
+                        value: (quality_3/quality_total*100).toFixed(2),
+                        name: '了如指掌',
+                        title: {
+                            offsetCenter: ['-145%', '-90%'],
+                            color: '#00e57b',
+                        },
+                        detail: {
+                            valueAnimation: true,
+                            offsetCenter: ['-145%', '-65%'],
+                        }
+                    },
+                    {
+                        value: (quality_2/quality_total*100).toFixed(2),
+                        name: '恍然大悟',
+
+                        title: {
+                            offsetCenter: ['-145%', '-35%'],
+                            color: '#50a7ff',
+                        },
+                        detail: {
+                            valueAnimation: true,
+                            offsetCenter: ['-145%', '-15%']
+                        }
+                    },
+                    {
+                        value: (quality_1/quality_total*100).toFixed(2),
+                        name: '模模糊糊',
+                        title: {
+                            offsetCenter: ['-145%', '15%'],
+                            color: '#ff9000',
+                        },
+                        detail: {
+                            valueAnimation: true,
+                            offsetCenter: ['-145%', '40%']
+                        }
+                    },
+                    {
+                        value: (quality_0/quality_total*100).toFixed(2),
+                        name: '茫无所知',
+                        title: {
+                            offsetCenter: ['-145%', '65%'],
+                            color: '#ff0000',
+                        },
+                        detail: {
+                            valueAnimation: true,
+                            offsetCenter: ['-145%', '90%'],
+                        }
+                    }
+                ];
+                const option = {
+                    color: ['#00e57b', '#50a7ff', '#ff9000', '#ff0000'], //环的颜色
+                    series: [
+                        {
+                            center: ['60%', '50%'],
+                            type: 'gauge',
+                            startAngle: 90,
+                            endAngle: -270,
+                            pointer: {
+                                show: false
+                            },
+                            progress: {
+                                show: true,
+                                overlap: false,
+                                roundCap: true,
+                                clip: false,
+                                itemStyle: {
+                                    borderWidth: 1,
+                                    borderColor: '#464646'
+                                }
+                            },
+                            axisLine: {
+                                lineStyle: {
+                                    width: 40,
+                                    color: [
+                                        [1, '#464646']  //圆环的背景颜色
+                                    ]
+                                }
+                            },
+                            splitLine: {
+                                show: false,
+                                distance: 0,
+                                length: 10
+                            },
+                            axisTick: {
+                                show: false
+                            },
+                            axisLabel: {
+                                show: false,
+                                distance: 50
+                            },
+                            data: gaugeData,
+                            title: {
+                                fontSize: 14,
+                            },
+                            detail: {
+                                width: 50,
+                                height: 14,
+                                fontSize: 14,
+                                color: 'inherit',
+                                borderColor: 'inherit',
+                                borderRadius: 20,
+                                borderWidth: 1,
+                                formatter: '{value}%'
+                            }
+                        }
+                    ]
+                };
+                option && myChart.setOption(option);
+
+            },
+            //quality图right
+            qualityDoughnutChartRight() {
+                let quality_0 = this.qualityDataInfo.quality_0
+                let quality_1 = this.qualityDataInfo.quality_1
+                let quality_2 = this.qualityDataInfo.quality_2
+                let quality_3 = this.qualityDataInfo.quality_3
+                const myChart = echarts.init(document.getElementById('qualityDoughnutChartId'));
+                const option = {
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    color: ['#00e57b', '#50a7ff', '#ff9000', '#ff0000'], //环的颜色
+                    series: [
+                        {
+                            center: ['66%', '50%'],
+                            name: '反馈次数',
+                            type: 'pie',
+                            radius: ['40%', '70%'],
+                            avoidLabelOverlap: false,
+                            itemStyle: {
+                                borderRadius: 10,
+                                borderColor: '#fff',
+                                borderWidth: 2
+                            },
+                            label: {
+                                show: false,
+                                position: 'center'
+                            },
+                            emphasis: {
+                                label: {
+                                    show: true,
+                                    fontSize: 40,
+                                    fontWeight: 'bold'
+                                }
+                            },
+                            labelLine: {
+                                show: false
+                            },
+                            data: [
+                                {value: quality_3, name: '了如指掌'},
+                                {value: quality_2, name: '恍然大悟'},
+                                {value: quality_1, name: '模模糊糊'},
+                                {value: quality_0, name: '茫无所知'},
+                            ]
+                        }
+                    ]
+                };
+                window.addEventListener('resize', function () {
+                    myChart.resize();
+                });
+                option && myChart.setOption(option);
+            },
+            //单词数与复习次数折线统计图
+            studyTimesAndDurationLineChart() {
+                let studyTimey = []
+                let studyWordy = []
+                let dataX = []
+                for (let i = 0; i < this.dailyList.length; i++) {
+                    studyTimey.push(this.dailyList[i].studytime)
+                    studyWordy.push(this.dailyList[i].studyword)
+                    dataX.push(this.dailyList[i].time.slice(5))
+                }
+                const myChart = echarts.init(document.getElementById("studyTimesAndDurationLineChartId"));
+                window.addEventListener('resize', function () {
+                    myChart.resize();
+                });
+                const option = {
+                    title: {
+                        textStyle: {
+                            color: '#ffffff',  //更改坐标轴文字颜色
+                            fontSize: 17      //更改坐标轴文字大小
+                        },
+                        text: '最近复习单词数与反馈次数'
+                    },
+                    tooltip: {  //hover字体
+                        trigger: 'axis',
+                    },
+                    legend: {
+                        data: ['学习单词数', '复习次数'],
+                        textStyle: {
+                            color: '#ffffff',  //更改坐标轴文字颜色
+                            fontSize: 12      //更改坐标轴文字大小
+                        }
+                    },
+                    grid: {
+                        bottom: '3%',
+                        left: '2%',
+                        right: '2%',
+                        containLabel: true
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: dataX,
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#ffffff',  //更改坐标轴文字颜色
+                                fontSize: 12      //更改坐标轴文字大小
+                            }
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        boundaryGap: true,
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#ffffff',  //更改坐标轴文字颜色
+                                fontSize: 12      //更改坐标轴文字大小
+                            }
+                        }
+                    },
+                    series: [
+                        {
+                            name: '复习次数',
+                            type: 'line',
+                            data: studyTimey,
+                            itemStyle: {
+                                color: '#50a7ff',
+                            },
+                        },
+                        {
+                            name: '学习单词数',
+                            type: 'line',
+                            data: studyWordy,
+                            itemStyle: {
+                                color: '#00e57b',
+                            },
+                        },
+
+                    ]
+                };
+                option && myChart.setOption(option);
+            },
+            //获取dailyList
+            async getMyDailyList() {
+                let _this = this
+                await axios({
+                    url: "search/getMyDailyList",
+                    method: 'get'
+                }).then(function (data) {
+                    _this.dailyList = data.data.reverse()
+                })
+            },
+            //顶部数据  需在获取dailyList之后
+            getStudyDataInfoSum() {
+                this.studyDataInfoSum.studyWordSum = this.myAllStudyWords.length
+                this.studyDataInfoSum.checkinSum = this.dailyList.reduce((acc, item) => acc + item.checkin, 0);
+                this.studyDataInfoSum.studyDurationSum = this.dailyList.reduce((acc, item) => acc + item.studyduration, 0);
+                this.studyDataInfoSum.studyTimesSum = this.dailyList.reduce((acc, item) => acc + item.studytime, 0);
+            },
+            //数字增加
+            numberSumAddDirective() {
+                let _this = this
+                let rate = 30; //定时器间隔时间
+                let time = 1300
+                //单词
+                let count_studyWordSum = 0 //初始值
+                let num_studyWordSum = this.studyDataInfoSum.studyWordSum
+                let average_studyWordSum = num_studyWordSum / (time / rate) //得到每次定时器跳动的值
+                let timer_studyWordSum = setInterval(() => {
+                    // 将我们得到的值设置给count
+                    count_studyWordSum += average_studyWordSum
+                    _this.studyDataInfoSum.studyWordSum = count_studyWordSum.toFixed(0)
+                    if (count_studyWordSum > num_studyWordSum) {
+                        count_studyWordSum = num_studyWordSum
+                        _this.studyDataInfoSum.studyWordSum = count_studyWordSum.toFixed(0)
+                        //清除定时器
+                        timer_studyWordSum = null
+                        clearInterval(timer_studyWordSum)
+                    }
+                }, rate);
+                //签到
+                let count_checkinSum = 0 //初始值
+                let num_checkinSum = this.studyDataInfoSum.checkinSum
+                let average_checkinSum = num_checkinSum / (time / rate) //得到每次定时器跳动的值
+                let timer_checkinSum = setInterval(() => {
+                    // 将我们得到的值设置给count
+                    count_checkinSum += average_checkinSum
+                    _this.studyDataInfoSum.checkinSum = count_checkinSum.toFixed(0)
+                    if (count_checkinSum > num_checkinSum) {
+                        count_checkinSum = num_checkinSum
+                        _this.studyDataInfoSum.checkinSum = count_checkinSum.toFixed(0)
+                        //清除定时器
+                        timer_checkinSum = null
+                        clearInterval(timer_checkinSum)
+                    }
+                }, rate);
+                //复习次数
+                let count_studyTimesSum = 0 //初始值
+                let num_studyTimesSum = this.studyDataInfoSum.studyTimesSum
+                let average_studyTimesSum = num_studyTimesSum / (time / rate) //得到每次定时器跳动的值
+                let timer_studyTimesSum = setInterval(() => {
+                    // 将我们得到的值设置给count
+                    count_studyTimesSum += average_studyTimesSum
+                    _this.studyDataInfoSum.studyTimesSum = count_studyTimesSum.toFixed(0)
+                    if (count_studyTimesSum > num_studyTimesSum) {
+                        count_studyTimesSum = num_studyTimesSum
+                        _this.studyDataInfoSum.studyTimesSum = count_studyTimesSum.toFixed(0)
+                        //清除定时器
+                        timer_studyTimesSum = null
+                        clearInterval(timer_studyTimesSum)
+                    }
+                }, rate);
+            },
+            //时间
+            timeSumAddDirective() {
+                let _this = this
+                let rate = 30; //定时器间隔时间
+                let time = 1300
+                //单词
+                let count = 0 //初始值
+                let num = this.studyDataInfoSum.studyDurationSum
+                let average = num / (time / rate) //得到每次定时器跳动的值
+                let timer_studyWordSum = setInterval(() => {
+                    // 将我们得到的值设置给count
+                    count += average
+                    if (count <= num) {
+                        if (count > 600 && count < 36000) {
+                            _this.studyDataInfoSum.studyDurationSum = Math.floor(count.toFixed(0) / 600) + 'm'
+                        } else if (count > 36000) {
+                            _this.studyDataInfoSum.studyDurationSum = Math.floor(count.toFixed(0) / 36000) + 'h' + Math.floor(count.toFixed(0) % 36000 / 600) + 'm'
+                        }
+                    } else {
+                        count = num
+                        if (count > 600 && count < 36000) {
+                            _this.studyDataInfoSum.studyDurationSum = Math.floor(count.toFixed(0) / 600) + 'm'
+                        } else if (count > 36000) {
+                            _this.studyDataInfoSum.studyDurationSum = Math.floor(count.toFixed(0) / 36000) + 'h' + Math.floor(count.toFixed(0) % 36000 / 600) + 'm'
+                        }
+                        //清除定时器
+                        timer_studyWordSum = null
+                        clearInterval(timer_studyWordSum)
+                    }
+                }, rate);
+
+            },
+
+
+            //删除词库
+            deleteTheUserBookConfirmBtn() {
+                let _this = this
+                MessageBoxVue.openMessageBox("删除该词库将删除该词库里的所有单词，你确定吗？")
+                let r = new Promise((resolve) => {
+                    let timer = setInterval(() => {   //定时器
+                        let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
+                        if (messageBoxConfirmValue !== "null") {
+                            clearInterval(timer)
+                            resolve(messageBoxConfirmValue)
+                        }
+                    }, 100)
+                })
+                r.then(async (res) => {
+                    if (res === "true") {
+                        //确认操作逻辑
+                        await _this.deleteTheUserBookAxios()  //删除
+                        sessionStorage.clear()  //清楚所有前端session
+                    }
+                })
+
+
+            },
+            //删除词库axios
+            async deleteTheUserBookAxios() {
+                let _this = this
+                await axios({
+                    method: 'post',
+                    url: "update/deleteTheUserBookAndAllWords?userbookid=" + _this.theUserBookId
+                }).then(function (data) {
+                    if (data.data) {
+                        _this.alreadyUserBookUpdate = true
+                        NotificationVue.showPublicNotification("success", "词库删除成功")
+                    } else {
+                        NotificationVue.showPublicNotification("error", "发生未知错误，请稍后再试。")
+                    }
+                })
+                _this.userBookBackBtn()   //获取新所有词库
+            },
+            //编辑词库确认
+            editUserBookConfirmBtn() {
+                let _this = this
+                if (this.userbookname === "") {
+                    NotificationVue.showPublicNotification("error", "请填写词库名称")
+                } else {
+                    axios({
+                        method: 'post',
+                        url: "update/updateTheUserBookInfo?userbookname=" + _this.userbookname + "&bookdescribe=" + _this.bookdescribe + "&share=" + _this.public_privacy_status + "&userbookid=" + _this.theUserBookId
+                    }).then(function (data) {
+                        if (data.data) {
+                            _this.alreadyUserBookUpdate = true
+                            NotificationVue.showPublicNotification("success", "词库编辑成功")
+                        } else {
+                            NotificationVue.showPublicNotification("error", "发生未知错误，请稍后再试。")
+                        }
+
+                    })
+                }
+
+            },
+            //编辑该词库按钮
+            editTheUserBookBtn(userbookid) {
+                this.theUserBookId = userbookid
+                let _this = this
+                let privacy_status = 0
+                let timer = setInterval(() => {   //定时器
+                    let userBook = _this.alMyUserBooks.find(item => item.userbookid === userbookid);
+                    if (userBook.userbookid === userbookid) {
+                        _this.all_add_detail_userbook = 3
+                        _this.userbookname = userBook.userbookname  //书名
+                        _this.bookdescribe = userBook.bookdescribe  //简介
+                        privacy_status = userBook.share  //书籍属性
+                        _this.theUserBookWordCount = userBook.voccount  //书籍属性
+
+                        if (_this.all_add_detail_userbook === 3) {
+                            _this.switchChangeBtn(privacy_status)   //更改属性按钮
+                            clearInterval(timer)
+                        }
+
+                    }
+                }, 100)
+
+            },
+            //获取词库属性并更改样式
+            switchChangeBtn(v) {
+                let timer = setInterval(() => {
+                    let switchBtnStatus_0 = document.getElementById("switchBtnStatus_0");
+                    let switchBtnStatus_1 = document.getElementById("switchBtnStatus_1");
+                    if (switchBtnStatus_0 !== null && switchBtnStatus_1 !== null) {
+                        if (v === 0) {
+                            if (!switchBtnStatus_0.classList.contains("switch_btn_active")) {
+                                switchBtnStatus_0.classList.add("switch_btn_active")
+                            }
+                            if (switchBtnStatus_1.classList.contains("switch_btn_active")) {
+                                switchBtnStatus_1.classList.remove("switch_btn_active")
+                            }
+                        } else {
+                            if (!switchBtnStatus_1.classList.contains("switch_btn_active")) {
+                                switchBtnStatus_1.classList.add("switch_btn_active")
+                            }
+                            if (switchBtnStatus_0.classList.contains("switch_btn_active")) {
+                                switchBtnStatus_0.classList.remove("switch_btn_active")
+                            }
+                        }
+                        clearInterval(timer)
+                    }
+                }, 100)
+                this.public_privacy_status = v
+            },
+
+
             /*点击某一项 打开修改卡*/
             updateItemDataBtn(category, value) {
                 updateCardApp.openUpdateCard(category, value);
@@ -540,8 +1241,136 @@
                         });
                     }
                 })
+            },
 
 
+            /*自定义书籍卡打开关闭按钮*/
+            async controlUserBookBtn() {
+                if (!this.control_userbook_div_state) {
+                    await this.showMyUserBook()
+                    this.all_add_detail_userbook = 0
+                    this.control_userbook_div_state = true
+                } else
+                    this.control_userbook_div_state = false
+            },
+            /*显示我的所有云词本*/
+            showMyUserBook() {
+                const _this = this;
+                axios({
+                    method: 'get',
+                    url: "search/allMyUserBooks?holderid=" + _this.userid
+                }).then(function (data) {
+                    _this.alMyUserBooks = data.data;
+                });
+            },
+            /*添加云词库按钮*/
+            addUserbookBtn() {
+                this.userbookname = ''  //书名
+                this.bookdescribe = ''  //简介
+                this.public_privacy_status = 0  //书籍属性
+                this.all_add_detail_userbook = 1
+            },
+            /*自定义书籍返回按钮*/
+            async userBookBackBtn() {
+                if (this.alreadyUserBookUpdate) {
+                    await this.showMyUserBook()
+                    this.alreadyUserBookUpdate = false
+                }
+                this.public_privacy_status = 0
+                this.all_add_detail_userbook = 0
+                this.theUserBookOfAllWords = []
+
+            },
+            /*确认添加书籍按钮axios*/
+            async addUserBookConfirmBtn() {
+                const _this = this;
+                await axios({
+                    method: 'post',
+                    url: "update/addUserBook?holderid=" + _this.userid + "&userbookname=" + _this.userbookname + "&bookdescribe=" + _this.bookdescribe + "&share=" + _this.public_privacy_status
+                }).then(function (data) {
+                    if (data.data === "NoUserBookName")
+                        NotificationVue.showPublicNotification("error", "请填写词库名称。");
+                    if (data.data === false)
+                        NotificationVue.showPublicNotification("error", "发生未知错误，请稍后再试。")
+                    if (data.data === true) {
+                        NotificationVue.showPublicNotification("success", "添加成功")
+                    }
+                });
+                _this.public_privacy_status = 0  //书籍属性
+                _this.userbookname = ''  //书名
+                _this.bookdescribe = ''  //简介
+                _this.alreadyUserBookUpdate = true
+            },
+            /*跳转词库详情按钮*/
+            async theUserBookDetailBtn(userbookid) {
+                await this.getTheUserBookOfWords(userbookid);
+                this.theUserBookDetail = this.alMyUserBooks.find(item => item.userbookid === userbookid);
+                this.all_add_detail_userbook = 2
+            },
+            /*获取某词库的单词*/
+            getTheUserBookOfWords(bookid) {
+                const _this = this
+                axios({
+                    method: 'get',
+                    url: "search/getUserBookOfAllWords?bookid=" + bookid
+                }).then(function (data) {
+                    _this.theUserBookOfAllWords = data.data
+                });
+            },
+            /*跳转到单词详情*/
+            theWordDetail(wordid) {
+                sessionStorage.setItem("wordid", wordid);
+                sessionStorage.setItem("backFromWordDetailPageValue", "index_01");
+                axios({
+                    method: 'post',
+                    url: 'update/addSearchTimes?wordid=' + wordid,
+                }).then(function (data) {
+                    window.location.assign('wordDetailPage?wordid=' + wordid);
+                })
+            },
+            /*从书籍删除该单词按钮*/
+            deleteTheWordFormUserBookBtn(wordid, bookid) {
+                MessageBoxVue.openMessageBox("你确定要将这个单词从这个词库删除吗？")
+                let r = new Promise((resolve) => {
+                    let timer = setInterval(() => {   //定时器
+                        let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
+                        if (messageBoxConfirmValue !== "null") {
+                            clearInterval(timer)
+                            resolve(messageBoxConfirmValue)
+                        }
+                    }, 100)
+                })
+                r.then(async (res) => {
+                    if (res === "true") {  //删除例句
+                        let v = await this.deleteTheWordFromUserBookAxios(wordid, bookid)
+                        if (v) {
+                            await this.getTheUserBookOfWords(bookid);
+                            NotificationVue.showPublicNotification("success", "删除成功。")
+                        } else {
+                            NotificationVue.showPublicNotification("error", "发生未知错误，删除失败。")
+                        }
+                    }
+                })
+            },
+            /*从书籍删除该单词axios*/
+            async deleteTheWordFromUserBookAxios(wordid, bookid) {
+                let result;
+                await axios({
+                    method: 'post',
+                    url: "update/deleteWordFromUserBookMapper?wordid=" + wordid + "&bookid=" + bookid
+                }).then(function (data) {
+                    result = data.data
+                });
+                return result
+            },
+            fetchUserId() {
+                const _this = this;
+                axios({
+                    method: "get",
+                    url: "search/getUserId"
+                }).then(function (data) {
+                    _this.userid = data.data
+                })
             },
         }
 
@@ -665,7 +1494,7 @@
 
             /*picker*/
             picker_years: Array.from({length: 40}, (_, index) => new Date().getFullYear() - index),   //年份
-            picker_months: Array.from({length: 12}, (_, index) => new Date().getMonth() + index-1 ),   //月份
+            picker_months: Array.from({length: 12}, (_, index) => new Date().getMonth() + index - 1),   //月份
             picker_days: null,  //天
             pointerDown: false,               //鼠标/手指是否按下
             itemHeight: 38,                   //每个picker_item高5rem=5*16=80px
@@ -1030,27 +1859,34 @@
         methods: {
             /*public确认还是取消按钮并关闭弹窗*/
             messageBoxConfirmBtn(v) {
-                // console.log("v="+v)
                 window.sessionStorage.setItem("messageBoxConfirmValue", v);
                 //关闭弹窗
-                let messageBox = document.getElementById("messageBox");
+                // let messageBox = document.getElementById("messageBox");
                 let MessageBoxContent = document.getElementById("MessageBoxContent");
                 MessageBoxContent.style.display = "none"
-                messageBox.style.marginTop = "-200px";
-                // console.log(window.sessionStorage.getItem("messageBoxConfirmValue")==="true")
+                // messageBox.style.marginTop = "-200px";
+                let m = function (e) {
+                    e.preventDefault();
+                };
+                document.body.style.overflow = '';
+                document.addEventListener('touchmove', m, {passive: true});//禁止页面滑动
             },
             /*打开弹窗 其他vue实例使用*/
             openMessageBox(content) {
+                let m = function (e) {
+                    e.preventDefault();
+                };
+                document.body.style.overflow = 'hidden';
+                document.addEventListener('touchmove', m, {passive: false});//禁止页面滑动
                 sessionStorage.setItem("messageBoxConfirmValue", "null");
                 this.messageBoxQuestion = content
                 // this.functionName = functionName
-                let messageBox = document.getElementById("messageBox");
+                // let messageBox = document.getElementById("messageBox");
                 let MessageBoxContent = document.getElementById("MessageBoxContent");
                 MessageBoxContent.style.display = "flex"
-                messageBox.style.marginTop = "20px";
+                // messageBox.style.marginTop = "20px";
             },
             tipEffection() {
-                console.log("123")
                 this.borderFramesValue = true
             },
             tipEffectionEnd() {

@@ -64,11 +64,19 @@ public interface StudyWordMapper {
     @Select("select count(*) from tb_voc_study where userid=#{userid} and Date(nextstudydate)<=#{date} and state = 0 ORDER BY ef LIMIT 1")
     int getTodayStudyWordsCount(@Param("userid") int userid, @Param("date") String date);
 
+
+    @Select("select count(*) from tb_voc_study where userid=#{userid}")
+    int getStudyWordSum(@Param("userid") int userid);
+
     @Update("update tb_voc_study set q_0=#{q_0} ,q_1=#{q_1},q_2=#{q_2},q_3=#{q_3},studycount=#{studycount},ef=#{ef},day_q_0=#{day_q_0},day_q_1=#{day_q_1},day_q_2=#{day_q_2},day_studycount=#{day_studycount},intervalday=#{intervalday},laststudydate=#{laststudydate},nextstudydate=#{nextstudydate} where userid=#{userid} and wordid=#{wordid}")
     boolean updateStudyWordInformation(StudyWord studyWord);
 
     @Update("update tb_voc_study set exapid = #{exapid} where userid = #{userid} and wordid = #{wordid}")
     boolean updateStudyWordExample( @Param("userid") int userid,@Param("wordid") int wordid,@Param("exapid") int exapid);
+
+
+    @Select("select * from tb_voc_study where userid=#{userid}")
+    List<StudyWord> getMyAllStudyWords(@Param("userid") int userid);
 
 
 

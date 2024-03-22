@@ -568,29 +568,35 @@
     box-sizing: border-box;
     transition: all 0.2s;
 }
+
 .studying_not_left_control_div > span:nth-child(1) {
     border: 2px solid #00e57b;
     background-color: #00e57b;
     color: #000000;
 }
+
 .studying_not_left_control_div > span:nth-child(3) {
-     border: 2px solid #ff0000;
- }
+    border: 2px solid #ff0000;
+}
+
 .studying_not_left_control_div > span:nth-child(2) {
     border: 2px solid #ff9000;
 }
+
 .studying_not_left_control_div > span:nth-child(1):hover {
     background-color: #00e57b;
     color: #000000;
 }
+
 .studying_not_left_control_div > span:nth-child(2):hover {
     background-color: #ff9000;
     color: #000000;
-}.studying_not_left_control_div > span:nth-child(3):hover {
-     background-color: #ff0000;
-     color: #000000;
- }
+}
 
+.studying_not_left_control_div > span:nth-child(3):hover {
+    background-color: #ff0000;
+    color: #000000;
+}
 
 
 .todayStudiedWords_item {
@@ -648,8 +654,6 @@
 }
 
 
-
-
 .control_example_div {
     display: flex;
     justify-content: center;
@@ -659,6 +663,7 @@
     z-index: 9999;
     background-color: rgba(0, 0, 0, 0.7);
 }
+
 .control_example_content_div {
     user-select: none;
     overflow: auto;
@@ -675,7 +680,6 @@
 .control_example_content_div::-webkit-scrollbar {
     height: 100%;
     width: 3px;
-    /*color: #00e57b;*/
     background-color: #969696;
 }
 
@@ -683,13 +687,15 @@
     border-radius: 10px;
     background-color: #00e57b;
 }
+
 .tittle_sort_div {
     background-color: #1e1e1e;
     z-index: 10;
-    width: 500px;
+    width: 497px;
     /*padding-right: 10px;*/
     position: fixed;
 }
+
 .tittle_div {
     border-bottom: 1px solid #7e7e7e;
     color: var(--normalTextColor);
@@ -701,6 +707,7 @@
     height: 30px;
     /*border: 1px red solid;*/
 }
+
 .tittle_span {
     color: var(--greenColor00e57b);
     font-size: 1.2em;
@@ -708,6 +715,7 @@
     height: 30px;
     width: 100%;
 }
+
 .close_div_btn {
     cursor: pointer;
     width: 30px;
@@ -725,6 +733,7 @@
     background-color: red;
     background-image: url("../image/pageWordDetail/close_btn_hover.png");
 }
+
 .sort_div {
     width: auto;
     height: 20px;
@@ -732,6 +741,7 @@
     padding-bottom: 10px;
     box-shadow: 0 4px 5px rgba(0, 0, 0, 0.45); /* 下边框阴影 */
 }
+
 .backOradd {
     cursor: pointer;
     margin-left: 5px;
@@ -757,12 +767,13 @@
     height: 80%;
     padding: 10px;
     padding-top: 100px;
-
     color: var(--normalTextColor);
 }
+
 .userBookNameDiv {
     display: flex;
 }
+
 .userBookItemDiv {
     /*padding-left: 5px;*/
     /*padding-right: 5px;*/
@@ -780,9 +791,11 @@
     font-size: 1em;
     border: 1px rgba(0, 0, 0, 0) solid;
 }
+
 .userBookItemDiv:hover {
     border: 1px #00e57b solid;
 }
+
 .userBookItemDiv:hover .userBookNameDiv_child1 {
     background-image: url("../image/pageWordDetail/book_icon_green.png");
 }
@@ -800,12 +813,14 @@
     background-repeat: no-repeat;
     background-position: center;
 }
+
 .userBookNameDiv_child2 {
     color: whitesmoke;
     font-size: 1em;
     line-height: 30px;
     transition: all 0.2s;
 }
+
 .addTheWordToCikuBtn {
     cursor: pointer;
     margin-left: 5px;
@@ -849,6 +864,7 @@
     font-size: 1em;
     border: none;
 }
+
 .addUserBookDiv > input:focus {
     outline: 1px solid #00e57b;
 }
@@ -864,11 +880,13 @@
     text-align: center;
     font-weight: 600;
 }
+
 .double_switch_div_btn {
     width: 100px;
     height: 30px;
     color: whitesmoke;
 }
+
 .addUserBookDiv_jianjie {
     display: flex;
     padding-top: 10px;
@@ -942,17 +960,22 @@
     color: #00e57b;
     transition: all 0.2s;
 }
+
 .all_words_div > div:hover {
     color: #00e57b;
-}
-.all_words_div_item_span {
-    color: #eaeaea;
-    font-size: 20px;
 }
 .all_words_div > div:hover .all_words_div_item_span {
     color: #00e57b;
     transition: all 0.2s;
 }
+
+.all_words_div_item_span {
+    color: #eaeaea;
+    font-size: 20px;
+}
+
+
+
 .word_item_span {
     /*margin-left: 10px;*/
     transition: all 0.2s;
@@ -975,9 +998,11 @@
     padding-bottom: 10px;
     border-bottom: 1px #727272 dashed;
 }
+
 .example_text {
     user-select: text;
 }
+
 .example_info {
     display: flex;
     justify-content: space-between;
@@ -990,6 +1015,7 @@
     font-size: 13px;
     /*color: #989898;*/
 }
+
 .example_heat {
     cursor: pointer;
     display: flex;
@@ -1007,6 +1033,7 @@
     /*margin: 0 auto;*/
 
 }
+
 .user_operation_div {
     display: flex;
 }
@@ -1022,18 +1049,22 @@
     cursor: pointer;
     color: #00e57b;
 }
+
 .example_holder {
     color: #0098da;
     /*background-color: #0098da*/
 }
+
 .example_adddate {
     color: #fd9300;
 }
-.all_example_item_select_control_div{
+
+.all_example_item_select_control_div {
     width: 20px;
     height: 20px;
 }
-.all_example_item_select_control_div>span{
+
+.all_example_item_select_control_div > span {
     display: block;
     width: 20px;
     height: 20px;
@@ -1041,16 +1072,19 @@
     background-position: center;
     background-repeat: no-repeat;
 
-    transition:all 0.2s;
+    transition: all 0.2s;
 }
+
 .all_example_item_select_control_no {
     cursor: pointer;
     background-image: url("../image/public_icon/no_selecte_icon_white.png");
 }
+
 .all_example_item_select_control_no:hover {
     background-image: url("../image/public_icon/no_selecte_cion_green.png");
 }
-.all_example_item_select_control_yes{
+
+.all_example_item_select_control_yes {
     cursor: not-allowed;
     background-image: url("../image/public_icon/selected_icon_green.png");
 }
@@ -1058,12 +1092,13 @@
 
 .studying_not_right_today_date {
     padding: 0;
-    margin:  0;
+    margin: 0;
     color: whitesmoke;
     font-size: 2.5em;
     font-weight: 700;
 }
-.studying_not_right_today_checkin{
+
+.studying_not_right_today_checkin {
     margin-left: 20px;
     display: inline-block;
     width: 30px;
@@ -1072,20 +1107,23 @@
     background-position: center;
     background-repeat: no-repeat;
 }
-.checkin_yes{
+
+.checkin_yes {
     background-image: url("../image/public_icon/jinbu_green.png");
 }
-.checkin_no{
+
+.checkin_no {
     background-image: url("../image/public_icon/jinbu_black.png");
 }
 
-.studying_not_right_today_button{
+.studying_not_right_today_button {
     display: flex;
     padding: 20px;
     align-items: center;
     justify-content: center;
 }
-.studying_not_right_today_button>span{
+
+.studying_not_right_today_button > span {
     display: block;
     width: 200px;
     height: 40px;
@@ -1094,28 +1132,33 @@
     text-align: center;
     font-weight: 700;
 }
-.checkin_btn_yes{
+
+.checkin_btn_yes {
     cursor: not-allowed;
     color: #000000;
     background: #00e57b;
 }
-.checkin_btn_no{
+
+.checkin_btn_no {
     cursor: pointer;
     color: #ffffff;
     background: #ff0000;
 }
-.studying_not_right_today_other_button_div{
+
+.studying_not_right_today_other_button_div {
     width: auto;
 
 }
-.other_button_div_tip{
+
+.other_button_div_tip {
     padding-bottom: 5px;
     display: flex;
     align-items: center;
     color: #989898;
     font-size: 15px;
 }
-.other_button_div_tip>span:nth-child(1){
+
+.other_button_div_tip > span:nth-child(1) {
     display: flex;
     width: 20px;
     height: 20px;
@@ -1124,13 +1167,15 @@
     background-repeat: no-repeat;
     background-image: url("../image/index-01/tip_white.png");
 }
-.other_button_div{
+
+.other_button_div {
     padding-top: 10px;
     border-top: 1px solid #484848;
     display: flex;
     justify-content: left;
 }
-.other_button_div>div{
+
+.other_button_div > div {
     display: flex;
     cursor: pointer;
     border-radius: 3px;
@@ -1141,15 +1186,18 @@
     font-size: 15px;
     color: #676767;
 }
-.other_button_div>div>span{
+
+.other_button_div > div > span {
     margin-right: 3px;
     transition: all 0.2s;
 }
-.other_button_div>div:hover  {
+
+.other_button_div > div:hover {
     border-color: #00e57b;
     color: #00e57b;
 }
-.other_button_div>div>span{
+
+.other_button_div > div > span {
     display: inline-flex;
     width: 20px;
     height: 20px;
@@ -1157,26 +1205,95 @@
     background-repeat: no-repeat;
     background-position: center;
 }
-.other_button_word_span{
+
+.other_button_word_span {
     background-image: url("../image/public_icon/word_icon_676767.png");
 }
-.other_button_team_span{
+
+.other_button_team_span {
     background-image: url("../image/public_icon/team_icon_676767.png");
 }
-.other_button_set_span{
+
+.other_button_set_span {
     background-image: url("../image/public_icon/set_icon_676767.png");
 }
-.other_button_word:hover .other_button_word_span{
+
+.other_button_word:hover .other_button_word_span {
     background-image: url("../image/public_icon/word_icon_00e57b.png");
 }
-.other_button_team:hover .other_button_team_span{
+
+.other_button_team:hover .other_button_team_span {
     background-image: url("../image/public_icon/team_icon_00e57b.png");
 }
-.other_button_set:hover .other_button_set_span{
+
+.other_button_set:hover .other_button_set_span {
     background-image: url("../image/public_icon/set_icon_00e57b.png");
 }
 
+.all_select_books_item {
+    font-size: 1em;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+.all_select_books_item:hover{
+    color: #00e57b;
+    font-size: 1.1em;
+}
 
+.all_word_item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px #727272 dashed;
+    padding: 5px 0 5px 0;
+}
+.all_word_item_icon_spelling{
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+.all_word_item_icon_spelling>span:nth-child(1){
+    display: inline-flex;
+    width: 23px;
+    height: 23px;
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.all_word_item_icon_spelling>span:nth-child(2){
+    margin-left: 5px;
+    font-size: 20px;
+    color: whitesmoke;
+}
+.all_word_item_detail_btn{
+    display: flex;
+}
+.all_word_item_detail_btn>span:nth-child(1){
+    margin-right: 7px;
+    max-width: 150px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow:ellipsis;/*超出部分省略号表示*/
+    font-size: 15px;
+    color: whitesmoke;
+}
+.all_word_item_detail_btn>span:nth-child(2){
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: all 0.2s;
+    background-image: url("../image/index-01/spelling_detail_icon_white.png");
+}
+
+.all_word_item_detail_btn>span:nth-child(2):hover{
+    background-image: url("../image/index-01/spelling_detail_icon_green.png");
+}
 
 
 

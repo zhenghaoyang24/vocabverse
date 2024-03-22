@@ -134,4 +134,20 @@ public class StudyWordServiceImpl implements StudyWordService {
         sqlSession.close();
         return todayStudiedWords;
     }
+
+    @Override
+    public List<StudyWord> getMyAllStudyWords(int userid) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        StudyWordMapper mapper = sqlSession.getMapper(StudyWordMapper.class);
+        List<StudyWord> studyWords = mapper.getMyAllStudyWords(userid);
+        sqlSession.close();
+        return studyWords;
+    }
+
+    @Override
+    public int getStudyWordSum(int userid) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        StudyWordMapper mapper = sqlSession.getMapper(StudyWordMapper.class);
+        return mapper.getStudyWordSum(userid);
+    }
 }

@@ -54,12 +54,27 @@
             transition: all 0.2s;
         }
 
+        .tip_example_control_span_not_allow {
+            cursor: not-allowed;
+            margin-left: 5px;
+            border-radius: 4px;
+            padding: 4px;
+            width: auto;
+            font-size: 0.9em;
+            font-weight: 800;
+            background-color: #676767;
+            color: #c4c4c4;
+            transition: all 0.2s;
+        }
+
         .tip_example_control_span:hover {
             background-color: #00e57b;
             color: #000000;
         }
 
+
         .tip_example_control_span_focus {
+            cursor: pointer;
             background-color: #00e57b;
             color: #000000;
         }
@@ -263,6 +278,69 @@
             </div>
         </div>
     </div>
+    <div v-if="control_selectword_div_state" class="control_example_div">
+        <div class="control_example_content_div">
+            <!--标题-->
+            <div class="tittle_sort_div">
+                <div class="tittle_div">
+                    <span class="tittle_span">选词</span>
+                    <span @click="selectWordCardBtn" class="close_div_btn"></span>
+                </div>
+                <div v-show="!showTheBookOfWords" class="sort_div">
+                    <span id="select_word_control_state_1" @click="selectWordControlStateBtn(1)"
+                          class="tip_example_control_span tip_example_control_span_focus">官方词库</span>
+                    <span id="select_word_control_state_2" @click="selectWordControlStateBtn(2)"
+                          class="tip_example_control_span">共享词库</span>
+                </div>
+                <div v-show="showTheBookOfWords" class="sort_div" style="display: flex;justify-content: space-between">
+                    <span>
+                        <span class="tip_example_control_span" @click="selectWordControlBackBtn">返回</span>
+                        <span @click="selectWordConfirmBtn" id="select_word_confirm_btn_id" class="tip_example_control_span_not_allow">确定</span>
+                        <span style="color: whitesmoke">已选{{selectedWordList.length}}个</span>
+                    </span>
+                    <span style="padding-right: 5px">
+                        <span class="tip_example_control_span tip_example_control_span_focus"
+                              @click="showWordItemParaphraseBtn">{{showWordItemParaphrase ? '隐藏释义' : '显示释义'}}</span>
+                        <span class="tip_example_control_span tip_example_control_span_focus"
+                              @click="showSelectedWordStateBtn">{{showSelectedWordState ? '隐藏已选' : '显示已选'}}</span>
+                    </span>
+                </div>
+            </div>
+            <!--显示词库页面-->
+            <div v-show="!showTheBookOfWords" class="all_example_list">
+                <div v-show="selectWordControlState===1" v-for="(item,index) in officialBooks"
+                     @click="theBookAllWords(item.bookid)" class="all_example_item all_select_books_item">
+                    <span>{{item.bookname}}</span>
+                    <span>{{item.voccount}}&nbsp;词</span>
+                </div>
+                <div v-show="selectWordControlState===2" v-for="(item,index) in userBooks"
+                     @click="theBookAllWords(item.userbookid)" class="all_example_item all_select_books_item">
+                    <span>{{item.userbookname}}</span>
+                    <span>{{item.voccount}}&nbsp;词</span>
+                </div>
+            </div>
+            <div v-show="showTheBookOfWords" class="all_example_list">
+                <div class="all_word_item" v-for="(item,index) in bookOfAllWords"
+                     v-show="showSelectedWordState? true:!myAllStudyWords.find(wordItem => wordItem.wordid === item.wordid)">
+                    <div class="all_word_item_icon_spelling">
+                        <span v-if="myAllStudyWords.find(wordItem => wordItem.wordid === item.wordid)"
+                              style="background-image: url('image/public_icon/selected_icon_gray.png');cursor: not-allowed"></span>
+                        <span @click="selectTheWordBtn(item.wordid,index)"
+                              v-else-if="!selectedWordList.includes(item.wordid)"
+                              style="background-image: url('image/public_icon/no_selecte_cion_green.png');cursor: pointer"></span>
+                        <span @click="selectTheWordBtn(item.wordid,index)" v-else
+                              style="background-image: url('image/public_icon/selected_icon_green.png');cursor: pointer"></span>
+                        <span>{{item.word.spelling}}</span>
+                    </div>
+                    <div class="all_word_item_detail_btn">
+                        <span v-show="showWordItemParaphrase">{{item.word.paraphrase}}</span>
+                        <span @click="theWordDetail(item.word.wordid)"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="content-body">
         <div class="content-div">
             <!--复习-->
@@ -307,7 +385,9 @@
                         </div>
                     </div>
                     <div class="study_bottom_div">
-                        <div style="width: 80px">
+                        <div style="min-width: 80px">
+                                     <span style="background-color: #ff0000;padding: 2px;border-radius: 3px;font-weight: 700;"
+                                           v-if="Math.abs(this.studyWord.intervalday)!==0">逾期{{Math.abs(this.studyWord.intervalday)}}天</span>
 
                         </div>
                         <div class="study_tip_div">
@@ -426,7 +506,6 @@
             </div>
             <!--完成页面-->
             <div v-else style="display: flex">
-
                 <div class="studying_not_left_div">
                     <div class="studying_not_left_title_div">
                         <div>今日学习单词</div>
@@ -488,11 +567,13 @@
                         <span v-else class="checkin_btn_no" @click="checkinBtn">今日未签到</span>
                     </div>
                     <div class="studying_not_right_today_other_button_div">
-                        <div class="other_button_div_tip"><span></span>：今天的单词已学习完，你可以选择更多新单词继续学习。</div>
+                        <div class="other_button_div_tip"><span></span>：今天的单词已学习完，你可以选择更多新单词继续学习。
+                        </div>
                         <div class="other_button_div">
-                            <div class="other_button_word"><span class="other_button_word_span"></span>选词</div>
+                            <div @click="selectWordCardBtn" class="other_button_word"><span
+                                    class="other_button_word_span"></span>选词
+                            </div>
                             <div class="other_button_team"><span class="other_button_team_span"></span>小队</div>
-                            <div class="other_button_set"><span class="other_button_set_span"></span>学习设置</div>
                         </div>
                     </div>
                 </div>
@@ -532,10 +613,23 @@
             theUserBookOfAllWords: [],   //书籍的所有单词
             alreadyUserBookUpdate: false,  //是否更改过自定义词典
             alMyUserBooks: [],
+            public_privacy_status: 0,  //书籍属性
             /*提示例句设置*/
             control_setexample_div_state: false,
             cardExampleList: [],
             tipExampleControlState: 2,//例句是显示全部还是我选择的  默认全部
+            /*选词设置*/
+            control_selectword_div_state: false,
+            selectWordControlState: 1,  //1 官方词库  2 共享词库
+            showTheBookOfWords: false,   //显示词库所有单词
+            officialBooks: {},   //官方词库
+            userBooks: {},  //共享词库
+            bookOfAllWords: [],
+            showSelectedWordState: false,  //显示已选单词
+            showWordItemParaphrase: false,
+            myAllStudyWords: [],
+            selectedWordList: [],  //选择的单词
+
 
         },
         watch: {
@@ -568,12 +662,156 @@
                     clearInterval(_this.oneWordThinkTimer)
                 }
             },
+            selectedWordList(newValue, oldValue) {
+                const id = document.getElementById("select_word_confirm_btn_id")
+                if (newValue.length === 0 && id.classList.contains("tip_example_control_span_focus")) {
+                    id.classList.remove("tip_example_control_span_focus")
+                }
+                if (newValue.length !== 0 && !(id.classList.contains("tip_example_control_span_focus"))) {
+                    id.classList.add("tip_example_control_span_focus")
+                }
+
+
+            }
         },
         created() {
             this.fetchStudyWord()
             this.fetchUserId();
         },
         methods: {
+            //选择单词确定
+            selectWordConfirmBtn() {
+                let _this = this
+                if (this.selectedWordList.length !== 0) {
+                    axios({
+                        url:'update/addStudyWordList?studyWordList='+_this.selectedWordList,
+                        method:'post'
+                    }).then(function (data){
+                        if (data.data){
+                            NotificationVue.showPublicNotification("success","添加成功，刷新页面即可记忆新单词。")
+                            _this.fetchMyAllStudyWords()
+                            _this.selectedWordList = []
+
+                        }else{
+                            NotificationVue.showPublicNotification("success","添加失败，发生未知错误。")
+                        }
+                    })
+                }
+            },
+            //选择单词
+            selectTheWordBtn(wordid, index) {
+                if (this.selectedWordList.includes(wordid)) {
+                    const _index = this.selectedWordList.indexOf(wordid);
+                    this.selectedWordList.splice(_index, 1);
+                } else {
+                    this.selectedWordList.push(wordid)
+                }
+            },
+            //隐藏已勾选单词
+            selectWordControlBackBtn() {
+                this.selectedWordList = []  //清空选择的单词
+                this.showTheBookOfWords = false  //显示词库
+                this.showSelectedWordState = false  //隐藏已选
+            },
+            showWordItemParaphraseBtn() {
+                if (this.showWordItemParaphrase) {
+                    this.showWordItemParaphrase = false  //隐藏已选
+                } else {
+                    this.showWordItemParaphrase = true
+                }
+            },
+            showSelectedWordStateBtn() {
+                if (this.showSelectedWordState) {
+                    this.showSelectedWordState = false  //隐藏已选
+                } else {
+                    this.showSelectedWordState = true
+                }
+            },
+            async theBookAllWords(id) {
+                let _this = this
+                await this.fetchMyAllStudyWords()   //获取所有studyWords
+                if (this.selectWordControlState === 1) {   //官方词库
+                    await axios({
+                        url: 'search/getOfficialBookOfAllWords?bookid=' + id,
+                        method: 'get'
+                    }).then(function (data) {
+                        _this.bookOfAllWords = data.data
+                    })
+                    this.showTheBookOfWords = true
+                } else {
+                    await axios({
+                        url: 'search/getUserBookOfAllWords?bookid=' + id,
+                        method: 'get'
+                    }).then(function (data) {
+                        _this.bookOfAllWords = data.data
+                    })
+                    this.showTheBookOfWords = true
+                }
+            },
+            //获取所有学习计划单词
+            fetchMyAllStudyWords() {
+                let _this = this
+                axios({
+                    url: 'search/getMyAllStudyWords',
+                    method: 'get'
+                }).then(function (data) {
+                    _this.myAllStudyWords = data.data
+                })
+            },
+            //获取词库
+            fetchBooks() {
+                let _this = this
+                axios({
+                    url: 'search/getAllShareUserBook',
+                    method: 'get'
+                }).then(function (data) {
+                    _this.userBooks = data.data
+                })
+                axios({
+                    url: 'search/getAllOfficialBook',
+                    method: 'get'
+                }).then(function (data) {
+                    _this.officialBooks = data.data
+                })
+
+
+            },
+            //关闭打开选词框
+            async selectWordCardBtn() {
+                if (!this.control_selectword_div_state) {
+                    //获取词书
+                    await this.fetchBooks()
+                    this.control_selectword_div_state = true
+                } else {
+                    this.selectWordControlState = 1
+                    this.showTheBookOfWords = false
+                    this.control_selectword_div_state = false
+                    this.showWordItemParaphrase = false
+                    this.selectedWordList = []
+                }
+
+            },
+            //显示词库状态
+            selectWordControlStateBtn(v) {
+                this.selectWordControlState = v
+                let select_word_control_state_1 = document.getElementById("select_word_control_state_1")
+                let select_word_control_state_2 = document.getElementById("select_word_control_state_2")
+                if (v == 1) {
+                    if (!select_word_control_state_1.classList.contains("tip_example_control_span_focus")) {
+                        select_word_control_state_1.classList.add("tip_example_control_span_focus")
+                    }
+                    if (select_word_control_state_2.classList.contains("tip_example_control_span_focus")) {
+                        select_word_control_state_2.classList.remove("tip_example_control_span_focus")
+                    }
+                } else {
+                    if (!select_word_control_state_2.classList.contains("tip_example_control_span_focus")) {
+                        select_word_control_state_2.classList.add("tip_example_control_span_focus")
+                    }
+                    if (select_word_control_state_1.classList.contains("tip_example_control_span_focus")) {
+                        select_word_control_state_1.classList.remove("tip_example_control_span_focus")
+                    }
+                }
+            },
             //签到
             checkinBtn() {
                 let _this = this
@@ -584,7 +822,7 @@
                     if (data.data) {
                         _this.fetchDaily()  //获取学习进度
                         NotificationVue.showPublicNotification("success", "签到成功！");
-                    }else{
+                    } else {
                         NotificationVue.showPublicNotification("error", "发生未知错误，签到失败！");
                     }
                 })
@@ -637,11 +875,6 @@
                     if (tip_example_control_state_1.classList.contains("tip_example_control_span_focus")) {
                         tip_example_control_state_1.classList.remove("tip_example_control_span_focus")
                     }
-
-                    // tip_example_control_state_2.style.backgroundColor = "#00e57b"
-                    // tip_example_control_state_2.style.color = "#000000"
-                    // tip_example_control_state_1.style.backgroundColor = "#1a1a1a"
-                    // tip_example_control_state_1.style.color = "#ffffff"
                 }
             },
             //添加热度
@@ -699,7 +932,7 @@
                             await this.getTheUserBookOfWords(bookid);
                             NotificationVue.showPublicNotification("success", "删除成功。")
                         } else {
-                            NotificationVue.showPublicNotification("error", "发生位置错误，删除失败。")
+                            NotificationVue.showPublicNotification("error", "发生未知错误，删除失败。")
                         }
                     }
                 })
@@ -1308,6 +1541,14 @@
                     }
                 })
             },
+            datedifference(sDate1, sDate2) {    //sDate1现在的时间  sDate2下次时间
+                let dateSpan, tempDate, iDays
+                sDate1 = Date.parse(sDate1)
+                sDate2 = Date.parse(sDate2)
+                dateSpan = sDate2 - sDate1
+                iDays = Math.floor(dateSpan / (24 * 3600 * 1000))
+                return iDays
+            },
             async fetchStudyWord() {
                 let _this = this
                 await axios({
@@ -1317,6 +1558,7 @@
                     _this.studyWord = data.data
                 })
                 if (this.studyWord.length !== 0) {
+                    this.studyWord.intervalday = this.datedifference(this.getNowDate(), this.studyWord.nextstudydate);
                     this.oneWordThinkTime = 0
                     if (this.studyWord.laststudydate !== this.getNowDate()) {  //今天第一次记这个单词单词
                         this.studyWord.day_q_0 = 0

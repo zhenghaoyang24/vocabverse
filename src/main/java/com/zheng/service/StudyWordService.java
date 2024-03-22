@@ -31,4 +31,12 @@ public interface StudyWordService {
 
     List<StudyWord> getTodayStudiedWords(int userid, String date);
 
+    List<StudyWord> getMyAllStudyWords(int userid);
+
+    int getStudyWordSum(int userid);
+
+
+
+
+
 }

@@ -2,13 +2,17 @@ package com.zheng.service.impl;
 
 import com.zheng.mapper.BotMapper;
 import com.zheng.mapper.DailyMapper;
+import com.zheng.mapper.StudyWordMapper;
 import com.zheng.pojo.Bot;
 import com.zheng.pojo.Daily;
+import com.zheng.pojo.StudyDataInfoSum;
 import com.zheng.service.DailyService;
 import com.zheng.utils.SqlSessionFactoryUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class DailyServiceImpl implements DailyService {
@@ -69,5 +73,16 @@ public class DailyServiceImpl implements DailyService {
         boolean b = mapper.checkinDaily(userid, time);
         sqlSession.close();
         return b;
+    }
+
+
+
+    @Override
+    public List<Daily> getDailyListByUserid(int userid) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        DailyMapper mapperDaily = sqlSession.getMapper(DailyMapper.class);
+        List<Daily> list = mapperDaily.getDailyListByUserid(userid);
+        sqlSession.close();
+        return list;
     }
 }

@@ -5,11 +5,9 @@ import com.zheng.pojo.UserBook;
 import com.zheng.pojo.VocBook;
 import com.zheng.service.UserBookService;
 import com.zheng.utils.SqlSessionFactoryUtils;
-import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.test.context.TestExecutionListeners;
 
 import java.util.List;
 
@@ -18,6 +16,16 @@ import java.util.List;
 public class UserBookServiceImpl implements UserBookService {
 
     static SqlSessionFactory sqlSessionFactory = SqlSessionFactoryUtils.getSqlSessionFactory();
+
+    //获取所有共享词库
+    @Override
+    public List<UserBook> getAllShareUserBook() {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        BookMapper mapper = sqlSession.getMapper(BookMapper.class);
+        List<UserBook> userBooks = mapper.getAllShareUserBook();
+        sqlSession.close();
+        return userBooks;
+    }
 
     @Override
     public List<UserBook> allMyUserBooks(int holderid) {
@@ -42,7 +50,7 @@ public class UserBookServiceImpl implements UserBookService {
         SqlSession sqlSession = sqlSessionFactory.openSession(true);
         BookMapper mapper = sqlSession.getMapper(BookMapper.class);
         boolean b = mapper.addWordToUserBook(wordid, userbookid);
-        if (b){
+        if (b) {
             mapper.addUserBookVocCount(userbookid);
         }
         sqlSession.close();
@@ -62,7 +70,7 @@ public class UserBookServiceImpl implements UserBookService {
     public List<VocBook> theUserBookOfAllWords(int bookid) {
         SqlSession sqlSession = sqlSessionFactory.openSession(true);
         BookMapper mapper = sqlSession.getMapper(BookMapper.class);
-        List<VocBook> vocBooks = mapper.theBookOfAllWords(bookid);
+        List<VocBook> vocBooks = mapper.theUserBookOfAllWords(bookid);
         sqlSession.close();
         return vocBooks;
     }
@@ -72,9 +80,28 @@ public class UserBookServiceImpl implements UserBookService {
         SqlSession sqlSession = sqlSessionFactory.openSession(true);
         BookMapper mapper = sqlSession.getMapper(BookMapper.class);
         boolean b = mapper.deleteWordFromUserBookMapper(wordid, bookid);
-        if (b){
+        if (b) {
             mapper.subUserBookVocCount(bookid);
         }
+        sqlSession.close();
+        return b;
+    }
+
+    @Override
+    public boolean deleteTheUserBookAndAllWords(int bookid, int holderid) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        BookMapper mapper = sqlSession.getMapper(BookMapper.class);
+        mapper.deleteTheUserBookOfAllWords(bookid);  //删除单词
+        boolean b = mapper.deleteTheUserBookById(bookid, holderid);  //删除词库
+        sqlSession.close();
+        return b;
+    }
+
+    @Override
+    public boolean updateTheUserBookInfo(String userbookname, String bookdescribe, int share, int userbookid, int holderid) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        BookMapper mapper = sqlSession.getMapper(BookMapper.class);
+        boolean b = mapper.updateTheUserBookInfo(userbookname, bookdescribe, share, userbookid, holderid);
         sqlSession.close();
         return b;
     }

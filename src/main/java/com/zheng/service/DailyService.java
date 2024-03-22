@@ -1,6 +1,9 @@
 package com.zheng.service;
 
 import com.zheng.pojo.Daily;
+import com.zheng.pojo.StudyDataInfoSum;
+
+import java.util.List;
 
 public interface DailyService {
     Daily getDaily(int userid, String time);
@@ -15,4 +18,7 @@ public interface DailyService {
     boolean updateDailyFeedbackDate(Daily daily);
 
     boolean checkinDaily(int userid, String time);
+
+
+    List<Daily> getDailyListByUserid(int userid);
 }

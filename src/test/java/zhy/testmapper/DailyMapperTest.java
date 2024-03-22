@@ -29,6 +29,7 @@ public class DailyMapperTest {
         mapper = sqlSession.getMapper(DailyMapper.class);
     }
 
+
     @Test
     public void getDailyByUseridAndTime(){
         Daily daily = mapper.getDailyByUseridAndTime(1000, "2024-1-24");

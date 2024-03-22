@@ -1,5 +1,6 @@
 package com.zheng.controller;
 
+import com.sun.scenario.effect.impl.sw.java.JSWBrightpassPeer;
 import com.zheng.pojo.*;
 import com.zheng.service.*;
 import com.zheng.utils.GetDateUtil;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Controller
 @RequestMapping("/update")
@@ -32,6 +34,24 @@ public class UpdateInfomController {
     private UserService userService;
     @Autowired
     private StudyWordService studyWordService;
+
+
+    @RequestMapping(value = "/updateTheUserBookInfo", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
+    @ResponseBody
+    boolean updateTheUserBookInfo(String userbookname, String bookdescribe, int share, int userbookid, HttpServletRequest request) {
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+         return userBookService.updateTheUserBookInfo(userbookname, bookdescribe, share, userbookid, userid);
+    }
+
+    /**
+     * 删除词库及其单词
+     */
+    @RequestMapping(value = "/deleteTheUserBookAndAllWords", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
+    @ResponseBody
+    boolean deleteTheUserBookAndAllWords(int userbookid, HttpServletRequest request) {
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+        return userBookService.deleteTheUserBookAndAllWords(userbookid,userid);
+    }
 
 
     @RequestMapping(value = "/checkinDaily", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
@@ -98,7 +118,6 @@ public class UpdateInfomController {
             double weight = SMCountUtil.countDayWeight(studyWord.getDay_q_0(), studyWord.getDay_q_1(), studyWord.getDay_q_2(), dayStudyCount + 1);
             int day = SMCountUtil.nextDay(studyWord.getQ_0() + studyWord.getQ_1() + studyWord.getQ_2() + studyWord.getQ_3(), studyWord.getEf(), quality, difficulty, weight);
             //计算下一个复习日期
-            System.out.println("day=" + day);
             studyWord.setIntervalday(day);
             String nextDate = GetDateUtil.getNextDate(day);
             studyWord.setNextstudydate(nextDate);
@@ -112,6 +131,37 @@ public class UpdateInfomController {
         studyWord.setDay_studycount(studyWord.getDay_studycount() + 1);
         //更改值
         return studyWordService.updateStudyWordInformation(studyWord);
+    }
+
+    /**
+     * 添加学习计划单词 List
+     * @param studyWordList
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/addStudyWordList", method = RequestMethod.POST)
+    @ResponseBody
+    public boolean addStudyWordList(int[] studyWordList, HttpServletRequest request) {
+
+        if (studyWordList.length>0){
+            int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+            String nowData = GetDateUtil.getNowData();
+            for(int i =0;i<studyWordList.length;i++){
+                System.out.println(studyWordList[i]);
+                boolean b = studyWordService.addStudyWordService(userid, studyWordList[i], nowData, nowData);
+                if (b) {
+                    wordService.updateWordStudyTime(studyWordList[i], "add");  //更改studytime
+                    Daily d = dailyService.getDaily(userid, nowData);
+                    if (d != null) {
+                        dailyService.setShouldStudy(d.getShouldstudy() + 1, userid, nowData);
+                    }
+                }
+            }
+            return  true;
+        }else{
+            return false;
+        }
+
     }
 
 

@@ -30,9 +30,66 @@ public class SearchInformController {
     private DailyService dailyService;
     @Autowired
     private StudyWordService studyWordService;
+    @Autowired
+    private OfficialBookService officialBookService;
+
+
+    @RequestMapping(value = "/getMyStudyWordSum", method = RequestMethod.GET)
+    @ResponseBody
+    int getMyStudyWordSum(HttpServletRequest request) {
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+        return studyWordService.getStudyWordSum(userid);
+    }
+
+
+    @RequestMapping(value = "/getMyDailyList", method = RequestMethod.GET)
+    @ResponseBody
+    List<Daily> getMyDailyList(HttpServletRequest request) {
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+        List<Daily> dailyList = dailyService.getDailyListByUserid(userid);
+        return dailyList;
+    }
 
 
 
+
+    @RequestMapping(value = "/getMyAllStudyWords", method = RequestMethod.GET)
+    @ResponseBody
+    List<StudyWord> getMyAllStudyWords(HttpServletRequest request){
+        int userid = Integer.parseInt(UserSessionCookieUtil.getUserIDSession(request));
+        return studyWordService.getMyAllStudyWords(userid);
+    }
+
+
+    /**
+     * 获取共享词库
+     * @return
+     */
+    @RequestMapping(value = "/getAllShareUserBook", method = RequestMethod.GET)
+    @ResponseBody
+    List<UserBook> getAllShareUserBook(){
+        List<UserBook> userBooks = userBookService.getAllShareUserBook();
+        return userBooks;
+    }
+
+
+    /**
+     * 获取官方词库
+     * @return
+     */
+    @RequestMapping(value = "/getAllOfficialBook", method = RequestMethod.GET)
+    @ResponseBody
+    List<OfficialBook> getAllOfficialBook(){
+        List<OfficialBook> officialBooks = officialBookService.getAllOfficialBook();
+        return officialBooks;
+    }
+
+
+    /**
+     * 获取今天学习过得的单词
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "/getTodayStudiedWords", method = RequestMethod.GET)
     @ResponseBody
     List<StudyWord> getTodayStudiedWords(HttpServletRequest request) {
@@ -219,11 +276,27 @@ public class SearchInformController {
     }
 
 
+    /**
+     * 获取自定义词书所有单词
+     * @param bookid
+     * @return
+     */
     @RequestMapping(value = "/getUserBookOfAllWords", method = RequestMethod.GET)
     @ResponseBody
     List<VocBook> theUserBookOfAllWords(int bookid) {
-        List<VocBook> vocBooks = userBookService.theUserBookOfAllWords(bookid);
-        return vocBooks;
+        return userBookService.theUserBookOfAllWords(bookid);
+    }
+
+
+    /**
+     * 获取官方词书所有单词
+     * @param bookid
+     * @return
+     */
+    @RequestMapping(value = "/getOfficialBookOfAllWords", method = RequestMethod.GET)
+    @ResponseBody
+    List<VocBook> getOfficialBookOfAllWords(int bookid) {
+        return officialBookService.theOfficialBookOfAllWords(bookid);
     }
 
     @RequestMapping(value = "/findUserById", method = RequestMethod.GET)
