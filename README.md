@@ -20,6 +20,8 @@
 ![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/2d207acb-e87f-4b81-9c48-6f03548e61bc)
 ![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/03ee35ce-6af5-4545-aaac-037b8ee2c52e)
 ![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/19601848-e5b4-4e64-afaa-610c61027e9b)
+![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/9aea1d67-1fd6-488a-8f00-07b1ebd2c594)
+
 
 
 
