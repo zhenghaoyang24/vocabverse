@@ -11,9 +11,10 @@
  ### 5.其他功能
   可将单词加入/移除学习计划，可标记熟知单词；增加、编辑、删除单词例句，设置单词提示例句；打卡签到；修改个人基本信息；
 ## 注意
- <p> 1.句子翻译使用了百度翻译API，需在controller/TranslateController下，将appId与秘钥更改为自己的id与秘钥。
-  <p>2.AI功能使用了文心一言API，需在utils/ERNIEBotUtils将API_Key与Secret_Key更改为自己的key。
-  <p>3.复习完成页面的组队功能与数据页面更改头像自定义头像功能未开发。
+ 1.句子翻译使用了百度翻译API，需在controller/TranslateController下，将appId与秘钥更改为自己的id与秘钥。<p>
+ 2.AI功能使用了文心一言API，需在utils/ERNIEBotUtils将API_Key与Secret_Key更改为自己的key。 <p>
+ 3.复习完成页面的组队功能与数据页面更改头像自定义头像功能尚未开发。 <p>
+  
 ## 页面
 ![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/81fb1141-2e53-4b82-9d8b-3ab0ddb9f2b2)
 ![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/2d207acb-e87f-4b81-9c48-6f03548e61bc)
