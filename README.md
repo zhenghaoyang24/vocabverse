@@ -15,4 +15,10 @@
  2.AI功能使用了文心一言API，需在utils/ERNIEBotUtils将API_Key与Secret_Key更改为自己的key。
  3.复习完成页面的组队功能与数据页面更改头像自定义头像功能未开发。
 ## 页面
+![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/81fb1141-2e53-4b82-9d8b-3ab0ddb9f2b2)
+![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/2d207acb-e87f-4b81-9c48-6f03548e61bc)
+![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/03ee35ce-6af5-4545-aaac-037b8ee2c52e)
+![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/19601848-e5b4-4e64-afaa-610c61027e9b)
+
+
 
