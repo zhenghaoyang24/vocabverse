@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ERNIEBotUtils {
 //    static final OkHttpClient client = new OkHttpClient().newBuilder().build();
-    private static String API_Key = "j8a6isKhFP8ADBKFRA0WYoLQ";
-    private static String Secret_Key = "wnPks6scewIebP8SGLVd3zY3Vtwv0Fkl";
+    private static String API_Key = "XXX";
+    private static String Secret_Key = "XXX";
     private static String get_access_token_url = "https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=" + API_Key + "&client_secret=" + Secret_Key;
 
     public static String getERNIEBotResault(String param_content) throws IOException {
