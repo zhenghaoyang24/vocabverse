@@ -15,8 +15,8 @@ public class TranslateController {
     @ResponseBody
     public String translate(String inputText,String toLanguageEn) {
         System.out.println(inputText);
-        String appId = "20230329001620142";  //appid
-        String userCode = "tZ3tqS7R9dioa_m6rkNH";  //秘钥
+        String appId = "XXX";  //appid
+        String userCode = "XXX";  //秘钥
         String  befor_sign = appId + inputText + "1435660288"+userCode;
         String sign = Md5Utils.md5Code(befor_sign);
         String httpUrl = "http://api.fanyi.baidu.com/api/trans/vip/translate?q="+inputText+"&from=auto&to="+toLanguageEn+"&appid="+appId+"&salt=1435660288&sign="+sign;
