@@ -1243,6 +1243,38 @@
 }
 
 
+.study_word_item_div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px #727272 dashed;
+    padding: 5px 0;
+    cursor: pointer;
+
+}
+.study_word_item_div:hover .study_word_item_div_spelling{
+    color: #00e57b;
+}
+
+.study_word_item_div_spelling{
+    font-size: 1.1em;
+    color: whitesmoke;
+    transition: all 0.2s;
+}
+.study_word_item_div:hover .study_word_item_div_control{
+    background-image: url("../image/index_04/next_step_icon_green.png");
+}
+
+.study_word_item_div_control{
+    width: 15px;
+    height: 15px;
+    background-image: url("../image/index_04/next_step_icon_white.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    transition: all 0.2s;
+}
+
 
 
 

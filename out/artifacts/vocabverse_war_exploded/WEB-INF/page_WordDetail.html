@@ -1044,6 +1044,8 @@
                 let item = sessionStorage.getItem("backFromWordDetailPageValue");
                 if (item === "index_02_cha")
                     window.location.assign('searchWordPage')
+                else if(item === "index_04")
+                    window.location.assign('dataPage')
                 else{
                     sessionStorage.removeItem("backFromWordDetailPageValue")
                     window.history.back();

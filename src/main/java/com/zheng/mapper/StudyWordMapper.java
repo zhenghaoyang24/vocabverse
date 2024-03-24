@@ -76,6 +76,12 @@ public interface StudyWordMapper {
 
 
     @Select("select * from tb_voc_study where userid=#{userid}")
+    @Results({
+            @Result(column = "wordid", property = "wordid"),
+            @Result(column = "exapid", property = "exapid"),
+            @Result( property = "example",column = "exapid",one = @One(select = "com.zheng.mapper.ExampleMapper.findExampleByExapid")),
+            @Result( property = "word",column = "wordid",one = @One(select = "com.zheng.mapper.VocabularyMapper.findWordById")),
+    })
     List<StudyWord> getMyAllStudyWords(@Param("userid") int userid);
 
 

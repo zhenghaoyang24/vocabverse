@@ -8,7 +8,6 @@ import java.util.Properties;
 //@Component
 public class SendMailCodeUtil {
 
-//    public static String test = "123";
 
     /**
      * 外网邮件发送
@@ -47,17 +46,14 @@ public class SendMailCodeUtil {
             message.setSubject("来自VocabVerse词境的验证码");
             // 7.设置正文
             message.setContent(to+"你好："+"<br/>您的邮箱验证码为：" + code+"<br/>验证码有效时长2分钟。", "text/html;charset=UTF-8");
-
-            // 8.准备发送，得到火箭
+            // 8.准备发送
             Transport transport = session.getTransport("smtp");
-            // 9.设置火箭的发射目标
+            // 9.设置发射目标
             //transport.connect("smtp.163.com", "发送者@163.com", "biao********");
-            transport.connect("smtp.qq.com", myEmailAddr, "lclmsphalkhwjcba");//授权码
+            transport.connect("smtp.qq.com", myEmailAddr, "gdpdjfowqoxdjiig");//授权码
             // 10.发送
             transport.sendMessage(message, message.getAllRecipients());
-
             // Transport对象:
-            // Transport.send(message);
         } catch (MessagingException e) {
             e.printStackTrace();
         }

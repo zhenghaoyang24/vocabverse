@@ -14,14 +14,15 @@ public class TranslateController {
     @RequestMapping(value = "translateText",method = RequestMethod.GET)
     @ResponseBody
     public String translate(String inputText,String toLanguageEn) {
-//        System.out.println(inputText);
-//        System.out.println(toLanguageEn);
-        String  befor_sign = "20230329001620142" + inputText + "1435660288tZ3tqS7R9dioa_m6rkNH";
+        System.out.println(inputText);
+        String appId = "20230329001620142";  //appid
+        String userCode = "tZ3tqS7R9dioa_m6rkNH";  //秘钥
+        String  befor_sign = appId + inputText + "1435660288"+userCode;
         String sign = Md5Utils.md5Code(befor_sign);
-        String httpUrl = "http://api.fanyi.baidu.com/api/trans/vip/translate?q="+inputText+"&from=auto&to="+toLanguageEn+"&appid=20230329001620142&salt=1435660288&sign="+sign;
-
+        String httpUrl = "http://api.fanyi.baidu.com/api/trans/vip/translate?q="+inputText+"&from=auto&to="+toLanguageEn+"&appid="+appId+"&salt=1435660288&sign="+sign;
         String outText = HttpURLConnectionUtil.doGet(httpUrl);
-//        System.out.println(outText);
+        System.out.println(outText);
         return outText;
+
     }
 }

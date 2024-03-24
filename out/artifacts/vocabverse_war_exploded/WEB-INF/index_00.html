@@ -39,22 +39,33 @@
         <a href="dataPage"><span>数据</span></a>
     </div>
     <div class="more-nav">
-        <div class="message_nav">
-            <img src="image/topnav/messagelogo_white.png" alt="">
-            <h3>消息</h3>
-        </div>
+        <!--        <div class="message_nav">-->
+        <!--            <img src="image/topnav/messagelogo_white.png" alt="">-->
+        <!--            <h3>消息</h3>-->
+        <!--        </div>-->
     </div>
 </div>
 
 <!--内容-->
 <div class="content-body">
-    <div class="content-div" id="todayInformApp">
-        <div style="width: 100%">
-            <div class="today_study_div">
-                <h1>今日已学</h1>
-                <div class="today_study_shuju">
-                    <div><span v-number-add-directive>{{todayWordNumber}}</span>个单词</div>
-                    <div><span v-number-add-directive>{{todayTime}}</span>分钟</div>
+    <div class="content-div" id="homePageApp">
+        <div class="homePage_content_div">
+            <div class="homePage_content">
+                <h1>{{homePageTitle}}</h1>
+                <h4>VocabVerse词境</h4>
+                <div class="content_button_div">
+                    <div @mouseenter="buttonTipEnter(1)" @mouseleave="buttonTipLeave(1)" @click="toPageBtn(1)"
+                         class="content_button_item"><span class="button_item_study"></span><span>学习单词</span></div>
+                    <div @mouseenter="buttonTipEnter(2)" @mouseleave="buttonTipLeave(2)" @click="toPageBtn(2)"
+                         class="content_button_item"><span class="button_item_translate"></span><span>查词翻译</span>
+                    </div>
+                    <div @mouseenter="buttonTipEnter(3)" @mouseleave="buttonTipLeave(3)" @click="toPageBtn(3)"
+                         class="content_button_item"><span class="button_item_AI"></span><span>AI助学</span></div>
+                    <div @mouseenter="buttonTipEnter(4)" @mouseleave="buttonTipLeave(4)" @click="toPageBtn(4)"
+                         class="content_button_item"><span class="button_item_data"></span><span>学习数据</span></div>
+                </div>
+                <div class="button_hover_tip_text_div">
+                    {{buttonHoverTip}}
                 </div>
             </div>
         </div>
@@ -62,35 +73,43 @@
 </div>
 
 <script>
-    Vue.directive('number-add-directive', {
-        inserted(el, binding) {
-            let count = 0 //初始值
-            let num = el.innerText //获取页面中的值
-            let rate = 30 //定时器间隔时间
-            let time = 1500
-            let average = num / (time / rate) //得到每次定时器跳动的值
-
-            let timer = setInterval(() => {
-                // 将我们得到的值设置给count
-                count += average
-                el.innerText = count.toFixed(0)
-                if (count > num) {
-                    count = num
-                    // el.innerText = count.toFixed(0)
-                    //清除定时器
-                    // timer = null
-                    clearInterval(timer)
-                }
-            }, rate);
-
-        },
-    });
-
     new Vue({
-        el: '#todayInformApp',
+        el: '#homePageApp',
         data: {
-            todayWordNumber: 142,
-            todayTime: 49
+            homePageTitle: "词本无意，意由境生。",
+            buttonHoverTipData: [
+                '使用SM2推荐最佳复习单词，提高学习效率。',
+                '支持单词查询和多语言翻译，方便快捷。',
+                '利用AI进行英语写作、单词造句等，提升英语水平。',
+                '打卡天数，学习质量、学习时间变化等数据。',
+            ],
+            buttonHoverTip: "",
+        },
+        methods: {
+            buttonTipEnter(v) {
+                this.buttonHoverTip = this.buttonHoverTipData[v - 1]
+
+            },
+            buttonTipLeave() {
+                this.buttonHoverTip = ""
+            },
+            toPageBtn(v) {
+                if (v === 1) {
+                    window.location.assign('studyPage')
+                }
+                if (v === 2) {
+                    window.location.assign('searchWordPage')
+                }
+                if (v === 3) {
+                    window.location.assign('wersebotPage')
+                }
+
+                if (v === 4) {
+                    window.location.assign('dataPage')
+                }
+
+
+            },
         }
     })
 </script>

@@ -271,6 +271,7 @@
 </div>
 <!--内容-->
 <div style="width: 100%" id="userDataApp">
+    <!--词库-->
     <div v-if="control_userbook_div_state" class="control_example_div">
         <div class="control_example_content_div">
             <!--标题-->
@@ -342,6 +343,40 @@
                         <span class="all_words_div_item_span">{{item.word.spelling}}</span>
                         <span @click.stop="deleteTheWordFormUserBookBtn(item.wordid,item.bookid)" class="word_item_span"
                               style="width: 20px;height: 20px">&nbsp;</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!--单词-->
+    <div v-if="control_studyWord_div_state" class="control_example_div">
+        <div class="control_example_content_div">
+            <!--标题-->
+            <div class="tittle_sort_div">
+                <div class="tittle_div">
+                    <span class="tittle_span">所有规划单词</span>
+                    <span @click="controlAllStudyWordBtn" class="close_div_btn"></span>
+                </div>
+                <div class="sort_div">
+                    <!--显示例句时渲染-->
+                    <span id="wordAllOrAlready_1" @click="wordAllOrAlreadyBtn(1)" class="backOradd switch_btn_active">所有</span>
+                    <span id="wordAllOrAlready_2" @click="wordAllOrAlreadyBtn(2)"  class="backOradd">熟知</span>
+                </div>
+            </div>
+            <!--我的所有词库-->
+            <div class="all_example_list">
+                <div v-if="myAllStudyWords.length===0"
+                     style="width: 100%;height: 100%;display:flex;justify-content: center;">
+                    <span style="margin: auto;color: whitesmoke;font-weight: 700">这里空空如也。你还没有任何词库！</span>
+                </div>
+                <div v-else v-for="(item,index) in myAllStudyWords" class="study_word_item_div"
+                     v-show="studyWordAllOrAlreadyState===1? true:item.state===1"
+                     @click="theWordDetail(item.wordid)">
+                    <div class="study_word_item_div_spelling">
+                        {{item.word.spelling}}
+                    </div>
+                    <div class="study_word_item_div_control">
                     </div>
                 </div>
             </div>
@@ -548,7 +583,7 @@
                         <div class="study_info_control_div">
                             <h4>数据管理</h4>
                             <div class="study_info_control_btn_div">
-                                <div class="study_info_control_btn_item study_info_control_btn_item_studyWord">
+                                <div @click="controlAllStudyWordBtn" class="study_info_control_btn_item study_info_control_btn_item_studyWord">
                                     <div></div>
                                     <div>我的单词</div>
                                 </div>
@@ -590,7 +625,8 @@
                             </div>
 
                         </div>
-                        <div id="studyTimesAndDurationLineChartId" style="width: 100%;height: 300px;margin-top: 20px;border-top: 1px solid #4b4b4b;padding-top: 20px"></div>
+                        <div id="studyTimesAndDurationLineChartId"
+                             style="width: 100%;height: 300px;margin-top: 20px;border-top: 1px solid #4b4b4b;padding-top: 20px"></div>
 
                     </div>
                 </div>
@@ -598,6 +634,7 @@
         </div>
     </div>
 </div>
+
 
 <script>
 
@@ -639,6 +676,10 @@
             theUserBookOfAllWords: [],   //书籍的所有单词
             alreadyUserBookUpdate: false,  //是否更改过自定义词典
             alMyUserBooks: [],
+            /*所有规划单词*/
+            control_studyWord_div_state: false,
+            studyWordAllOrAlreadyState:1,  //1显示所有，2显示熟知
+
         },
 
         async created() {
@@ -660,13 +701,90 @@
                 this.qualityDoughnutChartRight()
             },
             /*右侧数据*/
-            //复习适量比例与次数
+            wordAllOrAlreadyBtn(v) {
+                let timer = setInterval(() => {
+                    let wordAllOrAlready_1 = document.getElementById("wordAllOrAlready_1");
+                    let wordAllOrAlready_2 = document.getElementById("wordAllOrAlready_2");
+                    if (wordAllOrAlready_1 !== null && wordAllOrAlready_2 !== null) {
+                        if (v === 1) {
+                            if (!wordAllOrAlready_1.classList.contains("switch_btn_active")) {
+                                wordAllOrAlready_1.classList.add("switch_btn_active")
+                            }
+                            if (wordAllOrAlready_2.classList.contains("switch_btn_active")) {
+                                wordAllOrAlready_2.classList.remove("switch_btn_active")
+                            }
+                        } else {
+                            if (!wordAllOrAlready_2.classList.contains("switch_btn_active")) {
+                                wordAllOrAlready_2.classList.add("switch_btn_active")
+                            }
+                            if (wordAllOrAlready_1.classList.contains("switch_btn_active")) {
+                                wordAllOrAlready_1.classList.remove("switch_btn_active")
+                            }
+                        }
+                        clearInterval(timer)
+                    }
+                }, 100)
+                this.studyWordAllOrAlreadyState = v
+            },
+            /*删除学习计划*/
+            deleteStudyWordPlanningBtn(wordid) {
+                MessageBoxVue.openMessageBox("移除学习规划将删除你学习该单词的所有学习数据，并进入下一个单词的学习。");
+                let r = new Promise((resolve) => {
+                    let timer = setInterval(() => {   //定时器
+                        let messageBoxConfirmValue = window.sessionStorage.getItem("messageBoxConfirmValue")
+                        if (messageBoxConfirmValue !== "null") {
+                            clearInterval(timer)
+                            resolve(messageBoxConfirmValue)
+                        }
+                    }, 100)
+                })
+                r.then(async (res) => {
+                    if (res === "true") {  //删除
+                        this.deleteStudyWord(wordid)
+                    }
+                })
+
+            },
+            deleteStudyWord(wordid) {
+                let _this = this
+                axios({
+                    method: 'post',
+                    url: 'update/deleteTheStudyWord?wordid=' + wordid,
+                }).then(function (data) {
+                    if (data.data === true) {
+                        NotificationVue.showPublicNotification("success", "移除成功。")
+                        _this.fetchStudyWord()  //获取下一个单词
+                    } else {
+                        NotificationVue.showPublicNotification("error", "发生未知错误，删除失败。")
+                    }
+                })
+            },
+            //所有规划单词btn开关
+            controlAllStudyWordBtn() {
+                if (this.control_studyWord_div_state){
+                    this.control_studyWord_div_state = false
+                }else{
+                    this.control_studyWord_div_state = true
+                }
+                this.wordAllOrAlreadyBtn(1)
+            },
+            //跳转到单词详情
+            theWordDetail(wordid) {
+                sessionStorage.setItem("wordid", wordid);
+                sessionStorage.setItem("backFromWordDetailPageValue", "index_04");
+                axios({
+                    method: 'post',
+                    url: 'update/addSearchTimes?wordid=' + wordid,
+                }).then(function (data) {
+                    window.location.assign('wordDetailPage?wordid=' + wordid);
+                })
+            },
+            //复习质量比例与次数
             getQualityDataInfo() {
                 this.qualityDataInfo.quality_0 = this.myAllStudyWords.reduce((acc, item) => acc + item.q_0, 0);
                 this.qualityDataInfo.quality_1 = this.myAllStudyWords.reduce((acc, item) => acc + item.q_1, 0);
                 this.qualityDataInfo.quality_2 = this.myAllStudyWords.reduce((acc, item) => acc + item.q_2, 0);
                 this.qualityDataInfo.quality_3 = this.myAllStudyWords.reduce((acc, item) => acc + item.q_3, 0);
-
             },
             //获取所有学习计划单词
             async fetchMyAllStudyWords() {
@@ -688,7 +806,7 @@
                 const myChart = echarts.init(document.getElementById('qualityDataChartLeftId'));
                 const gaugeData = [
                     {
-                        value: (quality_3/quality_total*100).toFixed(2),
+                        value: (quality_3 / quality_total * 100).toFixed(2),
                         name: '了如指掌',
                         title: {
                             offsetCenter: ['-145%', '-90%'],
@@ -700,7 +818,7 @@
                         }
                     },
                     {
-                        value: (quality_2/quality_total*100).toFixed(2),
+                        value: (quality_2 / quality_total * 100).toFixed(2),
                         name: '恍然大悟',
 
                         title: {
@@ -713,7 +831,7 @@
                         }
                     },
                     {
-                        value: (quality_1/quality_total*100).toFixed(2),
+                        value: (quality_1 / quality_total * 100).toFixed(2),
                         name: '模模糊糊',
                         title: {
                             offsetCenter: ['-145%', '15%'],
@@ -725,7 +843,7 @@
                         }
                     },
                     {
-                        value: (quality_0/quality_total*100).toFixed(2),
+                        value: (quality_0 / quality_total * 100).toFixed(2),
                         name: '茫无所知',
                         title: {
                             offsetCenter: ['-145%', '65%'],
@@ -854,10 +972,12 @@
             studyTimesAndDurationLineChart() {
                 let studyTimey = []
                 let studyWordy = []
+                let studyDuration = []
                 let dataX = []
                 for (let i = 0; i < this.dailyList.length; i++) {
                     studyTimey.push(this.dailyList[i].studytime)
                     studyWordy.push(this.dailyList[i].studyword)
+                    studyDuration.push(Math.ceil(this.dailyList[i].studyduration)/10)
                     dataX.push(this.dailyList[i].time.slice(5))
                 }
                 const myChart = echarts.init(document.getElementById("studyTimesAndDurationLineChartId"));
@@ -876,7 +996,7 @@
                         trigger: 'axis',
                     },
                     legend: {
-                        data: ['学习单词数', '复习次数'],
+                        data: ['学习单词数', '复习次数','学习时间'],
                         textStyle: {
                             color: '#ffffff',  //更改坐标轴文字颜色
                             fontSize: 12      //更改坐标轴文字大小
@@ -905,17 +1025,32 @@
                             }
                         }
                     },
-                    yAxis: {
-                        type: 'value',
-                        boundaryGap: true,
-                        axisLabel: {
-                            show: true,
-                            textStyle: {
-                                color: '#ffffff',  //更改坐标轴文字颜色
-                                fontSize: 12      //更改坐标轴文字大小
+                    yAxis: [
+                        {
+                            type: 'value',
+                            name:'次数',
+                            boundaryGap: true,
+                            axisLabel: {
+                                show: true,
+                                textStyle: {
+                                    color: '#ffffff',  //更改坐标轴文字颜色
+                                    fontSize: 12      //更改坐标轴文字大小
+                                }
+                            },
+                        },
+                        {
+                            type: 'value',
+                            name:'秒',
+                            boundaryGap: true,
+                            axisLabel: {
+                                show: true,
+                                textStyle: {
+                                    color: '#ffffff',  //更改坐标轴文字颜色
+                                    fontSize: 12      //更改坐标轴文字大小
+                                }
                             }
-                        }
-                    },
+                        },
+                    ],
                     series: [
                         {
                             name: '复习次数',
@@ -931,6 +1066,15 @@
                             data: studyWordy,
                             itemStyle: {
                                 color: '#00e57b',
+                            },
+                        },
+                        {
+                            name: '学习时间',
+                            type: 'line',
+                            yAxisIndex: 1, //在单个图表实例中存在多个y轴的时候有用
+                            data: studyDuration,
+                            itemStyle: {
+                                color: '#ff9000',
                             },
                         },
 
@@ -1320,7 +1464,7 @@
             /*跳转到单词详情*/
             theWordDetail(wordid) {
                 sessionStorage.setItem("wordid", wordid);
-                sessionStorage.setItem("backFromWordDetailPageValue", "index_01");
+                sessionStorage.setItem("backFromWordDetailPageValue", "index_04");
                 axios({
                     method: 'post',
                     url: 'update/addSearchTimes?wordid=' + wordid,
