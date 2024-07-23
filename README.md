@@ -10,6 +10,10 @@
 7. 单词**查询**与句子**翻译**：单词中英文动态查询，句子多语言翻译。
 8. **AI助学**：AI单词造句，写作，句子润色，英语知识问答；AI回答反馈。
 9. **数据统计**与**个人信息修改**：统计学习情况，学习量变化，更改个人信息与密码。
+## 开发技术与环境🔬
+前端：vue
+后端：SSM框架，java8 1.8.0
+数据库：MySQL 5.7.37
 ## 注意❗
  1.句子翻译使用了[百度通用文本翻译API](https://api.fanyi.baidu.com/product/113)，需在controller/TranslateController下，将appId与秘钥更改为自己的id与秘钥。
  2.AI功能使用了[文心一言API](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t)，需在utils/ERNIEBotUtils将API_Key与Secret_Key更改为自己的key。
