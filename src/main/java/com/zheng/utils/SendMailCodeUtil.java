@@ -17,7 +17,7 @@ public class SendMailCodeUtil {
      */
     public static void  sendMail(String to, String code) {
         System.out.println("send email...");
-        String myEmailAddr = "vocabverse@foxmail.com";
+        String myEmailAddr = "XXX@mail.com";
 
         // Session对象:
         Properties props = new Properties();
@@ -50,7 +50,7 @@ public class SendMailCodeUtil {
             Transport transport = session.getTransport("smtp");
             // 9.设置发射目标
             //transport.connect("smtp.163.com", "发送者@163.com", "biao********");
-            transport.connect("smtp.qq.com", myEmailAddr, "gdpdjfowqoxdjiig");//授权码
+            transport.connect("smtp.qq.com", myEmailAddr, "XXXXXXX");//授权码
             // 10.发送
             transport.sendMessage(message, message.getAllRecipients());
             // Transport对象:
