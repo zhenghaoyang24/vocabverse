@@ -17,7 +17,7 @@
 ## 注意(必读)❗
  1.句子翻译使用了[百度通用文本翻译API](https://api.fanyi.baidu.com/product/113)，需在`controller/TranslateController`下，将appId与秘钥更改为自己的id与秘钥。  
  2.AI功能使用了[文心一言API](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t)，需在`utils/ERNIEBotUtils`将`API_Key`与`Secret_Key`更改为自己的key。  
- 3.邮箱注册功能需要开启邮箱`POP3/SMTP/IMAP`服务，并更改`src/main/java/com/zheng/SendMailCodeUtil.java`文件下`String myEmailAddr = "XXX@mail.com";`为自己的邮箱地址，`transport.connect("smtp.qq.com", myEmailAddr, "XXXXXXX");`为自己的授权码。开起服务可阅读[此链接](https://blog.csdn.net/qq_42263280/article/details/129584017)。  
+ 3.邮箱注册功能需要开启邮箱`POP3/SMTP/IMAP`服务，并更改`src/main/java/com/zheng/SendMailCodeUtil.java`文件下`String myEmailAddr = "XXX@mail.com";`为自己的邮箱地址，`transport.connect("smtp.qq.com", myEmailAddr, "XXXXXXX");`为自己的授权码。开起服务教程可阅读[此链接](https://blog.csdn.net/qq_42263280/article/details/129584017)。  
  3.由于数据库单词量大（单词10万+，例句14万+），导入数据库会花费较多时间。
 ## 页面🪟
 ![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/81fb1141-2e53-4b82-9d8b-3ab0ddb9f2b2)
