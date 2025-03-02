@@ -14,7 +14,6 @@ public class TranslateController {
     @RequestMapping(value = "translateText",method = RequestMethod.GET)
     @ResponseBody
     public String translate(String inputText,String toLanguageEn) {
-        System.out.println(inputText);
         String appId = "XXX";  //appid
         String userCode = "XXX";  //秘钥
         String  befor_sign = appId + inputText + "1435660288"+userCode;

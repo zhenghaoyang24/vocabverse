@@ -2,7 +2,7 @@
 
 一个专注于单词记忆的网站。
 
-## 实现功能 🎖️
+## 实现功能 🎖
 
 1. **邮箱注册与登录**：
    - 使用邮箱服务协议发送验证码进行注册。
@@ -49,29 +49,57 @@
 
 ## 注意事项 (必读) ❗
 
-1. **翻译功能**：
-   - 使用了 [百度通用文本翻译 API](https://api.fanyi.baidu.com/product/113)。
-   - 需在 `controller/TranslateController` 中，将 `appId` 和 `秘钥` 替换为自己的 ID 和秘钥。
+### 翻译功能  
+使用了 [百度通用文本翻译 API](https://api.fanyi.baidu.com/product/113)。  
+需在 `controller/TranslateController` 中，将 `appId` 和 `秘钥` 替换为自己的 ID 和秘钥。
 
-2. **AI 功能**：
-   - 使用了 [文心一言 API](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t)。
-   - 需在 `utils/ERNIEBotUtils` 中，将 `API_Key` 和 `Secret_Key` 替换为自己的 Key。
+```java
+// 
+public String translate(String inputText,String toLanguageEn){
+   //appid
+   String appId="XXX";
+   //秘钥
+   String userCode="XXX";  
+   // ......
+}
+```
 
-3. **邮箱注册功能**：
-   - 需要开启邮箱的 `POP3/SMTP/IMAP` 服务。
-   - 在 `src/main/java/com/zheng/SendMailCodeUtil.java` 中，将 `String myEmailAddr = "XXX@mail.com";` 替换为自己的邮箱地址，`transport.connect("smtp.qq.com", myEmailAddr, "XXXXXXX");` 替换为自己的邮箱授权码。
-   - 开启邮箱服务的教程可参考 [此链接](https://blog.csdn.net/qq_42263280/article/details/129584017)。
+### AI 功能  
+使用了 [文心一言 API](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t)。   
+需在 `utils/ERNIEBotUtils` 中，将 `API_Key` 和 `Secret_Key` 替换为自己的 Key。
 
-4. **数据库导入**：
-   - 由于数据库单词量较大（单词 10 万+，例句 14 万+），导入数据库可能需要较长时间。
+```java
+// utils/ERNIEBotUtils
+public class ERNIEBotUtils {
+   private static String API_Key = "XXX";
+   private static String Secret_Key = "XXX";
+   // ......
+}
+```
 
-## 页面展示 🪟
+### 邮箱注册功能
+需要开启邮箱的 `POP3/SMTP/IMAP` 服务。  
+在 `utils/SendMailCodeUtil.java` 中，将 `String myEmailAddr = "XXX@mail.com";` 替换为自己的邮箱地址，`transport.connect("smtp.qq.com", myEmailAddr, "XXXXXXX");` 替换为自己的邮箱授权码。  
+开启 `QQ 邮箱` 服务的教程可参考 [此链接](https://blog.csdn.net/qq_42263280/article/details/129584017)。
+
+```java
+public static void  sendMail(String to, String code) {
+    // 邮箱
+    String myEmailAddr = "XXX@mail.com";
+    try {
+        //授权码
+        transport.connect("smtp.qq.com", myEmailAddr, "XXXXXXX");
+    }
+}
+```
+
+### 数据库导入
+由于数据库单词量较大（单词 10 万+，例句 14 万+），导入数据库可能需要较长时间。
+
+## 页面预览 👀
 
 ![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/81fb1141-2e53-4b82-9d8b-3ab0ddb9f2b2)  
 ![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/2d207acb-e87f-4b81-9c48-6f03548e61bc)  
 ![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/03ee35ce-6af5-4545-aaac-037b8ee2c52e)  
 ![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/19601848-e5b4-4e64-afaa-610c61027e9b)  
-![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/9aea1d67-1fd6-488a-8f00-07b1ebd2c594)  
-
----
-
+![image](https://github.com/zhenghaoyang24/vocabverse/assets/95458562/9aea1d67-1fd6-488a-8f00-07b1ebd2c594)

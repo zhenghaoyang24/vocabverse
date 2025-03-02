@@ -16,15 +16,11 @@ public class SendMailCodeUtil {
      * @param code
      */
     public static void  sendMail(String to, String code) {
-        System.out.println("send email...");
         String myEmailAddr = "XXX@mail.com";
-
         // Session对象:
         Properties props = new Properties();
         props.setProperty("mail.smtp.host", "smtp.qq.com"); // 设置主机地址
-        // smtp.163.com
         // smtp.qq.com
-        // smtp.sina.com
         props.setProperty("mail.smtp.auth", "true");// 认证
         // 2.产生一个用于邮件发送的Session对象
         Session session = Session.getInstance(props);
@@ -36,22 +32,17 @@ public class SendMailCodeUtil {
             // 4.设置消息的发送者
             Address fromAddr = new InternetAddress(myEmailAddr);
             message.setFrom(fromAddr);
-
-            // 5.设置消息的接收者 nkpxcloxbtpxdjai
             Address toAddr = new InternetAddress(to);
-            // TO 直接发送 CC抄送 BCC密送
             message.setRecipient(MimeMessage.RecipientType.TO, toAddr);
-
-            // 6.设置主题
+            // 设置主题
             message.setSubject("来自VocabVerse词境的验证码");
-            // 7.设置正文
+            // 设置正文
             message.setContent(to+"你好："+"<br/>您的邮箱验证码为：" + code+"<br/>验证码有效时长2分钟。", "text/html;charset=UTF-8");
-            // 8.准备发送
+            // 准备发送
             Transport transport = session.getTransport("smtp");
-            // 9.设置发射目标
-            //transport.connect("smtp.163.com", "发送者@163.com", "biao********");
+            // 设置发射目标
             transport.connect("smtp.qq.com", myEmailAddr, "XXXXXXX");//授权码
-            // 10.发送
+            // 发送
             transport.sendMessage(message, message.getAllRecipients());
             // Transport对象:
         } catch (MessagingException e) {
